@@ -1,0 +1,369 @@
+@import 'bootstrap/dist/css/bootstrap.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'summernote/dist/summernote-bs5.min.css';
+@import "tailwindcss";
+
+:root {
+  --font-body: 'Inter', sans-serif;
+  --font-heading: 'Roboto', sans-serif;
+}
+
+@media (max-width: 576px) {
+  .card-header .input-group { width: 100%; }
+}
+
+body {
+     font-family: var(--font-body); 
+     font-size: 16px; 
+     line-height: 1.5; 
+    }
+    
+h1, h2, h3 { 
+    font-family: var(--font-heading); 
+    margin-bottom: 
+    1rem; }
+
+.sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background-color: #f8f9fa;
+}
+.sidebar .nav-link {
+    color: #000;
+}
+
+.footer-custom {
+    background-color: #077A7D;
+    color: #f1f1f1;
+}
+
+/* Scrollable cards */
+.card-scroll {
+    overflow-x: auto;
+}
+.card-scroll .d-flex .card {
+    min-width: 16rem;
+}
+
+.chart-card {
+    height: 400px;         /* tinggi sama untuk kedua kartu */
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-card .card-body {
+    flex: 1;               /* isi body memenuhi kartu */
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 100%;          /* full tinggi body */
+    width: 100%;
+}
+.offcanvas .nav-link {
+    color: #000 !important;
+}
+
+.offcanvas .nav-link.active {
+    color: #000 !important;
+    background-color: #e2f5f0; /* atau warna highlight Anda */
+}
+
+.object-cover {
+    object-fit: cover;
+}
+
+.badge-aspek {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+
+/* Semua teks pagination jadi hitam */
+.page-link {
+    color: #000 !important;
+}
+
+/* Hover tetap hitam agar konsisten */
+.page-link:hover {
+    color: #000 !important;
+}
+
+/* Warna aktif halaman */
+.page-item.active .page-link {
+    background-color: #077A7D !important;
+    border-color: #077A7D !important;
+    color: #fff !important;
+}
+
+.page-link {
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Smooth transition untuk ikon */
+.sidebar .arrow {
+  transition: transform .3s ease;
+}
+
+/* Saat collapse terbuka, panah berputar 180° */
+.sidebar .collapse.show + ul .nav-link[aria-expanded="true"] .arrow,
+.sidebar .nav-link[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+}
+
+/* Transisi halus untuk panah */
+.offcanvas .arrow {
+  transition: transform 0.3s ease;
+}
+
+/* Saat collapse terbuka (class .show) atau aria-expanded="true", panah berputar 180° */
+.offcanvas .nav-link[aria-expanded="true"] .arrow {
+  transform: rotate(180deg);
+}
+
+/* animate the chevron on toggle */
+.arrow {
+  transition: transform .2s ease;
+}
+.arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.card-animate {
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.card-animate:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #198754 !important; /* hijau Bootstrap */
+}
+
+.badge-hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.card-animate:hover .badge-hover-glow {
+  box-shadow: 0 0 0.4rem rgba(255, 255, 255, 0.4);
+}
+
+.note-editable ol {
+    list-style: decimal !important; /* For ordered lists */
+    list-style-position: inside !important; /* Optional: Adjust positioning */
+}
+
+.note-editable ul {
+    list-style: disc !important; /* For unordered lists */
+    list-style-position: inside !important; /* Optional: Adjust positioning */
+}
+
+.editor-output ol {
+    list-style: decimal !important;
+    list-style-position: inside !important;
+    margin-left: 1rem;
+    padding-left: 1rem;
+}
+
+.editor-output ul {
+    list-style: disc !important;
+    list-style-position: inside !important;
+    margin-left: 1rem;
+    padding-left: 1rem;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar-collapsed {
+  width: 100px !important;
+  min-width: 100px !important;
+}
+
+/* Arrow rotation for dropdown */
+.arrow {
+  transition: transform 0.3s ease;
+}
+
+.arrow.rotated {
+  transform: rotate(180deg);
+}
+
+/* Smooth transitions for Alpine.js */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Tooltip untuk collapsed state */
+.sidebar-collapsed .nav-link {
+  justify-content: center;
+}
+
+.sidebar-collapsed .nav-link i {
+  margin-right: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+  .sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+  
+  .sidebar-collapsed {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+}
+
+/*dark mode styles */
+
+/* Paksa kelas terang ikut gelap saat data-bs-theme="dark" */
+[data-bs-theme="dark"] .bg-white { 
+  background-color: var(--bs-body-bg) !important; 
+  color: var(--bs-body-color) !important;
+}
+
+/* Header tabel yang pakai table-light -> pakai palet gelap */
+[data-bs-theme="dark"] .table-light {
+  --bs-table-bg: var(--bs-tertiary-bg);
+  --bs-table-color: var(--bs-body-color);
+  --bs-table-border-color: var(--bs-border-color);
+}
+
+/* Garis tabel & striping */
+[data-bs-theme="dark"] .table,
+[data-bs-theme="dark"] .table * {
+  border-color: var(--bs-border-color) !important;
+}
+[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+  --bs-table-accent-bg: rgba(255,255,255,.05);
+}
+
+/* Form controls yang di-wrap bg putih manual */
+[data-bs-theme="dark"] .input-group-text,
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Sidebar kustom agar ikut token Bootstrap */
+.sidebar {
+  background-color: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+/* 1) Variabel tema */
+:root {
+  --hsu-neon: #b0eace;          /* hijau neon */
+}
+[data-bs-theme="light"] {
+  --hsu-neon-text: #0B0B0B;     /* teks gelap di light */
+  --hsu-neon-text-active:  #0B0B0B; 
+}
+[data-bs-theme="dark"] {
+  --hsu-neon-text:  #ffffff;   
+  --hsu-neon-text-active:  #0B0B0B;    /* teks putih di dark */
+}
+
+/* 2) Nav-link aktif pakai variabel di atas */
+.sidebar .nav-link {
+  color: var(--hsu-neon-text) !important; 
+}
+.sidebar .nav-link.active {
+  background-color: var(--hsu-neon) !important;
+  color: var(--hsu-neon-text-active) !important;
+  border-radius: .5rem;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+/* Ikon pada link aktif ikut warna teks */
+.sidebar .nav-link.active i,
+.sidebar .nav-link.active .bi {
+  color: var(--hsu-neon-text-active) !important;
+}
+
+/* 3) (Opsional) state hover utk active */
+.sidebar .nav-link.active:hover {
+  filter: brightness(.96);
+}
+
+/* From Uiverse.io by shadowfax29 */ 
+/* The switch - the box around the slider */
+.switch {
+  font-size: 12px;
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cfcfcf;
+  transition: .4s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 20px;
+  left: 0.3em;
+  bottom: 0.3em;
+  background-color: yellow;
+  transition: .4s;
+}
+
+.switch input:checked + .slider:before {
+  background-color: rgb(83, 86, 247);
+  border-radius: 50px;
+  box-shadow: inset 9px 0px 1px 0px yellow;
+}
+
+.switch input:checked + .slider {
+  background-color:rgb(83, 86, 247);
+}
+
+.switch input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(1.5em);
+}
+
+.offcanvas .nav-link {
+  color: var(--hsu-neon-text) !important; 
+}

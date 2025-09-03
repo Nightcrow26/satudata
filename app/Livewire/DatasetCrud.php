@@ -1,0 +1,288 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use Livewire\Attributes\Url;
+use Livewire\Attributes\Title;
+use App\Models\Dataset;
+use App\Models\Skpd;
+use App\Models\Aspek;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+
+#[Title('Dataset')]
+class DatasetCrud extends Component
+{
+    use WithPagination, WithFileUploads;
+
+    #[Url(except: '')]
+    public string $search = '';
+
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;
+
+    public string $dataset_id = '';
+    public string $deleteId = '';
+    public ?Dataset $editingDataset = null;
+
+    public string $nama = '';
+    public string $status = '';
+    public $excel;
+    public $metadata;
+    public $bukti_dukung; // <— PDF bukti dukung
+    public int $tahun;
+    public string $catatan_verif = '';
+    public string $deskripsi = '';
+    public string $keyword = '';
+    public int $view = 0;
+    public ?string $instansi_id = null;
+    public ?string $aspek_id = null;
+
+    public int $perPage = 10;
+
+    public $availableSkpds = [];
+    public $availableAspeks = [];
+
+    protected array $messages = [
+        'excel.file'    => 'File Excel harus berupa file.',
+        'excel.mimes'   => 'Format Excel hanya boleh: xlsx, xls, csv.',
+        'excel.max'     => 'Ukuran file Excel maksimal 5 MB.',
+        'metadata.file' => 'File metadata harus berupa file.',
+        'metadata.mimes'=> 'Format metadata hanya boleh: xlsx, xls, csv.',
+        'metadata.max'  => 'Ukuran file metadata maksimal 5 MB.',
+        // Pesan untuk bukti_dukung
+        'bukti_dukung.file'  => 'Bukti dukung harus berupa file.',
+        'bukti_dukung.mimes' => 'Bukti dukung harus berformat PDF.',
+        'bukti_dukung.max'   => 'Ukuran file bukti dukung maksimal 10 MB.',
+    ];
+
+    protected function rules(): array
+    {
+        return [
+            'nama'         => 'required|string|min:3',
+            'status'       => 'required|string',
+            'excel'        => 'nullable|file|mimes:xlsx,xls,csv|max:5120',
+            'metadata'     => 'nullable|file|mimes:xlsx,xls,csv|max:5120',
+            'bukti_dukung' => 'nullable|file|mimes:pdf|max:10240', // <— validasi PDF
+            'tahun'        => 'required|integer',
+            'catatan_verif'=> 'nullable|string',
+            'deskripsi'    => 'nullable|string',
+            'keyword'      => 'nullable|string',
+            'view'         => 'nullable|integer|min:0',
+            'instansi_id'  => 'nullable|exists:skpd,id',
+            'aspek_id'     => 'nullable|exists:aspeks,id',
+        ];
+    }
+
+    public function mount(): void
+    {
+        if (auth()->user()->hasRole('user')) {
+            $this->availableSkpds = Skpd::orderBy('nama')
+            ->whereColumn('id', 'unor_induk_id')
+            ->where('id', auth()->user()->skpd_uuid)
+            ->get();
+        }
+        else {
+            $this->availableSkpds = Skpd::orderBy('nama')
+            ->whereColumn('id', 'unor_induk_id')
+            ->get();
+        }
+
+        $this->availableAspeks = Aspek::orderBy('nama')->get();
+    }
+
+    public function render()
+    {
+        // 1) Query dasar
+        $query = Dataset::with(['skpd', 'aspek', 'user'])
+            ->when($this->search !== '', fn($q) =>
+                $q->where('nama', 'ilike', "%{$this->search}%")
+            );
+
+        // 2) Batasi untuk role 'user' berdasarkan skpd milik user
+        if (auth()->user()->hasRole('user')) {
+            $query->where('instansi_id', auth()->user()->skpd_uuid);
+        }
+
+        // 3) Paging & sorting
+        $datasets = $query
+            ->orderBy('created_at', 'desc')
+            ->paginate($this->perPage)
+            ->onEachSide(1);
+
+        return view('livewire.dataset-crud', compact('datasets'));
+    }
+
+    private function resetInput(): void
+    {
+        $this->reset([
+            'dataset_id','nama','status','excel','tahun',
+            'metadata','bukti_dukung','catatan_verif','deskripsi','keyword',
+            'view','instansi_id','aspek_id'
+        ]);
+
+        $this->deskripsi = '';
+        $this->editingDataset = null;
+    }
+
+    public function showCreateModal(): void
+    {
+        $this->resetValidation();
+        $this->resetInput();
+
+        $this->deskripsi = '';
+        $this->showModal = true;
+        $this->dispatch('show-modal', id: 'dataset-modal');
+
+        // Kosongkan summernote di frontend
+        $this->dispatch('clear-summernote-content');
+    }
+
+    public function showEditModal(string $id): void
+    {
+        $this->resetValidation();
+        $this->resetInput();
+
+        $dataset = Dataset::findOrFail($id);
+        $this->dataset_id    = $dataset->id;
+        $this->nama          = $dataset->nama;
+        $this->status        = $dataset->status;
+        $this->tahun         = $dataset->tahun;
+        $this->catatan_verif = $dataset->catatan_verif ?? '';
+        $this->deskripsi     = $dataset->deskripsi ?? '';
+        $this->keyword       = $dataset->keyword ?? '';
+        $this->view          = $dataset->view ?? 0;
+        $this->instansi_id   = $dataset->instansi_id;
+        $this->aspek_id      = $dataset->aspek_id;
+        $this->editingDataset= $dataset;
+        // catatan: $this->bukti_dukung TIDAK di-set (file input tak bisa diprefill)
+        $this->showModal     = true;
+
+        $this->dispatch('show-modal', id: 'dataset-modal');
+        $this->dispatch('set-summernote-content', content: $this->deskripsi);
+    }
+
+    public function saveDataset(): void
+    {
+        $validated = $this->validate();
+
+        // === Upload Excel (opsional) ===
+        if ($this->excel) {
+            $filename  = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->excel->getClientOriginalName(), PATHINFO_FILENAME));
+            $extension = $this->excel->getClientOriginalExtension();
+            $fullName  = $filename . '.' . $extension;
+
+            $pathExcel = $this->excel->storeAs('datasets/excel', $fullName, 's3');
+            $validated['excel'] = $pathExcel;
+
+            if ($this->dataset_id) {
+                $old = Dataset::find($this->dataset_id)?->excel;
+                $old && Storage::disk('s3')->delete($old);
+            }
+        } else {
+            unset($validated['excel']);
+        }
+
+        // === Upload Metadata (opsional) ===
+        if ($this->metadata) {
+            $metaName = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->metadata->getClientOriginalName(), PATHINFO_FILENAME));
+            $metaExt  = $this->metadata->getClientOriginalExtension();
+            $metaFull = $metaName . '.' . $metaExt;
+
+            $pathMeta = $this->metadata->storeAs('datasets/meta', $metaFull, 's3');
+            $validated['metadata'] = $pathMeta;
+
+            if ($this->dataset_id) {
+                $oldM = Dataset::find($this->dataset_id)?->metadata;
+                $oldM && Storage::disk('s3')->delete($oldM);
+            }
+        } else {
+            unset($validated['metadata']);
+        }
+
+        // === Upload Bukti Dukung (opsional, PDF) ===
+        if ($this->bukti_dukung) {
+            $bdName = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->bukti_dukung->getClientOriginalName(), PATHINFO_FILENAME));
+            $bdExt  = $this->bukti_dukung->getClientOriginalExtension();
+            $bdFull = $bdName . '.' . $bdExt;
+
+            $pathBukti = $this->bukti_dukung->storeAs('datasets/bukti_dukung', $bdFull, 's3');
+            $validated['bukti_dukung'] = $pathBukti;
+
+            if ($this->dataset_id) {
+                $oldBukti = Dataset::find($this->dataset_id)?->bukti_dukung;
+                $oldBukti && Storage::disk('s3')->delete($oldBukti);
+            }
+        } else {
+            unset($validated['bukti_dukung']);
+        }
+
+        // === Simpan ===
+        if ($this->dataset_id) {
+            Dataset::findOrFail($this->dataset_id)->update($validated);
+        } else {
+            Dataset::create(array_merge(
+                ['id' => (string) Str::uuid(), 'user_id' => auth()->id()],
+                $validated
+            ));
+        }
+
+        $message = $this->dataset_id ? 'Dataset diperbarui!' : 'Dataset ditambahkan!';
+        $this->dispatch('swal',
+            title: $message,
+            icon: 'success',
+            toast: true,
+            position: 'bottom-end',
+            timer: 3000
+        );
+
+        $this->closeModal();
+        $this->resetPage();
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->resetInput();
+        $this->dispatch('hide-modal', id: 'dataset-modal');
+    }
+
+    public function confirmDelete(string $id): void
+    {
+        $this->deleteId = $id;
+        $this->showDeleteModal = true;
+        $this->dispatch('show-modal', id: 'delete-modal');
+    }
+
+    public function deleteDatasetConfirmed(): void
+    {
+        $dataset = Dataset::findOrFail($this->deleteId);
+
+        $dataset->excel && Storage::disk('s3')->delete($dataset->excel);
+        $dataset->metadata && Storage::disk('s3')->delete($dataset->metadata);
+        // Hapus juga bukti_dukung
+        $dataset->bukti_dukung && Storage::disk('s3')->delete($dataset->bukti_dukung);
+
+        $dataset->delete();
+
+        $this->dispatch('swal',
+            title: 'Dataset dihapus!',
+            icon: 'success',
+            toast: true,
+            position: 'bottom-end',
+            timer: 3000
+        );
+        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+        $this->resetPage();
+    }
+
+    public function cancelDelete(): void
+    {
+        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+    }
+}

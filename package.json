@@ -1,0 +1,32 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "dependencies": {
+        "@popperjs/core": "^2.11.8",
+        "@tailwindcss/vite": "^4.0.7",
+        "alpinejs": "^3.14.9",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "bootstrap": "^5.3.7",
+        "bootstrap-icons": "^1.13.1",
+        "concurrently": "^9.0.1",
+        "jquery": "^3.7.1",
+        "laravel-vite-plugin": "^1.0",
+        "summernote": "^0.9.1",
+        "tailwindcss": "^4.0.7",
+        "tom-select": "^2.4.3",
+        "vite": "^6.0"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-linux-x64-gnu": "4.9.5",
+        "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
+        "lightningcss-linux-x64-gnu": "^1.29.1"
+    },
+    "devDependencies": {
+        "trix": "^2.0.10"
+    }
+}
