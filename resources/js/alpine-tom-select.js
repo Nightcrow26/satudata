@@ -3,7 +3,6 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
     id, val: model, ts: null, multiple, ajax, placeholder,
     
     init() {
-      console.log('Initializing TomSelect for:', id); // Debug log
       
       this.$nextTick(() => {
         const el = this.$refs.sel
@@ -27,23 +26,16 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
           placeholder: this.placeholder,
           maxOptions: 2000,
           onChange: v => { 
-            console.log('TomSelect onChange for', id, ':', v);
-            
             // Convert value untuk Livewire
             const newVal = this.multiple ? (v ?? []) : (v || null);
-            
-            console.log('Setting Livewire model for', id, 'to:', newVal);
             
             // Set value ke Livewire model
             this.val = newVal;
             
             // Force Livewire sync jika perlu
-            this.$nextTick(() => {
-              console.log('After nextTick - Livewire val for', id, ':', this.val);
-              
+            this.$nextTick(() => {    
               // Trigger Livewire update secara eksplisit jika live=false
               if (this.val !== newVal) {
-                console.log('Force syncing for', id);
                 this.val = newVal;
               }
             });
@@ -63,12 +55,9 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
 
         try {
           this.ts = new TomSelect(el, cfg);
-          console.log('TomSelect initialized successfully for:', id);
-
           // Set nilai awal dari Livewire -> TomSelect
           if (this.val) {
             this.ts.setValue(this.val, true);
-            console.log('Initial value set for', id, ':', this.val);
           }
         } catch (error) {
           console.error('Error initializing TomSelect for', id, ':', error);
@@ -84,14 +73,11 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
           const curr = this.ts.getValue()
           const target = v || (this.multiple ? [] : null)
           
-          console.log('Watch triggered for', id, 'curr:', curr, 'target:', target, 'oldVal:', oldVal);
-          
           // More robust comparison
           const currStr = Array.isArray(curr) ? curr.join(',') : String(curr || '');
           const targetStr = Array.isArray(target) ? target.join(',') : String(target || '');
           
           if (currStr !== targetStr) {
-            console.log('Setting value for', id, 'from', currStr, 'to', targetStr);
             this.ts.setValue(target, true);
           }
         })
@@ -99,7 +85,6 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
         // Re-init saat modal dibuka
         window.addEventListener('show-modal', e => {
           if (e.detail?.id !== 'walidata-modal') return
-          console.log('Reinitializing due to modal show for:', id);
           setTimeout(() => {
             if (this.$refs.sel?.tomselect) {
               this.$refs.sel.tomselect.destroy();
@@ -111,10 +96,7 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
     },
     
     refreshOptions(opts) {
-      console.log('refreshOptions called for', this.id, 'with:', opts);
-      
       if (!this.ts) {
-        console.warn('TomSelect not ready for refreshOptions:', this.id);
         return;
       }
       
@@ -124,7 +106,6 @@ window.tomSelectComp = function ({ id, model, placeholder = 'Pilih…', multiple
       
       if (this.val) {
         this.ts.setValue(this.val, true)
-        console.log('Value restored after refresh for', this.id, ':', this.val);
       }
     }
   }

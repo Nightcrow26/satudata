@@ -3,7 +3,7 @@
         class="dropdown-item px-4"
         type="button"
         @click="open = false"
-        wire:click="showEditModal('{{ auth()->user()->id }}')"
+        wire:click="showProfileModal('{{ auth()->user()->id }}')"
     >
         <i class="bi bi-person-circle me-2"></i>Profile
     </button>

@@ -40,7 +40,10 @@ Contoh POSITIF:
 
 Contoh NEGATIF (larangan substitusi):
 - Q: "Tren jumlah GURU 2019-2024?"
-  SALAH jika menghasilkan ["BTS", ...] karena 'BTS' tidak muncul di pertanyaan.
+  SALAH jika menghasilkan ["BTS", "Data", ...] karena 'BTS' dan 'Data' tidak muncul di pertanyaan.
+
+- Q: "Data kemiskinan di Kabupaten HSU?"
+  SALAH jika menghasilkan ["BTS", "Data", ...] karena 'BTS' dan 'Data' tidak muncul di pertanyaan.
 SYS;
 
         // 2) Skema Structured Outputs (strict) agar hasil konsisten

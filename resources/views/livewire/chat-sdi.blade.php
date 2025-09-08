@@ -97,7 +97,7 @@
     <template x-if="streaming || pending.answer.length">
       <div class="chat-msg ai">
         <div class="chat-bubble ai">
-          <div class="role-tag">ASISTEN</div>
+          <div class="role-tag loading">ASISTEN</div>
           <div class="content" x-text="pending.answer"></div>
 
           <div class="sources" x-show="pending.sources.length">
@@ -162,6 +162,19 @@
     @media (prefers-color-scheme: dark){
       .chat-bubble.ai{background:#1f2330;color:#e8ecf7}
       .chat-body{background:#0f1320}
+    }
+
+    /* animasi titik tiga */
+    .role-tag.loading::after {
+      content: '...';
+      animation: dots 1.5s steps(3, end) infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: ''; }
+      33%  { content: '.'; }
+      66%  { content: '..'; }
+      100% { content: '...'; }
     }
   </style>
 

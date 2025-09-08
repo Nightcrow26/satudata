@@ -50,7 +50,7 @@ class Home extends Component
             ->get();
 
         $this->latestIndikator = Walidata::with(['aspek', 'skpd'])
-            ->latest('updated_at')
+            ->latest('verifikasi_data')
             ->take(4)
             ->get();
 

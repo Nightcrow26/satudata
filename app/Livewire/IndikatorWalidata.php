@@ -91,6 +91,10 @@ class IndikatorWalidata extends Component
                     $x->where('satuan', 'ilike', $term)
                       ->orWhere('tahun', 'ilike', $term)
                       ->orWhere('data',  'ilike', $term);
+                })
+                ->orWhereHas('skpd', function ($s) use ($term) {
+                    $s->where('singkatan', 'ilike', $term)
+                    ->orWhere('nama', 'ilike', $term);
                 });
             });
 
@@ -100,7 +104,7 @@ class IndikatorWalidata extends Component
         }
 
         $walidatas = $query
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('verifikasi_data', 'desc')
             ->paginate($this->perPage)
             ->onEachSide(1);
 
@@ -273,6 +277,7 @@ class IndikatorWalidata extends Component
     {
         try {
             $response = Http::withToken('d71e88f811fdf46c2d3afc5ab7a3c41b')
+                ->timeout(60)
                 ->get('https://sipd.go.id/ewalidata/serv/get_dssd_final', [
                     'kodepemda' => '6308',
                     'tahun'     => 2024,

@@ -17,6 +17,7 @@ class Userprofile extends Component
     public string $email = '';
     public string $nik = '';
     public string $role = '';
+    public string $deskripsi = '';
     public ?string $skpd_uuid = null;
 
     public array $availableRoles = [];
@@ -57,7 +58,7 @@ class Userprofile extends Component
         $this->role        = $u->getRoleNames()->first() ?? '';
     }
 
-    public function showEditModal(): void
+    public function showProfileModal(): void
     {
         $this->loadUser((string) auth()->id());
         $this->dispatch('show-modal', id: 'profile-modal');

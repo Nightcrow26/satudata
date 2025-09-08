@@ -192,14 +192,15 @@
                                     <li class="mb-1"><i class="bi bi-building me-2"></i>{{ Str::limit($item->skpd->singkatan ?? '-', 10)}}</li>
                                     <li class="mb-1"><i class="bi bi-calendar-event me-2"></i>{{ $item->created_at->format('d M Y') }}</li>
                                     <li><i class="bi bi-eye me-2"></i>{{ $item->view }}</li>
-                                    <li><a href="{{ Storage::disk('s3')->temporaryUrl($item->pdf, now()->addMinutes(15)) }}" type="button"
-                                    class="badge bg-success text-white" style="font-size:0.75rem;text-decoration: none;"
-                                    target="_blank"><i class="bi bi-download"></i> Unduh</a></li>
                                 </ul>
                             </div>
                         </div>
                         <div style="text-align:justify;">
-                            <p class="mb-2 fw-semibold" style="font-size:0.8rem;">{{ $item->nama }}</p>
+                            <p class="mb-2 fw-semibold" style="font-size:0.8rem;">{{ $item->nama }}  
+                                <a href="{{ Storage::disk('s3')->temporaryUrl($item->pdf, now()->addMinutes(15)) }}" type="button"
+                                    class="badge bg-success text-white" style="font-size:0.75rem;text-decoration: none;"
+                                    target="_blank"><i class="bi bi-download"></i></a>
+                            </p>
                             <p class="card-text small text-muted mb-0" style="flex-grow:1; font-size:0.8rem;">
                                 {{ Str::limit(strip_tags(Str::of($item->deskripsi)->before('</p>')->before("\n")), 80, '...') }}
                             </p>

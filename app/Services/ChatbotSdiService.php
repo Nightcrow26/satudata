@@ -171,7 +171,7 @@ class ChatbotSdiService
             return ['answer'=>'Tidak ada dataset yang cocok.','insights'=>[],'viz'=>[],'data_preview'=>[],'sources'=>[]];
         }
 
-        $emit('delta', ['text' => "\n🧩 Menyiapkan JSON ringkas…"]);
+        $emit('delta', ['text' => "\n🧩 Menyiapkan Jawaban…"]);
 
         $parts = [];    // potongan JSON per dataset
         $sources = [];
@@ -224,9 +224,10 @@ class ChatbotSdiService
 
         // Prompt naratif + instruksi terstruktur
         $prompt = <<<PROMPT
-        Anda menerima beberapa potongan JSON berisi cuplikan dataset. Tugas Anda:
-        1) Ringkas temuan utama (insights) yang relevan dengan pertanyaan.
-        2) Rekomendasikan 1–2 visualisasi yang tepat (struktur objek "viz" seperti contoh).
+        Anda menerima beberapa potongan JSON berisi cuplikan dataset. Tugas Anda memberikan pengguna jawaban komprehensif berdasarkan data tersebut,  
+        berikan jawaban yang berkaitan dengan pertanyaan sesuai langkah berikut:
+        1) berikan temuan utama (insights) sepanjang 1-2 paragraf yang relevan dengan pertanyaan.
+        2) Rekomendasikan visualisasi yang tepat (struktur objek "viz" seperti contoh).
         3) Sertakan "data_preview" dari cuplikan yang paling relevan (maks 40 baris total).
         4) Tautkan "sources" ke asal dataset yang dilampirkan.
         5) Jawab jelas, gunakan angka yang ada; jika perlu agregasi sederhana (sum/mean), jelaskan singkat.
