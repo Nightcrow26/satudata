@@ -39,7 +39,8 @@
     <li class="nav-item">
       <x-nav-link :active="request()->routeIs('dashboard')"
                   href="{{ route('dashboard') }}"
-                  class="d-flex align-items-center mb-2">
+                  class="d-flex align-items-center mb-2"
+                  data-bs-toggle="tooltip" title="Dashboard">
         <i class="bi bi-house-door me-2"></i>
         <span x-show="!collapsed" x-transition>Dashboard</span>
       </x-nav-link>
@@ -48,7 +49,8 @@
     <li class="nav-item">
       <x-nav-link :active="request()->routeIs('dataset.index','dataset.*')"
                   href="{{ route('dataset.index') }}"
-                  class="d-flex align-items-center mb-2">
+                  class="d-flex align-items-center mb-2"
+                  data-bs-toggle="tooltip" title="Dataset">
         <i class="bi bi-folder me-2"></i>
         <span x-show="!collapsed" x-transition>Dataset</span>
       </x-nav-link>
@@ -58,7 +60,8 @@
     <li class="nav-item">
       <x-nav-link :active="request()->routeIs('publikasi.index','publikasi.*')"
                   href="{{ route('publikasi.index') }}"
-                  class="d-flex align-items-center mb-2">
+                  class="d-flex align-items-center mb-2"
+                  data-bs-toggle="tooltip" title="Publikasi">
         <i class="bi bi-book me-2"></i>
         <span x-show="!collapsed" x-transition>Publikasi</span>
       </x-nav-link>
@@ -68,7 +71,8 @@
     <li class="nav-item">
       <x-nav-link :active="request()->routeIs('walidata.index','walidata.*')"
                   href="{{ route('walidata.index') }}"
-                  class="d-flex align-items-center mb-2">
+                  class="d-flex align-items-center mb-2"
+                  data-bs-toggle="tooltip" title="Indikator Walidata">
         <i class="bi bi-journal-check me-2"></i>
         <span x-show="!collapsed" x-transition>Indikator Walidata</span>
       </x-nav-link>
@@ -78,7 +82,8 @@
     <li class="nav-item">
       <x-nav-link :active="request()->routeIs('skpd.index','skpd.*')"
                   href="{{ route('skpd.index') }}"
-                  class="d-flex align-items-center mb-2">
+                  class="d-flex align-items-center mb-2"
+                  data-bs-toggle="tooltip" title="SKPD">
         <i class="bi bi-building me-2"></i>
         <span x-show="!collapsed" x-transition>SKPD</span>
       </x-nav-link>
@@ -89,7 +94,8 @@
       <li class="nav-item">
         <x-nav-link :active="request()->routeIs('users.index','users.*')"
                     href="{{ route('users.index') }}"
-                    class="d-flex align-items-center mb-2">
+                    class="d-flex align-items-center mb-2"
+                    data-bs-toggle="tooltip" title="Users">
           <i class="bi bi-people me-2"></i>
           <span x-show="!collapsed" x-transition>Users</span>
         </x-nav-link>
@@ -113,7 +119,8 @@
              }
            "
            class="nav-link d-flex align-items-center mb-2"
-           :class="{ 'justify-content-center': collapsed, 'justify-content-between': !collapsed }">
+           :class="{ 'justify-content-center': collapsed, 'justify-content-between': !collapsed }"
+            data-bs-toggle="tooltip" title="Master Data">
           <span class="d-flex align-items-center">
             <i class="bi bi-building-gear me-2" :class="{ 'me-0': collapsed }"></i>
             <span x-show="!collapsed" x-transition>Master Data</span>

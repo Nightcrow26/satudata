@@ -116,18 +116,6 @@ class DatasetCrud extends Component
         return view('livewire.dataset-crud', compact('datasets'));
     }
 
-    private function resetInput(): void
-    {
-        $this->reset([
-            'dataset_id','nama','status','excel','tahun',
-            'metadata','bukti_dukung','catatan_verif','deskripsi','keyword',
-            'view','instansi_id','aspek_id'
-        ]);
-
-        $this->deskripsi = '';
-        $this->editingDataset = null;
-    }
-
     public function showCreateModal(): void
     {
         $this->resetValidation();
@@ -158,16 +146,49 @@ class DatasetCrud extends Component
         $this->instansi_id   = $dataset->instansi_id;
         $this->aspek_id      = $dataset->aspek_id;
         $this->editingDataset= $dataset;
-        // catatan: $this->bukti_dukung TIDAK di-set (file input tak bisa diprefill)
+        
         $this->showModal     = true;
 
+        // Dispatch events dengan delay untuk memastikan modal terbuka dulu
         $this->dispatch('show-modal', id: 'dataset-modal');
-        $this->dispatch('set-summernote-content', content: $this->deskripsi);
+        
+        // Delay untuk set content setelah modal terbuka dan summernote ter-initialize
+        $this->js("
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('set-summernote-content', {
+                    detail: { content: '" . addslashes($this->deskripsi) . "' }
+                }));
+            }, 500);
+        ");
     }
 
     public function saveDataset(): void
     {
+        // Ambil content dari hidden input sebelum validasi
+        $this->js("
+            const hiddenInput = document.getElementById('dataset-deskripsi-editor-hidden');
+            if (hiddenInput) {
+                window.Livewire.find('" . $this->getId() . "').set('deskripsi', hiddenInput.value);
+            }
+        ");
+        
+        // Delay sedikit untuk memastikan set deskripsi selesai
+        $this->js("
+            setTimeout(() => {
+                window.Livewire.find('" . $this->getId() . "').call('processSaveDataset');
+            }, 100);
+        ");
+    }
+
+    public function processSaveDataset(): void
+    {
         $validated = $this->validate();
+
+        // Debug log untuk melihat nilai deskripsi
+        \Log::info('Saving dataset', [
+            'deskripsi_property' => $this->deskripsi,
+            'validated_deskripsi' => $validated['deskripsi'] ?? 'NOT_SET'
+        ]);
 
         // === Upload Excel (opsional) ===
         if ($this->excel) {
@@ -220,14 +241,32 @@ class DatasetCrud extends Component
             unset($validated['bukti_dukung']);
         }
 
+        // Pastikan deskripsi tidak kosong jika ada content
+        if (empty($validated['deskripsi']) && !empty($this->deskripsi)) {
+            $validated['deskripsi'] = $this->deskripsi;
+        }
+
         // === Simpan ===
         if ($this->dataset_id) {
-            Dataset::findOrFail($this->dataset_id)->update($validated);
+            $dataset = Dataset::findOrFail($this->dataset_id);
+            $dataset->update($validated);
+            
+            // Verifikasi data tersimpan
+            $dataset->refresh();
+            \Log::info('Dataset updated', [
+                'id' => $dataset->id,
+                'deskripsi_saved' => $dataset->deskripsi
+            ]);
         } else {
-            Dataset::create(array_merge(
+            $dataset = Dataset::create(array_merge(
                 ['id' => (string) Str::uuid(), 'user_id' => auth()->id()],
                 $validated
             ));
+            
+            \Log::info('Dataset created', [
+                'id' => $dataset->id,
+                'deskripsi_saved' => $dataset->deskripsi
+            ]);
         }
 
         $message = $this->dataset_id ? 'Dataset diperbarui!' : 'Dataset ditambahkan!';
@@ -241,6 +280,24 @@ class DatasetCrud extends Component
 
         $this->closeModal();
         $this->resetPage();
+    }
+
+    // Method baru untuk mengupdate deskripsi dari JavaScript
+    public function updateDeskripsi($content): void
+    {
+        $this->deskripsi = $content;
+    }
+
+    private function resetInput(): void
+    {
+        $this->reset([
+            'dataset_id','nama','status','excel','tahun',
+            'metadata','bukti_dukung','catatan_verif','deskripsi','keyword',
+            'view','instansi_id','aspek_id'
+        ]);
+
+        $this->deskripsi = '';
+        $this->editingDataset = null;
     }
 
     public function closeModal(): void

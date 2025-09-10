@@ -50,7 +50,6 @@ class PublikasiCrud extends Component
         'foto.max'   => 'Ukuran gambar maksimal 2 MB.',
     ];
 
-
     protected function rules(): array
     {
         return [
@@ -60,7 +59,7 @@ class PublikasiCrud extends Component
             'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'tahun'          => 'required|digits:4|integer',
             'catatan_verif'  => 'nullable|string',
-            'deskripsi'      => 'nullable|string',
+            'deskripsi'      => 'nullable|string|max:65535',
             'keyword'        => 'nullable|string|max:255',
             'instansi_id'    => 'nullable|exists:skpd,id',
             'aspek_id'       => 'nullable|exists:aspeks,id',
@@ -69,9 +68,18 @@ class PublikasiCrud extends Component
 
     public function mount(): void
     {
-        $this->availableSkpds = Skpd::orderBy('nama')
-                                     ->whereColumn('id', 'unor_induk_id')
-                                     ->get();
+        // Role-based SKPD loading
+        if (auth()->user()->hasRole('user')) {
+            $this->availableSkpds = Skpd::orderBy('nama')
+                ->whereColumn('id', 'unor_induk_id')
+                ->where('id', auth()->user()->skpd_uuid)
+                ->get();
+        } else {
+            $this->availableSkpds = Skpd::orderBy('nama')
+                ->whereColumn('id', 'unor_induk_id')
+                ->get();
+        }
+
         $this->availableAspeks = Aspek::orderBy('nama')->get();
     }
 
@@ -87,18 +95,16 @@ class PublikasiCrud extends Component
 
     public function render()
     {
-        // 1. Bangun query dasar dengan eager loading dan pencarian
         $query = Publikasi::with(['skpd', 'aspek', 'user'])
             ->when($this->search !== '', fn($q) =>
                 $q->where('nama', 'ilike', "%{$this->search}%")
             );
 
-        // 2. Jika role user biasa, batasi berdasarkan skpd_uuid milik user
+        // Role-based filtering
         if (auth()->user()->hasRole('user')) {
             $query->where('instansi_id', auth()->user()->skpd_uuid);
         }
 
-        // 3. Paging dan sorting
         $publikasis = $query
             ->orderBy('created_at', 'desc')
             ->paginate($this->perPage)
@@ -114,7 +120,6 @@ class PublikasiCrud extends Component
             'tahun','catatan_verif','deskripsi','keyword',
             'instansi_id','aspek_id'
         ]);
-        // Pastikan deskripsi benar-benar empty string
         $this->deskripsi = '';
         $this->editingPublikasi = null;
     }
@@ -124,13 +129,11 @@ class PublikasiCrud extends Component
         $this->resetValidation();
         $this->resetInput();
         
-        // Pastikan deskripsi benar-benar kosong
         $this->deskripsi = '';
-        
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'publikasi-modal');
         
-        // Dispatch event untuk clear summernote content
+        // Kosongkan summernote di frontend
         $this->dispatch('clear-summernote-content');
     }
 
@@ -153,11 +156,47 @@ class PublikasiCrud extends Component
 
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'publikasi-modal');
+        
+        // Delay untuk set content setelah modal terbuka dan summernote ter-initialize
+        $this->js("
+            setTimeout(() => {
+                window.dispatchEvent(new CustomEvent('set-summernote-content', {
+                    detail: { 
+                        content: '" . addslashes($this->deskripsi) . "',
+                        target: 'publikasi'
+                    }
+                }));
+            }, 500);
+        ");
     }
 
     public function savePublikasi(): void
     {
+        // Ambil content dari hidden input sebelum validasi
+        $this->js("
+            const hiddenInput = document.getElementById('publikasi-deskripsi-editor-hidden');
+            if (hiddenInput) {
+                window.Livewire.find('" . $this->getId() . "').set('deskripsi', hiddenInput.value);
+            }
+        ");
+        
+        // Delay sedikit untuk memastikan set deskripsi selesai
+        $this->js("
+            setTimeout(() => {
+                window.Livewire.find('" . $this->getId() . "').call('processSavePublikasi');
+            }, 100);
+        ");
+    }
+
+    public function processSavePublikasi(): void
+    {
         $validated = $this->validate();
+
+        // Debug log untuk melihat nilai deskripsi
+        \Log::info('Saving publikasi', [
+            'deskripsi_property' => $this->deskripsi,
+            'validated_deskripsi' => $validated['deskripsi'] ?? 'NOT_SET'
+        ]);
 
         // Handle Foto
         if ($this->foto) {
@@ -191,22 +230,53 @@ class PublikasiCrud extends Component
             unset($validated['pdf']);
         }
 
-        $validated['user_id'] = auth()->id();
-        if (!$this->publikasi_id) {
-            $validated['id'] = (string) Str::uuid();
+        // Pastikan deskripsi tidak kosong jika ada content
+        if (empty($validated['deskripsi']) && !empty($this->deskripsi)) {
+            $validated['deskripsi'] = $this->deskripsi;
         }
 
+        $validated['user_id'] = auth()->id();
+
         if ($this->publikasi_id) {
-            Publikasi::findOrFail($this->publikasi_id)->update($validated);
+            $publikasi = Publikasi::findOrFail($this->publikasi_id);
+            $publikasi->update($validated);
+            
+            // Verifikasi data tersimpan
+            $publikasi->refresh();
+            \Log::info('Publikasi updated', [
+                'id' => $publikasi->id,
+                'deskripsi_saved' => $publikasi->deskripsi
+            ]);
+            
             $msg = 'Publikasi diperbarui!';
         } else {
-            Publikasi::create($validated);
+            $validated['id'] = (string) Str::uuid();
+            $publikasi = Publikasi::create($validated);
+            
+            \Log::info('Publikasi created', [
+                'id' => $publikasi->id,
+                'deskripsi_saved' => $publikasi->deskripsi
+            ]);
+            
             $msg = 'Publikasi dibuat!';
         }
 
         $this->dispatch('swal', title: $msg, icon: 'success', toast: true, position: 'bottom-end', timer: 3000);
-        $this->dispatch('hide-modal', id: 'publikasi-modal');
+        $this->closeModal();
         $this->resetPage();
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->resetInput();
+        $this->dispatch('hide-modal', id: 'publikasi-modal');
+    }
+
+    // Method baru untuk mengupdate deskripsi dari JavaScript
+    public function updateDeskripsi($content): void
+    {
+        $this->deskripsi = $content;
     }
 
     public function confirmDelete(string $id): void

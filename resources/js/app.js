@@ -43,102 +43,94 @@ import './alpine-tom-select'
 window.TomSelect = TomSelect; // agar tersedia di inline Alpine
 
 
-function initSummernoteGlobal() {
-  $('.summernote').each(function() {
-    // Destroy jika sudah ada
-    if ($(this).next('.note-editor').length) {
-      $(this).summernote('destroy');
+// Fungsi untuk inisialisasi Summernote yang lebih clean
+function initSummernote(selector = '.summernote') {
+  $(selector).each(function() {
+    const $editor = $(this);
+    const editorId = $editor.attr('id');
+    const $hiddenInput = $('#' + editorId + '-hidden');
+    
+    // Destroy existing instance
+    if ($editor.next('.note-editor').length) {
+      $editor.summernote('destroy');
     }
-    // Init baru
-    $(this).summernote({
+    
+    // Initialize Summernote
+    $editor.summernote({
       height: 200,
-      toolbar: [ /* toolbar Anda */ ],
+      toolbar: [
+        ['style', ['style']],
+        ['font', ['bold','italic','underline','clear']],
+        ['fontname', ['fontname']],
+        ['color', ['color']],
+        ['para', ['ul','ol','paragraph']],
+        ['table', ['table']],
+        ['insert', ['link','picture','video']],
+        ['view', ['fullscreen','codeview','help']]
+      ],
       callbacks: {
-        onChange(contents) {
-          // Update field hidden & Livewire property
-          $('#'+$(this).attr('id')+'-hidden').val(contents);
-          window.Livewire.find(
-            document.querySelector('[wire\\:id]').getAttribute('wire:id')
-          ).set('deskripsi', contents);
+        onChange: function(contents, $editable) {
+          // Update hidden input immediately
+          $hiddenInput.val(contents);
+          
+          // Debounce untuk Livewire update
+          clearTimeout(this.livewireUpdateTimeout);
+          this.livewireUpdateTimeout = setTimeout(() => {
+            try {
+              const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+              const livewireComponent = window.Livewire?.find(wireId);
+              
+              if (livewireComponent) {
+                // Tentukan property berdasarkan ID editor
+                let propertyName = 'deskripsi'; // default
+                
+                if (editorId.includes('publikasi-deskripsi')) {
+                  propertyName = 'deskripsi';
+                } else if (editorId.includes('dataset-deskripsi')) {
+                  propertyName = 'deskripsi';
+                } else if (editorId.includes('publikasi-konten')) {
+                  propertyName = 'konten';
+                }
+                
+                // Update Livewire property
+                livewireComponent.set(propertyName, contents);
+              }
+            } catch (error) {
+              console.error('Error updating Livewire property:', error);
+            }
+          }, 300); // Debounce 300ms
         }
       }
     });
+    
+    // Set initial content dari hidden input
+    const initialContent = $hiddenInput.val() || '';
+    if (initialContent) {
+      $editor.summernote('code', initialContent);
+    }
   });
 }
 
 // Panggil saat load & setelah Livewire update
-document.addEventListener('livewire:load', initSummernoteGlobal);
-Livewire.hook('message.processed', initSummernoteGlobal);
+document.addEventListener('livewire:load', initSummernote);
+Livewire.hook('message.processed', initSummernote);
 
-function handleSummernoteOnModal() {
+// Event listeners untuk modal
+function handleModalSummernote() {
   window.addEventListener('show-modal', (event) => {
-    // Proses untuk modal dataset dan publikasi
-    if (event.detail.id === 'dataset-modal' || event.detail.id === 'publikasi-modal') {
+    const modalIds = ['dataset-modal', 'publikasi-modal'];
+    if (modalIds.includes(event.detail.id)) {
+      // Delay untuk memastikan modal sudah terbuka penuh
       setTimeout(() => {
-        // Hancurkan instance lama, lalu inisialisasi ulang semua .summernote
-        $('.summernote').each(function() {
-          if ($(this).next('.note-editor').length) {
-            $(this).summernote('destroy');
-          }
-          
-          // Inisialisasi Summernote
-          $(this).summernote({
-            height: 200,
-            toolbar: [
-              ['style', ['style']],
-              ['font', ['bold','italic','underline','clear']],
-              ['fontname', ['fontname']],
-              ['color', ['color']],
-              ['para', ['ul','ol','paragraph']],
-              ['table', ['table']],
-              ['insert', ['link','picture','video']],
-              ['view', ['fullscreen','codeview','help']]
-            ],
-            callbacks: {
-              onChange: function(contents) {
-                // Update hidden input
-                const hiddenInput = $('#' + $(this).attr('id') + '-hidden');
-                if (hiddenInput.length) {
-                  hiddenInput.val(contents);
-                }
-                
-                // Sinkron ke Livewire - tentukan property berdasarkan ID
-                const wireId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
-                if (wireId && window.Livewire) {
-                  try {
-                    const editorId = $(this).attr('id');
-                    let propertyName = 'deskripsi'; // default
-                    
-                    if (editorId.includes('publikasi-konten')) {
-                      propertyName = 'konten';
-                    } else if (editorId.includes('dataset-deskripsi')) {
-                      propertyName = 'deskripsi';
-                    }
-                    
-                    window.Livewire.find(wireId).set(propertyName, contents);
-                  } catch (e) {
-                    console.error('Error updating Livewire property:', e);
-                  }
-                }
-              }
-            }
-          });
-          
-          // Set nilai dari hidden input setelah inisialisasi
-          // Delay sedikit untuk memastikan hidden input sudah ter-update dari Livewire
-          setTimeout(() => {
-            const hiddenInput = $('#' + $(this).attr('id') + '-hidden');
-            const content = hiddenInput.val() || '';
-            $(this).summernote('code', content);
-          }, 100);
-        });
-      }, 200);
+        initSummernote('.summernote');
+      }, 300);
     }
   });
 
   window.addEventListener('hide-modal', (event) => {
-    // Hancurkan semua instance saat modal ditutup
-    if (event.detail.id === 'dataset-modal' || event.detail.id === 'publikasi-modal') {
+    const modalIds = ['dataset-modal', 'publikasi-modal'];
+    if (modalIds.includes(event.detail.id)) {
+      // Destroy summernote saat modal ditutup
       $('.summernote').each(function() {
         if ($(this).next('.note-editor').length) {
           $(this).summernote('destroy');
@@ -147,6 +139,34 @@ function handleSummernoteOnModal() {
     }
   });
 }
+
+// Livewire event listeners
+document.addEventListener('livewire:init', () => {
+  // Clear content
+  Livewire.on('clear-summernote-content', () => {
+    $('.summernote').each(function() {
+      const $editor = $(this);
+      const editorId = $editor.attr('id');
+      const $hiddenInput = $('#' + editorId + '-hidden');
+      
+      $editor.summernote('code', '');
+      $hiddenInput.val('');
+    });
+  });
+  
+  // Set content
+  Livewire.on('set-summernote-content', (event) => {
+    const content = event.content || '';
+    $('.summernote').each(function() {
+      const $editor = $(this);
+      const editorId = $editor.attr('id');
+      const $hiddenInput = $('#' + editorId + '-hidden');
+      
+      $editor.summernote('code', content);
+      $hiddenInput.val(content);
+    });
+  });
+});
 
 // Tambahkan event listener untuk Livewire updated
 document.addEventListener('livewire:updated', () => {
@@ -294,13 +314,13 @@ function registerModalListeners() {
 document.addEventListener('DOMContentLoaded', () => {
   initCharts();
   registerModalListeners(); 
-  handleSummernoteOnModal();
+  handleModalSummernote();
 });
 
 document.addEventListener('livewire:navigated', () => {
   initCharts();
   registerModalListeners();
-  handleSummernoteOnModal();
+  handleModalSummernote();
 });
 
 // Modifikasi event listener swal untuk tidak menutup modal jika ada flag keepModalOpen
@@ -321,7 +341,7 @@ window.addEventListener('swal', e => {
         timer: e.detail.timer ?? 3000,
         timerProgressBar: true,
         showConfirmButton: false,
-        heightAuto: false,
+        //heightAuto: false,
     });
 });
 
