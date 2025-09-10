@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -113,7 +113,7 @@ class SkpdCrud extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.skpd.index', compact('skpds'));
+        return view('livewire.admin.skpd.index', compact('skpds'));
     }
 
     private function resetInput(): void

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -113,7 +113,7 @@ class DatasetCrud extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.dataset-crud', compact('datasets'));
+        return view('livewire.admin.dataset-crud', compact('datasets'));
     }
 
     public function showCreateModal(): void

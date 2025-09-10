@@ -54,41 +54,41 @@
   <div class="offcanvas-body p-0">
     <nav class="nav flex-column p-3">
       <!-- Dashboard -->
-      <x-nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}">
+      <x-admin.nav-link :active="request()->routeIs('dashboard')" href="{{ route('dashboard') }}">
         <i class="bi bi-house-door me-2"></i>Dashboard
-      </x-nav-link>
+      </x-admin.nav-link>
 
-      <x-nav-link :active="request()->routeIs('dataset.index','dataset.*')"
+      <x-admin.nav-link :active="request()->routeIs('dataset.index','dataset.*')"
                   href="{{ route('dataset.index') }}">
         <i class="bi bi-folder me-2"></i>Dataset
-      </x-nav-link>
-     
+      </x-admin.nav-link>
+
       <!-- Publikasi -->
-      <x-nav-link :active="request()->routeIs('publikasi.index','publikasi.*')"
+      <x-admin.nav-link :active="request()->routeIs('publikasi.index','publikasi.*')"
                   href="{{ route('publikasi.index') }}"
                   class="mt-2">
         <i class="bi bi-book me-2"></i>Publikasi
-      </x-nav-link>
+      </x-admin.nav-link>
 
-      <x-nav-link :active="request()->routeIs('walidata.index','walidata.*')"
+      <x-admin.nav-link :active="request()->routeIs('walidata.index','walidata.*')"
                   href="{{ route('walidata.index') }}"
                   class="mt-2">
         <i class="bi bi-journal-check me-2"></i>Indikator Walidata
-      </x-nav-link>
+      </x-admin.nav-link>
 
       @if (auth()->user()->hasRole('admin'))
         <!-- Admin Only Section -->
-        <x-nav-link :active="request()->routeIs('skpd.index','skpd.*')"
+        <x-admin.nav-link :active="request()->routeIs('skpd.index','skpd.*')"
                     href="{{ route('skpd.index') }}"
                     class="mt-2">
           <i class="bi bi-building me-2"></i>SKPD
-        </x-nav-link>
+        </x-admin.nav-link>
 
-        <x-nav-link :active="request()->routeIs('users.index','users.*')"
+        <x-admin.nav-link :active="request()->routeIs('users.index','users.*')"
                     href="{{ route('users.index') }}"
                     class="mt-2">
           <i class="bi bi-people me-2"></i>Users
-        </x-nav-link>
+        </x-admin.nav-link>
 
         {{-- Master Data Dropdown --}}
         @php
@@ -110,25 +110,25 @@
               x-cloak
               style="display: none;">
             <li class="nav-item">
-              <x-nav-link :active="request()->routeIs('bidang')"
+              <x-admin.nav-link :active="request()->routeIs('bidang')"
                           href="{{ route('bidang') }}"
                           class="mb-1">
                 Bidang
-              </x-nav-link>
+              </x-admin.nav-link>
             </li>
             <li class="nav-item">
-              <x-nav-link :active="request()->routeIs('indikator')"
+              <x-admin.nav-link :active="request()->routeIs('indikator')"
                           href="{{ route('indikator') }}"
                           class="mb-1">
                 Indikator
-              </x-nav-link>
+              </x-admin.nav-link>
             </li>
             <li class="nav-item">
-              <x-nav-link :active="request()->routeIs('aspek')"
+              <x-admin.nav-link :active="request()->routeIs('aspek')"
                           href="{{ route('aspek') }}"
                           class="mb-1">
                 Aspek
-              </x-nav-link>
+              </x-admin.nav-link>
             </li>
             {{-- Switch Tema --}}
           </ul>

@@ -81,7 +81,7 @@
       </div>
 
       <div class="mt-3">
-        <x-pagination :items="$aspeks" />
+        <x-admin.pagination :items="$aspeks" />
       </div>
     </div>
   </div>

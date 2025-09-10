@@ -96,7 +96,7 @@
       </div>
 
       <div class="mt-3">
-        <x-pagination :items="$users" />
+        <x-admin.pagination :items="$users" />
       </div>
     </div>
   </div>

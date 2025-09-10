@@ -55,6 +55,7 @@
 
     <main>
               {{ $slot}}
+              <x-admin.chat-fab/> 
     </main>
 
     @livewireScripts

@@ -114,7 +114,7 @@
             </div>
 
             <div class="p-3">
-                <x-pagination :items="$walidatas" />
+                <x-admin.pagination :items="$walidatas" />
             </div>
         </div>
     </div>

@@ -152,7 +152,7 @@
             </div>
 
             <div class="p-3">
-                <x-pagination :items="$datasets" />
+                <x-admin.pagination :items="$datasets" />
             </div>
         </div>
     </div>

@@ -251,8 +251,6 @@
         </section>
         {{-- contoh: resources/views/user/home.blade.php --}}
         {{-- ... konten halaman Anda ... --}}
-
-        <x-chat-fab/> 
         @stack('scripts')
 
     </main>

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Users;
+namespace App\Livewire\Admin\Users;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -92,7 +92,7 @@ class Index extends Component
                 ->paginate($this->perPage)
                 ->onEachSide(1);
 
-        return view('livewire.users.index', compact('users'));
+        return view('livewire.admin.users.index', compact('users'));
     }
 
     private function resetInput(): void

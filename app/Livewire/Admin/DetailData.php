@@ -1,5 +1,5 @@
 <?php
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -318,7 +318,7 @@ class DetailData extends Component
         $chartPaginatedData = $this->getChartPaginatedTableData();
         $mapPaginatedData = $this->getMapPaginatedTableData();
         
-        return view('livewire.detail-data', [
+        return view('livewire.admin.detail-data', [
             'tableData' => $paginatedData->items(),
             'datasets' => $paginatedData, // Untuk pagination tabel
             'chartDatasets' => $chartPaginatedData, // Untuk pagination chart

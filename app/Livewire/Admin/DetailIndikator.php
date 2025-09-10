@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use App\Models\Walidata;
 use Livewire\Component;
@@ -179,7 +179,7 @@ class DetailIndikator extends Component
         $paginatedData = $this->getPaginatedTableData();
         $chartPaginatedData = $this->getChartPaginatedTableData();
 
-        return view('livewire.detail-indikator', [
+        return view('livewire.admin.detail-indikator', [
             'tableData' => $paginatedData->items(),
             'datasets' => $paginatedData,
             'chartDatasets' => $chartPaginatedData,

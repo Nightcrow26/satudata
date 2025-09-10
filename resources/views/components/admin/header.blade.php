@@ -34,7 +34,7 @@
       style="display: none;"
       role="menu"
     >
-      <livewire:userprofile />
+      <livewire:admin.userprofile />
       <form id="logout-form" action="{{ route('logout') }}" method="POST" class="m-0 p-2">
         @csrf
         <button class="dropdown-item text-danger" type="submit">

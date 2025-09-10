@@ -1,65 +1,65 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
-use App\Models\Indikator;
-use App\Models\Bidang;
-use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Models\Bidang;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
- 
-#[title('Indikator')]
-class IndikatorCrud extends Component
+
+#[Title('Bidang')]
+class BidangCrud extends Component
 {
     use WithPagination;
 
-    #[\Livewire\Attributes\Url(except: '')]
+    // URL search & pagination
+    #[Url(except: '')]
     public string $search = '';
     public int $perPage = 10;
 
+    // Modal state
     public bool $showModal = false;
     public bool $showDeleteModal = false;
 
-    public string $indikator_id = '';
-    public string $kode_indikator = '';
-    public string $uraian_indikator = '';
+    // Data field
     public string $bidang_id = '';
+    public string $kode_bidang = '';
+    public string $uraian_bidang = '';
 
     public string $deleteId = '';
-
-    public function updatedPerPage() { $this->resetPage(); }
 
     protected function rules(): array
     {
         return [
-            'kode_indikator' => 'required|string',
-            'uraian_indikator' => 'required|string',
-            'bidang_id' => 'required|uuid|exists:bidangs,id',
+            'kode_bidang' => 'required|string',
+            'uraian_bidang' => 'required|string',
         ];
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function render()
     {
-        $indikators = Indikator::query()
+        $bidangs = Bidang::query()
             ->when($this->search !== '', fn($q) =>
-                $q->where('kode_indikator', 'ilike', "%{$this->search}%")
-                  ->orWhere('uraian_indikator', 'ilike', "%{$this->search}%")
+                $q->where('kode_bidang', 'like', "%{$this->search}%")
+                  ->orWhere('uraian_bidang', 'ilike', "%{$this->search}%")
             )
-            ->orderBy('kode_indikator')
-            ->with('bidang')
+            ->orderBy('kode_bidang')
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        $bidangs = Bidang::orderBy('kode_bidang')->get();
-
-        return view('livewire.indikator', compact('indikators', 'bidangs'));
+        return view('livewire.admin.bidang', compact('bidangs'));
     }
 
     private function resetInput(): void
     {
-        $this->reset(['indikator_id', 'kode_indikator', 'uraian_indikator', 'bidang_id']);
+        $this->reset(['bidang_id', 'kode_bidang', 'uraian_bidang']);
     }
 
     public function showCreateModal(): void
@@ -68,7 +68,7 @@ class IndikatorCrud extends Component
         $this->resetInput();
         $this->showModal = true;
 
-        $this->dispatch('show-modal', id: 'indikator-modal');
+        $this->dispatch('show-modal', id: 'bidang-modal');
     }
 
     public function showEditModal(string $id): void
@@ -76,30 +76,32 @@ class IndikatorCrud extends Component
         $this->resetValidation();
         $this->resetInput();
 
-        $indikator = Indikator::findOrFail($id);
-        $this->indikator_id = $indikator->id;
-        $this->kode_indikator = $indikator->kode_indikator;
-        $this->uraian_indikator = $indikator->uraian_indikator;
-        $this->bidang_id = $indikator->bidang_id;
+        $bidang = Bidang::findOrFail($id);
+        $this->bidang_id = $bidang->id;
+        $this->kode_bidang = $bidang->kode_bidang;
+        $this->uraian_bidang = $bidang->uraian_bidang;
 
         $this->showModal = true;
-        $this->dispatch('show-modal', id: 'indikator-modal');
+        $this->dispatch('show-modal', id: 'bidang-modal');
     }
 
-    public function saveIndikator(): void
+    public function saveBidang(): void
     {
         $validated = $this->validate();
 
-        if ($this->indikator_id) {
-            Indikator::findOrFail($this->indikator_id)->update($validated);
+        if ($this->bidang_id) {
+            Bidang::findOrFail($this->bidang_id)->update($validated);
         } else {
-            Indikator::create(array_merge(['id' => (string) Str::uuid()], $validated));
+            Bidang::create(array_merge(
+                ['id' => (string) Str::uuid()],
+                $validated
+            ));
         }
 
         $this->dispatch('swal',
-            title: $this->indikator_id
-                ? 'Indikator berhasil diperbarui!'
-                : 'Indikator berhasil dibuat!',
+            title: $this->bidang_id
+                ? 'Bidang berhasil diperbarui!'
+                : 'Bidang berhasil dibuat!',
             icon: 'success',
             toast: true,
             position: 'bottom-end',
@@ -113,7 +115,7 @@ class IndikatorCrud extends Component
     public function closeModal(): void
     {
         $this->showModal = false;
-        $this->dispatch('hide-modal', id: 'indikator-modal');
+        $this->dispatch('hide-modal', id: 'aspek-modal');
         $this->resetInput();
     }
 
@@ -124,12 +126,12 @@ class IndikatorCrud extends Component
         $this->dispatch('show-modal', id: 'delete-modal');
     }
 
-    public function deleteIndikatorConfirmed(): void
+    public function deleteBidangConfirmed(): void
     {
-        Indikator::findOrFail($this->deleteId)->delete();
+        Bidang::findOrFail($this->deleteId)->delete();
 
         $this->dispatch('swal',
-            title: 'Indikator berhasil dihapus!',
+            title: 'Bidang berhasil dihapus!',
             icon: 'success',
             toast: true,
             position: 'bottom-end',

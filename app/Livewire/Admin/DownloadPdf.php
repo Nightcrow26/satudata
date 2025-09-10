@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use App\Models\Dataset;
@@ -88,6 +88,6 @@ class DownloadPdf extends Component
 
     public function render()
     {
-        return view('livewire.download-pdf');
+        return view('livewire.admin.download-pdf');
     }
 }

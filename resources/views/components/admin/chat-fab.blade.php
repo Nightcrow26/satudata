@@ -57,7 +57,7 @@
 
       <!-- Tinggi nyaman untuk percakapan + grafik -->
       <div class="modal-body" style="min-height:50vh; max-height:70vh; overflow:auto">
-        <livewire:chat-sdi />
+        <livewire:admin.chat-sdi />
       </div>
     </div>
   </div>

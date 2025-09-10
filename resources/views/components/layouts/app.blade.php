@@ -47,18 +47,18 @@
   <body class="min-h-screen flex flex-col bg-gray-100 text-gray-800 font-inter">
 
     {{-- Nav Mobile --}}
-    <x-nav-mobile :title="$title" />
+    <x-admin.nav-mobile :title="$title" />
 
     {{-- Main Layout --}}
     <div class="flex flex-1 overflow-hidden">
       
       {{-- Sidebar --}}
-      <x-sidebar />
+      <x-admin.sidebar />
 
       {{-- Main Content Area --}}
       <div class="flex flex-col flex-1 overflow-auto">
         {{-- Header --}}
-        <x-header :title="$title" />
+        <x-admin.header :title="$title" />
 
         {{-- Main Slot Content --}}
         <main class="p-4">
@@ -67,10 +67,10 @@
       </div>
     </div>
 
-    <x-chat-fab/>
+    <x-admin.chat-fab/>
 
     {{-- Footer --}}
-    <x-footer/>
+    <x-admin.footer/>
 
     {{-- Scripts --}}
     @livewireScripts

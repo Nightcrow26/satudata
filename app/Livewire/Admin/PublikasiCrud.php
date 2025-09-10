@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -110,7 +110,7 @@ class PublikasiCrud extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.publikasi', compact('publikasis'));
+        return view('livewire.admin.publikasi', compact('publikasis'));
     }
 
     private function resetInput(): void

@@ -4,7 +4,7 @@
             <div class="d-flex flex-column flex-lg-row justify-content-between align-items-stretch align-items-lg-center gap-2">
                 {{-- Title + Per-Page --}}
                 <div class="d-flex align-items-center flex-wrap">
-                <h3 class="mb-0 me-2">Indikator Walidata</h3>
+                <h3 class="mb-0 me-2">SKPD</h3>
                 <select wire:model.live="perPage"
                         class="form-select form-select-sm w-auto shadow-sm border border-success rounded ms-0 ms-sm-2 mt-2 mt-sm-0">
                     <option value="10">10</option>
@@ -95,7 +95,7 @@
       </div>
 
       <div class="mt-3">
-        <x-pagination :items="$skpds" />
+        <x-admin.pagination :items="$skpds" />
       </div>
     </div>
 

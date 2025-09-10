@@ -1,7 +1,6 @@
 <?php
 
-// app/Livewire/ChatSdi.php
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 
@@ -48,7 +47,7 @@ class ChatSdi extends Component
 
     public function render()
     {
-        return view('livewire.chat-sdi');
+        return view('livewire.admin.chat-sdi');
     }
 }
 

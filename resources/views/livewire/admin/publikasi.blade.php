@@ -97,7 +97,7 @@
         </table>
       </div>
       <div class="mt-3">
-        <x-pagination :items="$publikasis" />
+        <x-admin.pagination :items="$publikasis" />
       </div>
     </div>
   </div>

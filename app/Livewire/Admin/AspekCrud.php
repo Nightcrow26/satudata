@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -62,7 +62,7 @@ class AspekCrud extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.aspek', compact('aspeks'));
+        return view('livewire.admin.aspek', compact('aspeks'));
     }
 
     private function resetInput(): void

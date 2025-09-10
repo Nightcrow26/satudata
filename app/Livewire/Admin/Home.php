@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -88,7 +88,7 @@ class Home extends Component
 
     public function render()
     {
-        return view('livewire.home', [
+        return view('livewire.admin.home', [
             'aspekCount'      => $this->aspekCount,
             'datasetCount'    => $this->datasetCount,
             'instansiCount'   => $this->instansiCount,

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -108,7 +108,7 @@ class IndikatorWalidata extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.indikator-walidata', compact('walidatas'));
+        return view('livewire.admin.indikator-walidata', compact('walidatas'));
     }
 
     private function resetInput(): void
