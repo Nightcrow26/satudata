@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 class SsoController extends Controller
@@ -55,12 +56,55 @@ class SsoController extends Controller
         $user = User::where('nik', $nik)->first();
 
         
-       if (! $user) {
-            // Revoke token (opsional, biar token langsung mati)
+        if (! $user) {
+            // Jika SSO memberikan data pengguna (mis. nik & nama) tetapi belum ada di DB,
+            // kita buat akun sementara dengan role 'guest', login sebagai guest, lalu arahkan ke publik.
+            $userData = $userResponse->json('data');
+
+            if ($nik && $userData) {
+                // Build minimal user payload. Sesuaikan field yang diperlukan.
+                $name = $userData['nama'] ?? ($userData['name'] ?? 'Pengguna SSO');
+                $email = $userData['email'] ?? null;
+
+                // Create user record with a random password (hashed) so the account exists.
+                $newUser = User::create([
+                    'name' => $name,
+                    'email' => $email,
+                    'nik' => $nik,
+                    'password' => Hash::make(Str::random(24)),
+                ]);
+
+                // Assign 'guest' role if using Spatie roles/permissions and the role exists.
+                try {
+                    if (method_exists($newUser, 'assignRole')) {
+                        $newUser->assignRole('guest');
+                    }
+                } catch (\Exception $e) {
+                    // If role doesn't exist or assign fails, ignore silently for now.
+                }
+
+                // Login the newly created guest user
+                Auth::login($newUser);
+
+                // Revoke token (opsional)
+                $this->revokeTokenPortal($tokenResponse->json('access_token'));
+
+                // Redirect to public home (or a dedicated guest landing) with a flash
+                return redirect()->route('public.home')
+                    ->with('swal', [
+                        'title' => 'Anda masuk sebagai tamu (guest). Silakan lengkapi data jika perlu.',
+                        'icon' => 'info',
+                        'toast' => true,
+                        'position' => 'bottom-end',
+                        'timer' => 4000,
+                    ])
+                    ->with('guest_login', true);
+            }
+
+            // Jika tidak ada data pengguna dari SSO, lakukan revoke dan redirect ke portal logout
             $this->revokeTokenPortal($tokenResponse->json('access_token'));
 
-            // Redirect user ke Portal logout agar session SSO ikut hilang
-            $redirectBack = route('home');
+            $redirectBack = route('public.home');
             $portalLogout = env('SSO_BASE_URL')
                         . '/logout?redirect='
                         . urlencode($redirectBack);
@@ -79,7 +123,24 @@ class SsoController extends Controller
         Auth::login($user);
         $this->revokeTokenPortal($tokenResponse->json('access_token'));
 
-        return redirect()->route('dashboard');
+        // If the user does NOT have any admin-like role, treat them as public guest and redirect to public.home
+        try {
+            // If user explicitly has 'guest' role, send them to public.home immediately
+            if (method_exists($user, 'hasRole') && $user->hasRole('guest')) {
+                return redirect()->route('public.home');
+            }
+
+            if (method_exists($user, 'hasAnyRole')) {
+                // If the user does NOT have admin/verifikator/user role, send to public
+                if (! $user->hasAnyRole(['admin', 'verifikator', 'user'])) {
+                    return redirect()->route('public.home');
+                }
+            }
+        } catch (\Exception $e) {
+            // If role checks fail for some reason, fall back to admin dashboard for safety.
+        }
+
+        return redirect()->route('admin.dashboard');
     }
 
     public function revokeTokenPortal($token)

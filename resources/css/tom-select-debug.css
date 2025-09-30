@@ -1,0 +1,102 @@
+/* Tom Select Dark Mode Force Fix */
+
+/* Force dark mode styles with high specificity */
+html.dark .ts-wrapper,
+html.dark [data-x-data] .ts-wrapper,
+.dark .ts-wrapper,
+.dark [data-x-data] .ts-wrapper {
+    background-color: #1f2937 !important;
+    border: 1px solid #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+html.dark .ts-control,
+html.dark [data-x-data] .ts-control,
+.dark .ts-control,
+.dark [data-x-data] .ts-control {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border: 1px solid #4b5563 !important;
+}
+
+html.dark .ts-control input,
+.dark .ts-control input {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+}
+
+/* JavaScript applied dark-mode classes */
+.ts-wrapper.dark-mode,
+.ts-control.dark-mode {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-color: #4b5563 !important;
+}
+
+.ts-control.dark-mode input {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+}
+
+.ts-control.dark-mode input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Dropdown visibility fix */
+.ts-dropdown.dark,
+body > .ts-dropdown.dark {
+    background-color: #1f2937 !important;
+    border: 1px solid #4b5563 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+    z-index: 10010 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.ts-dropdown.dark .option,
+body > .ts-dropdown.dark .option {
+    color: #f3f4f6 !important;
+    background-color: transparent !important;
+}
+
+.ts-dropdown.dark .option:hover,
+.ts-dropdown.dark .option.active,
+body > .ts-dropdown.dark .option:hover,
+body > .ts-dropdown.dark .option.active {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
+
+.ts-dropdown.dark .option.selected,
+body > .ts-dropdown.dark .option.selected {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* Input field fix */
+.dark .ts-control input {
+    color: #f9fafb !important;
+    background-color: transparent !important;
+}
+
+.dark .ts-control input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Arrow fix */
+.dark .ts-control:after {
+    border-color: #9ca3af transparent transparent transparent !important;
+}
+
+.dark .ts-control.dropdown-active:after {
+    border-color: transparent transparent #9ca3af transparent !important;
+}
+
+/* Modal specific fixes */
+.modal .dark .ts-dropdown,
+[role="dialog"] .dark .ts-dropdown {
+    z-index: 10050 !important;
+}
+
+/* Remove debug borders */

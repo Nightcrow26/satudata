@@ -1,0 +1,122 @@
+/* resources/css/tokens.css */
+/* PUBLIC TOKENS — scoped agar tidak mengganggu admin */
+[data-app="public"] {
+    /* ===== Foundation ===== */
+    /* Spacing scale (pakai di komponen, bukan langsung di Blade) */
+    --space-0: 0;
+    --space-1: .25rem;
+    /* 4px */
+    --space-2: .5rem;
+    /* 8px */
+    --space-3: .75rem;
+    /* 12px */
+    --space-4: 1rem;
+    /* 16px */
+    --space-5: 1.25rem;
+    /* 20px */
+    --space-6: 1.5rem;
+    /* 24px */
+    --space-8: 2rem;
+    /* 32px */
+    --space-10: 2.5rem;
+    /* 40px */
+    --space-12: 3rem;
+    /* 48px */
+
+    /* Radius & elevation */
+    --radius-sm: .5rem;
+    --radius-md: .75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-full: 9999px;
+    --shadow-sm: 0 1px 2px rgb(2 6 23 / .05);
+    --shadow-md: 0 4px 8px rgb(2 6 23 / .08);
+    --shadow-lg: 0 8px 20px rgb(2 6 23 / .10);
+
+    /* Motion */
+    --duration-fast: .15s;
+    --duration: .2s;
+    --duration-slow: .35s;
+
+    /* Typography (cukup untuk UI publik) */
+    --text-xs: .75rem;
+    --leading-xs: 1rem;
+    --text-sm: .875rem;
+    --leading-sm: 1.25rem;
+    --text-md: 1rem;
+    --leading-md: 1.5rem;
+    --text-lg: 1.125rem;
+    --leading-lg: 1.75rem;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+
+    /* ===== Brand scale (teal) ===== */
+    --brand-50: #f0fdfa;
+    --brand-100: #ccfbf1;
+    --brand-200: #99f6e4;
+    --brand-300: #5eead4;
+    --brand-400: #2dd4bf;
+    --brand-500: #14b8a6;
+    --brand-600: #0d9488;
+    --brand-700: #0f766e;
+    --brand-800: #115e59;
+    --brand-900: #134e4a;
+
+    /* ===== Semantic (alias) ===== */
+    --surface: #ffffff;
+    --surface-2: #f8fafc;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+
+    --primary: var(--brand-600);
+    --primary-contrast: #fff;
+    --primary-hover: var(--brand-700);
+    --primary-soft-bg: var(--brand-50);
+    --primary-soft-text: var(--brand-700);
+    --primary-soft-border: var(--brand-200);
+
+    --neutral-bg: #f1f5f9;
+    /* slate-100 */
+    --neutral-text: #0f172a;
+    /* slate-900 */
+    --neutral-border: #e2e8f0;
+
+    --success: #16a34a;
+    --warning: #f59e0b;
+    --info: #0284c7;
+    --danger: #dc2626;
+
+    /* Focus ring */
+    --ring-color: color-mix(in srgb, var(--primary) 45%, transparent);
+    --ring: 0 0 0 3px var(--ring-color);
+}
+
+/* Dark khusus publik */
+[data-app="public"][data-theme="dark"] {
+    color-scheme: dark;
+    --surface: #0b1220;
+    --surface-2: #0f172a;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #1f2937;
+    --neutral-bg: #0f172a;
+    --neutral-text: #e2e8f0;
+    --neutral-border: #1f2937;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / .40);
+    --shadow-md: 0 6px 12px rgb(0 0 0 / .50);
+    --shadow-lg: 0 10px 28px rgb(0 0 0 / .55);
+
+    --primary-hover: color-mix(in srgb, var(--primary) 85%, white);
+    --ring-color: color-mix(in srgb, var(--primary) 55%, transparent);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    [data-app="public"] {
+        --duration-fast: 0s;
+        --duration: 0s;
+        --duration-slow: 0s;
+    }
+}

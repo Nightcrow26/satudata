@@ -186,7 +186,7 @@
             </tr>
             <tr>
                 <td>Tanggal Dibuat</td>
-                <td>{{ $dataset->created_at->format('d F Y') }}</td>
+                <td>{{ $dataset->created_at->translatedFormat('d F Y') }}</td>
             </tr>
             <tr>
                 <td>Jumlah Kolom</td>

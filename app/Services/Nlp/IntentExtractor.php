@@ -28,6 +28,7 @@ ATURAN KERAS:
 - Gunakan HANYA informasi yang eksplisit ada di pertanyaan pengguna.
 - JANGAN mengganti, menambah, atau menebak entitas/topik lain yang tidak disebut.
 - Jika tahun tidak jelas, kosongkan 'years'.
+- jika pengguna menanyakan pertanyaan umum tanpa konteks data, kembalikan keywords kosong ([]).
 - 'keywords' berisi 1–6 kata/frasal inti yang benar-benar relevan (hindari kata umum seperti "data", "informasi", "laporan", "statistik").
 - Jika entitas tidak ada, kembalikan keywords kosong ([]) dan biarkan bidang lain null/absen.
 

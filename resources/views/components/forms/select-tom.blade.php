@@ -14,11 +14,46 @@
 
 @php
   $compId = $id ?? $attributes->get('id') ?? ('ts-'.\Illuminate\Support\Str::uuid());
+  
+  // Cek berbagai cara untuk mendapatkan model binding
   $propModel = $bind ?? $model ?? $attributes->get('bind') ?? $attributes->get('model');
+  
+  // Jika tidak ada prop model, cek wire:model attributes
   if (empty($propModel)) {
-      throw new \Exception('x-forms.select-tom: prop "model" (atau "bind") wajib diisi.');
+      $wireModelLive = $attributes->get('wire:model.live');
+      $wireModelDefer = $attributes->get('wire:model.defer'); 
+      $wireModel = $attributes->get('wire:model');
+      
+      $propModel = $wireModelLive ?? $wireModelDefer ?? $wireModel;
+      
+      // Tentukan apakah live berdasarkan wire:model type
+      if ($wireModelLive) {
+          $live = true;
+      }
   }
+  
+  if (empty($propModel)) {
+      throw new \Exception('x-forms.select-tom: prop "model" (atau "bind") atau wire:model wajib diisi.');
+  }
+  
   $isLive = filter_var($live, FILTER_VALIDATE_BOOLEAN);
+  
+  // Remove wire:model attributes dari $attributes untuk mencegah conflict
+  $attributes = $attributes->except(['wire:model', 'wire:model.live', 'wire:model.defer']);
+  
+  // Normalize options format - support both formats:
+  // Format 1: [['id' => 'value', 'text' => 'label'], ...]
+  // Format 2: ['value' => 'label', ...]
+  $normalizedOptions = [];
+  foreach ($options as $key => $value) {
+      if (is_array($value) && isset($value['id']) && isset($value['text'])) {
+          // Format 1: sudah dalam format yang benar
+          $normalizedOptions[] = $value;
+      } else {
+          // Format 2: convert ke format yang diharapkan
+          $normalizedOptions[] = ['id' => $key, 'text' => $value];
+      }
+  }
 @endphp
 
 <div
@@ -34,7 +69,7 @@
 
     // Retry-apply update bila TomSelect belum siap
     applyUpdate(detail, attempt = 0) {
-      console.log('applyUpdate called for', @js($compId), detail); // Debug log
+      // applyUpdate called for component
       
       if (!this.ts) {
         if (attempt < 20) { // Tingkatkan retry attempts
@@ -49,8 +84,8 @@
       const v    = detail.value ?? null;
       const t    = detail.text  ?? (v ?? '');
 
-      console.log('Applying update:', { opts, v, t }); // Debug log
-      console.log('Current options before update:', this.ts.options); // Debug log
+  // Applying update: opts/v/t prepared
+  // Current options inspected
 
       // Pastikan tidak disabled saat set
       if (this.$refs.sel.disabled) { 
@@ -58,54 +93,41 @@
         this.ts.enable(); 
       }
 
-      // STEP 1: Clear semua options
-      this.ts.clearOptions();
-      console.log('Options cleared'); // Debug log
+  // STEP 1: Clear semua options
+  this.ts.clearOptions();
       
       // STEP 2: Add placeholder option jika bukan multiple
       if (!@js($multiple)) {
         this.ts.addOption({ value: '', text: @js($placeholder) });
-        console.log('Placeholder added'); // Debug log
       }
       
       // STEP 3: Add new options dari server
       if (opts.length) {
         opts.forEach(o => {
-          console.log('Adding option:', o); // Debug log
           this.ts.addOption({ value: o.id, text: o.text });
         });
-        console.log('New options added:', opts.length); // Debug log
       }
       
-      // STEP 4: Refresh options agar TomSelect aware
-      this.ts.refreshOptions(false);
-      console.log('Options refreshed, current options:', this.ts.options); // Debug log
+  // STEP 4: Refresh options agar TomSelect aware
+  this.ts.refreshOptions(false);
       
       // STEP 5: Set value
       if (v) {
         // Double check apakah option sudah ada
         if (!this.ts.options[v]) {
-          console.log('Option not found, adding manually:', { v, t }); // Debug log
           this.ts.addOption({ value: v, text: t });
         }
-        
-        console.log('Setting value to:', v); // Debug log
+
         this.ts.setValue(v, false); // false = don't trigger onChange
         this.val = v; // Set langsung ke Livewire model
-        console.log('Value set, current getValue():', this.ts.getValue()); // Debug log
       } else {
-        console.log('Setting empty value'); // Debug log
         this.ts.setValue('', false);
         this.val = null;
       }
-
-      console.log('Update applied successfully for', @js($compId)); // Debug log
-      
-      // Debug final state
+      // Update applied successfully for component
+      // Final state check performed silently
       setTimeout(() => {
-        console.log('FINAL STATE - getValue():', this.ts.getValue());
-        console.log('FINAL STATE - options:', Object.keys(this.ts.options));
-        console.log('FINAL STATE - val (livewire):', this.val);
+        // noop final verification
       }, 100);
     }
   }"
@@ -113,25 +135,92 @@
 
   {{-- Event listener untuk tom-update --}}
   @tom-update.window="
-    console.log('tom-update received:', $event.detail, 'for component:', @js($compId)); // Debug log
+    // tom-update received for component
     if ($event.detail?.id === @js($compId)) {
       applyUpdate($event.detail);
     }
   "
-  class="w-100"
+  class="w-full"
 >
   @if($label)
-    <label class="form-label" for="{{ $compId }}">{{ $label }}</label>
+    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="{{ $compId }}">{{ $label }}</label>
   @endif
 
   <div wire:ignore>
-    <select x-ref="sel" id="{{ $compId }}" class="form-select" {{ $disabled ? 'disabled' : '' }}>
+    <select x-ref="sel" id="{{ $compId }}" name="{{ $attributes->get('name') }}" class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white dark:focus:ring-indigo-400 dark:focus:border-indigo-400" {{ $disabled ? 'disabled' : '' }}>
       @unless($ajax)
         <option value="">{{ $placeholder }}</option>
-        @foreach($options as $opt)
+        @foreach($normalizedOptions as $opt)
           <option value="{{ $opt['id'] }}">{{ $opt['text'] }}</option>
         @endforeach
       @endunless
     </select>
   </div>
+
+  @push('styles')
+  <style>
+    /* Styling khusus untuk Tom Select dropdown {{ $compId }} */
+    .ts-dropdown {
+      max-width: 600px !important;
+      max-height: 300px !important;
+      overflow-y: auto !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 0.375rem !important;
+      background: white !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+    
+    .ts-dropdown .ts-dropdown-content {
+      max-height: 280px !important;
+      overflow-y: auto !important;
+    }
+    
+    .ts-dropdown-option {
+      padding: 8px 12px !important;
+      cursor: pointer !important;
+      border-bottom: 1px solid #f3f4f6 !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      max-width: 580px !important;
+    }
+    
+    .ts-dropdown-option:hover {
+      background-color: #f9fafb !important;
+    }
+    
+    .ts-dropdown-option.selected {
+      background-color: #e0e7ff !important;
+      color: #3730a3 !important;
+    }
+    
+    .ts-dropdown-option:last-child {
+      border-bottom: none !important;
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      .ts-dropdown {
+        background: #374151 !important;
+        border-color: #4b5563 !important;
+      }
+      
+      .ts-dropdown-option {
+        color: #f9fafb !important;
+        border-bottom-color: #4b5563 !important;
+      }
+      
+      .ts-dropdown-option:hover {
+        background-color: #4b5563 !important;
+      }
+      
+      .ts-dropdown-option.selected {
+        background-color: #1e1b4b !important;
+        color: #a5b4fc !important;
+      }
+    }
+  </style>
+  @endpush
 </div>

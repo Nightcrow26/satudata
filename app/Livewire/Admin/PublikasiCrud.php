@@ -120,6 +120,16 @@ class PublikasiCrud extends Component
             'tahun','catatan_verif','deskripsi','keyword',
             'instansi_id','aspek_id'
         ]);
+        
+        // Set default values for create mode
+        $this->status = 'draft';
+        $this->tahun = date('Y');
+        
+        // Auto-set instansi_id for user role
+        if (auth()->user()->hasRole('user')) {
+            $this->instansi_id = auth()->user()->skpd_uuid;
+        }
+        
         $this->deskripsi = '';
         $this->editingPublikasi = null;
     }
@@ -133,8 +143,34 @@ class PublikasiCrud extends Component
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'publikasi-modal');
         
-        // Kosongkan summernote di frontend
-        $this->dispatch('clear-summernote-content');
+        // Kosongkan trix di frontend
+        $this->dispatch('clear-trix-content');
+        
+        // Update Tom Select options dengan format yang benar
+        $this->js("
+            setTimeout(() => {
+                // Update instansi options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'instansi_id',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . ",
+                        value: '" . $this->instansi_id . "'
+                    }
+                }));
+                
+                // Update aspek options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'aspek_id',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) {
+                            return ['id' => $aspek->id, 'text' => $aspek->nama];
+                        })->values()) . "
+                    }
+                }));
+            }, 100);
+        ");
     }
 
     public function showEditModal(string $id): void
@@ -142,28 +178,60 @@ class PublikasiCrud extends Component
         $this->resetValidation();
         $this->resetInput();
         
-        $pub = Publikasi::findOrFail($id);
-        $this->publikasi_id   = $pub->id;
-        $this->nama           = $pub->nama;
-        $this->status         = $pub->status;
-        $this->tahun          = $pub->tahun;
-        $this->catatan_verif  = $pub->catatan_verif ?? '';
-        $this->deskripsi      = $pub->deskripsi ?? '';
-        $this->keyword        = $pub->keyword ?? '';
-        $this->instansi_id    = $pub->instansi_id;
-        $this->aspek_id       = $pub->aspek_id;
-        $this->editingPublikasi = $pub;
+        $publikasi = Publikasi::findOrFail($id);
+        $this->publikasi_id = $publikasi->id;
+        $this->nama = $publikasi->nama;
+        $this->status = $publikasi->status;
+        $this->tahun = $publikasi->tahun;
+        $this->catatan_verif = $publikasi->catatan_verif ?? '';
+        $this->deskripsi = $publikasi->deskripsi ?? '';
+        $this->keyword = $publikasi->keyword ?? '';
+        $this->instansi_id = $publikasi->instansi_id;
+        $this->aspek_id = $publikasi->aspek_id;
+        $this->editingPublikasi = $publikasi;
 
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'publikasi-modal');
         
-        // Delay untuk set content setelah modal terbuka dan summernote ter-initialize
+        // Update Tom Select options dan set Trix content
         $this->js("
             setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('set-summernote-content', {
-                    detail: { 
-                        content: '" . addslashes($this->deskripsi) . "',
-                        target: 'publikasi'
+                // Update instansi options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'instansi_id',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . ",
+                        value: '" . $this->instansi_id . "'
+                    }
+                }));
+                
+                // Update aspek options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'aspek_id',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) {
+                            return ['id' => $aspek->id, 'text' => $aspek->nama];
+                        })->values()) . ",
+                        value: '" . $this->aspek_id . "'
+                    }
+                }));
+                
+                // Update status Tom Select untuk edit mode
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'status',
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('admin') ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
+                        value: '" . $this->status . "'
+                    }
+                }));
+                
+                // Update Trix Editor content untuk deskripsi
+                window.dispatchEvent(new CustomEvent('trix-update', {
+                    detail: {
+                        target: 'deskripsi',
+                        content: " . json_encode($this->deskripsi) . "
                     }
                 }));
             }, 500);
@@ -282,7 +350,9 @@ class PublikasiCrud extends Component
     public function confirmDelete(string $id): void
     {
         $this->deleteId = $id;
-        $this->dispatch('show-modal', id: 'delete-modal');
+        $publikasi = Publikasi::findOrFail($id);
+        $this->nama = $publikasi->nama; // Set nama untuk ditampilkan di modal
+        $this->showDeleteModal = true;
     }
 
     public function deletePublikasiConfirmed(): void
@@ -297,12 +367,17 @@ class PublikasiCrud extends Component
             icon: 'success',
             toast: true, position: 'bottom-end', timer: 3000
         );
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+    }
+
+    public function closeDeleteModal(): void
+    {
+        $this->showDeleteModal = false;
     }
 }

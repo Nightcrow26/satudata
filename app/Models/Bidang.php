@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Bidang extends Model
@@ -25,5 +26,13 @@ class Bidang extends Model
                 $model->{$model->getKeyName()} = (string) Str::uuid();
             }
         });
+    }
+
+    /**
+     * Relasi ke walidata
+     */
+    public function walidata(): HasMany
+    {
+        return $this->hasMany(Walidata::class, 'bidang_id', 'id');
     }
 }

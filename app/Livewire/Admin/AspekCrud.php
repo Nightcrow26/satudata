@@ -149,8 +149,9 @@ class AspekCrud extends Component
     public function confirmDelete(string $id): void
     {
         $this->deleteId        = $id;
+        $aspek = Aspek::findOrFail($id);
+        $this->nama = $aspek->nama; // Set nama untuk ditampilkan di modal
         $this->showDeleteModal = true;
-        $this->dispatch('show-modal', id:'delete-modal');
     }
 
     public function deleteAspekConfirmed(): void
@@ -167,14 +168,17 @@ class AspekCrud extends Component
             timer   : 3000
         );
 
-        $this->dispatch('hide-modal', id:'delete-modal');
         $this->showDeleteModal = false;
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id:'delete-modal');
+        $this->showDeleteModal = false;
+    }
+
+    public function closeDeleteModal(): void
+    {
         $this->showDeleteModal = false;
     }
 }

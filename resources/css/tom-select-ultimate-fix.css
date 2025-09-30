@@ -1,0 +1,261 @@
+/* Tom Select Dark Mode Ultimate Fix */
+
+/* Highest specificity for dark mode Tom Select */
+html.dark body .ts-wrapper,
+html.dark body [data-x-data] .ts-wrapper,
+body.dark .ts-wrapper,
+.dark body .ts-wrapper {
+    background-color: #1f2937 !important;
+    border: 1px solid #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+html.dark body .ts-control,
+html.dark body [data-x-data] .ts-control,
+body.dark .ts-control,
+.dark body .ts-control {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border: 1px solid #4b5563 !important;
+}
+
+/* Input dalam Tom Select */
+html.dark body .ts-control input,
+body.dark .ts-control input,
+.dark body .ts-control input {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+    border: none !important;
+}
+
+html.dark body .ts-control input::placeholder,
+body.dark .ts-control input::placeholder,
+.dark body .ts-control input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Focus states */
+html.dark body .ts-control:focus,
+body.dark .ts-control:focus,
+.dark body .ts-control:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 1px #3b82f6 !important;
+    background-color: #1f2937 !important;
+}
+
+/* Dropdown yang terbuka */
+html.dark body .ts-dropdown.dark,
+body.dark .ts-dropdown.dark,
+.dark body .ts-dropdown.dark {
+    background-color: #1f2937 !important;
+    border: 1px solid #4b5563 !important;
+    color: #f3f4f6 !important;
+}
+
+/* Options dalam dropdown */
+html.dark body .ts-dropdown.dark .option,
+body.dark .ts-dropdown.dark .option,
+.dark body .ts-dropdown.dark .option {
+    color: #f3f4f6 !important;
+    background-color: transparent !important;
+}
+
+html.dark body .ts-dropdown.dark .option:hover,
+body.dark .ts-dropdown.dark .option:hover,
+.dark body .ts-dropdown.dark .option:hover {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
+
+/* Remove blue highlight from selected options */
+html.dark body .ts-dropdown.dark .option.selected,
+body.dark .ts-dropdown.dark .option.selected,
+.dark body .ts-dropdown.dark .option.selected {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+}
+
+html.dark body .ts-dropdown.dark .option.active,
+body.dark .ts-dropdown.dark .option.active,
+.dark body .ts-dropdown.dark .option.active {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+}
+
+/* Override any white backgrounds */
+html.dark .ts-control,
+html.dark .ts-wrapper,
+html.dark .ts-dropdown {
+    background-color: #1f2937 !important;
+}
+
+/* Pastikan tidak ada background putih */
+.dark .ts-control,
+.dark .ts-wrapper {
+    background: #1f2937 !important;
+    background-color: #1f2937 !important;
+}
+
+/* Force remove any white/light backgrounds */
+.ts-control[style*="background-color: white"],
+.ts-control[style*="background-color: #ffffff"],
+.ts-control[style*="background-color: #fff"],
+.ts-wrapper[style*="background-color: white"],
+.ts-wrapper[style*="background-color: #ffffff"], 
+.ts-wrapper[style*="background-color: #fff"] {
+    background-color: #1f2937 !important;
+}
+
+/* Dark mode class dari JavaScript */
+.ts-wrapper.dark-mode,
+.ts-control.dark-mode {
+    background-color: #1f2937 !important;
+    background: #1f2937 !important;
+    color: #f9fafb !important;
+    border-color: #4b5563 !important;
+}
+
+/* PREVENT AUTO-OPEN DROPDOWN IN DARK MODE */
+.dark .ts-dropdown {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Only show dropdown when Tom Select is actually active/open */
+.dark .ts-wrapper.dropdown-active .ts-dropdown,
+.dark .ts-dropdown.open {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Extra protection - hide all dropdowns unless explicitly opened */
+.dark .ts-dropdown:not(.open):not([style*="display: block"]) {
+    display: none !important;
+}
+
+/* Focus styling for dark mode */
+.dark .ts-control:focus,
+.dark .ts-wrapper .ts-control:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 1px #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
+
+
+/* Remove blue outline and focus */
+.dark .ts-control:focus,
+.dark .ts-wrapper:focus,
+.dark .ts-control:active,
+.dark .ts-wrapper:active,
+html.dark .ts-control:focus,
+html.dark .ts-wrapper:focus,
+html.dark .ts-control:active,
+html.dark .ts-wrapper:active {
+    outline: none !important;
+    border-color: #4b5563 !important;
+    box-shadow: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+}
+
+
+
+/* Force override any blue backgrounds */
+.dark .ts-wrapper:not(.dropdown-active),
+.dark .ts-control:not(:focus),
+html.dark .ts-wrapper:not(.dropdown-active),
+html.dark .ts-control:not(:focus) {
+    background-color: #1f2937 !important;
+    color: #f3f4f6 !important;
+    border-color: #4b5563 !important;
+}
+
+/* Prevent any blue states */
+.dark .ts-wrapper,
+.dark .ts-control,
+html.dark .ts-wrapper,
+html.dark .ts-control {
+    background-image: none !important;
+    background-attachment: unset !important;
+    background-blend-mode: unset !important;
+    background-clip: unset !important;
+    background-origin: unset !important;
+    background-position: unset !important;
+    background-repeat: unset !important;
+    background-size: unset !important;
+    filter: none !important;
+}
+
+/* ULTIMATE FIX FOR BLUE DROPDOWN ITEMS */
+.dark .ts-dropdown .option,
+.dark .ts-dropdown .option.selected,
+.dark .ts-dropdown .option.active,
+.dark .ts-dropdown .option:hover,
+.dark .ts-dropdown .option:focus,
+html.dark .ts-dropdown .option,
+html.dark .ts-dropdown .option.selected,
+html.dark .ts-dropdown .option.active,
+html.dark .ts-dropdown .option:hover,
+html.dark .ts-dropdown .option:focus {
+    background-color: #1f2937 !important;
+    background: #1f2937 !important;
+    color: #f3f4f6 !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+    border: none !important;
+    text-shadow: none !important;
+}
+
+/* Force hover state to be gray, not blue */
+.dark .ts-dropdown .option:hover,
+html.dark .ts-dropdown .option:hover {
+    background-color: #374151 !important;
+    background: #374151 !important;
+    color: #ffffff !important;
+}
+
+/* Force selected state to be blue but remove highlight */
+.dark .ts-dropdown .option.selected,
+html.dark .ts-dropdown .option.selected {
+    background-color: #2563eb !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+
+/* NUCLEAR OPTION FOR SINGLE ITEM VALUE */
+.dark .ts-control .item,
+.dark .ts-control .item.active,
+html.dark .ts-control .item,
+html.dark .ts-control .item.active {
+    background-color: transparent !important;
+    background: transparent !important;
+    color: #f3f4f6 !important;
+    text-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Force text color and remove any blue tint */
+.dark .ts-control .item,
+.dark .ts-control div,
+.dark .ts-control span,
+html.dark .ts-control .item,
+html.dark .ts-control div,
+html.dark .ts-control span {
+    color: #f3f4f6 !important;
+    background: transparent !important;
+    text-decoration: none !important;
+    border: none !important;
+    outline: none !important;
+}

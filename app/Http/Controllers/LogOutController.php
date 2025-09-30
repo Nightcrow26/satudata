@@ -14,7 +14,7 @@ class LogOutController extends Controller
     {
         Auth::logout();
         // 2) Redirect browser ke endpoint logout portal
-        $redirectBack = route('home'); // route('home') mengembalikan URL home aplikasi
+        $redirectBack = route('public.home'); // route('home') mengembalikan URL home aplikasi
         $portalLogout = env('SSO_BASE_URL')
                       . '/logout?redirect=' 
                       . urlencode($redirectBack);

@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str; 
 use Illuminate\Support\Facades\Storage;
+use App\Traits\ViewTracker;
 
 class Dataset extends Model
 {
-    use HasFactory;
+    use HasFactory, ViewTracker;
 
     // Primary key is auto-incrementing id
     // If you use UUIDs, adjust $keyType and $incrementing accordingly
@@ -79,6 +80,14 @@ class Dataset extends Model
     }
 
     /**
+     * Alias for skpd relationship - for consistency with frontend terminology
+     */
+    public function instansi(): BelongsTo
+    {
+        return $this->belongsTo(Skpd::class, 'instansi_id', 'id');
+    }
+
+    /**
      * Dataset belongs to a user.
      */
     public function user(): BelongsTo
@@ -95,11 +104,47 @@ class Dataset extends Model
     }
 
     /**
-     * Accessor to get full URL of the Excel file
+     * Accessor untuk views (plural) agar konsisten dengan frontend
+     */
+    public function getViewsAttribute(): int
+    {
+        return $this->view ?? 0;
+    }
+
+    /**
+     * Accessor to get full URL of the Excel file from S3
      */
     public function getExcelUrlAttribute(): ?string
     {
-        return Storage::disk('s3')
-            ->temporaryUrl($this->excel, now()->addMinutes(10));
+        if (!$this->excel) {
+            return null;
+        }
+
+        // Jika sudah berupa URL lengkap, return as is
+        if (filter_var($this->excel, FILTER_VALIDATE_URL)) {
+            return $this->excel;
+        }
+
+        // Generate temporary URL dari S3 (valid 15 menit)
+        try {
+            return Storage::disk('s3')->temporaryUrl($this->excel, now()->addMinutes(15));
+        } catch (\Exception $e) {
+            // Fallback jika S3 error
+            return null;
+        }
+    }
+
+    /**
+     * Resolve route model binding untuk public dataset
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->where('id', $value)
+            ->where(function ($query) {
+                $query->where('status', 'published')
+                      ->orWhere('status', 'approved');
+            })
+            ->with(['aspek', 'skpd', 'user'])
+            ->first();
     }
 }

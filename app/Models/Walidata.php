@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use App\Traits\ViewTracker;
 
 class Walidata extends Model
 {
     use HasFactory;
     use HasUuids; // Hapus baris ini jika id selalu Anda set dari "idtransaksi".
+    use ViewTracker;
 
     /** =====================
      *  Konfigurasi dasar
@@ -32,6 +34,7 @@ class Walidata extends Model
         'aspek_id',
         'indikator_id',
         'bidang_id',
+        'view',
     ];
 
     // Cast seperlunya; 'data' Anda simpan string pada migrasi final.
@@ -60,11 +63,22 @@ class Walidata extends Model
 
     public function indikator()
     {
-        return $this->belongsTo(Indikator::class, 'indikator_id', 'id')->withDefault();
+        return $this->belongsTo(Indikator::class, 'indikator_id', 'id')->withDefault([
+            'nama' => 'Indikator Tidak Ditemukan',
+            'definisi' => 'Definisi tidak tersedia',
+        ]);
     }
 
     public function bidang()
     {
         return $this->belongsTo(Bidang::class, 'bidang_id', 'id')->withDefault();
+    }
+
+    /**
+     * Accessor untuk views (plural) agar konsisten dengan frontend
+     */
+    public function getViewsAttribute(): int
+    {
+        return $this->view ?? 0;
     }
 }

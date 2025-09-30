@@ -1,11 +1,172 @@
-@import 'bootstrap/dist/css/bootstrap.css';
+/* @import 'bootstrap/dist/css/bootstrap.css'; */
 @import 'bootstrap-icons/font/bootstrap-icons.css';
-@import 'summernote/dist/summernote-bs5.min.css';
 @import "tailwindcss";
+
+@import './tokens.css';
+@import './theme.css';
+@import './dark-mode-editors.css';
+@import './tom-select-debug.css';
+@import './tom-select-ultimate-fix.css';
+
+@import '../../vendor/livewire/flux/dist/flux.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
+@source '../../vendor/livewire/flux/stubs/**/*.blade.php';
+
+@plugin "@tailwindcss/forms";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-zinc-50: #fafafa;
+    --color-zinc-100: #f5f5f5;
+    --color-zinc-200: #e5e5e5;
+    --color-zinc-300: #d4d4d4;
+    --color-zinc-400: #a3a3a3;
+    --color-zinc-500: #737373;
+    --color-zinc-600: #525252;
+    --color-zinc-700: #404040;
+    --color-zinc-800: #262626;
+    --color-zinc-900: #171717;
+    --color-zinc-950: #0a0a0a;
+
+    --color-accent: var(--color-neutral-800);
+    --color-accent-content: var(--color-neutral-800);
+    --color-accent-foreground: var(--color-white);
+}
+
+@layer theme {
+    .dark {
+        --color-accent: var(--color-white);
+        --color-accent-content: var(--color-white);
+        --color-accent-foreground: var(--color-neutral-800);
+    }
+}
+
+@layer base {
+
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+/* Tom Select styling untuk mencegah tumpang tindih dalam modal */
+/* Tom Select dropdown ensure above modal and scrollable */
+.ts-dropdown {
+  z-index: 9999 !important; /* above modal (z-50 => 9999 is safe) */
+  border-radius: 0.375rem;
+  border: 1px solid rgb(209 213 219);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  max-height: 18rem; /* limit height */
+  overflow-y: auto;
+}
+
+/* Dark mode untuk Tom Select */
+.dark .ts-dropdown {
+    background-color: rgb(55 65 81);
+    border-color: rgb(75 85 99);
+    color: rgb(249 250 251);
+}
+
+.dark .ts-dropdown .option {
+    color: rgb(249 250 251);
+}
+
+.dark .ts-dropdown .option.active,
+.dark .ts-dropdown .option:hover {
+    background-color: rgb(79 70 229);
+    color: white;
+}
+
+/* Tom Select control styling dalam modal */
+/* Control styling align with input */
+.ts-control {
+  border-radius: 0.375rem;
+  border: 1px solid rgb(209 213 219);
+  padding: 0.5rem 0.75rem;
+  background-color: #ffffff;
+  min-height: 2.5rem;
+}
+
+/* Allow selects inside modals to overflow (Alpine teleport container) */
+.modal-select-overflow { overflow: visible !important; }
+
+.dark .ts-control {
+    background-color: rgb(55 65 81);
+    border-color: rgb(75 85 99);
+    color: rgb(249 250 251);
+}
+
+[data-flux-field]:not(ui-radio, ui-checkbox) {
+    @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply  !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+/* \[:where(&)\]:size-4 {
+    @apply size-4;
+} */
+
 
 :root {
   --font-body: 'Inter', sans-serif;
   --font-heading: 'Roboto', sans-serif;
+}
+
+/* Sidebar styles */
+.sidebar {
+  width: 280px;
+  transition: all 0.3s ease;
+}
+
+.sidebar-collapsed {
+  width: 80px;
+}
+
+.sidebar .arrow {
+  transition: transform 0.2s ease;
+}
+
+.sidebar .rotated {
+  transform: rotate(180deg);
+}
+
+/* Mobile sidebar animations */
+.mobile-sidebar-enter {
+  transform: translateX(-100%);
+}
+
+.mobile-sidebar-enter-active {
+  transform: translateX(0);
+  transition: transform 300ms ease-in-out;
+}
+
+.mobile-sidebar-leave {
+  transform: translateX(0);
+}
+
+.mobile-sidebar-leave-active {
+  transform: translateX(-100%);
+  transition: transform 300ms ease-in-out;
 }
 
 @media (max-width: 576px) {
@@ -29,7 +190,11 @@ h1, h2, h3 {
     background-color: #f8f9fa;
 }
 .sidebar .nav-link {
-    color: #000;
+    color: #1f2937 !important; /* text-gray-800 for better contrast */
+}
+
+.sidebar .nav-link:hover {
+    color: #111827 !important; /* text-gray-900 for maximum contrast on hover */
 }
 
 .footer-custom {
@@ -179,6 +344,56 @@ h1, h2, h3 {
     list-style-position: inside !important;
     margin-left: 1rem;
     padding-left: 1rem;
+}
+
+/* Trix Content Output - untuk display di halaman publik */
+.trix-content ol,
+div[class*="trix"] ol,
+p ol {
+    list-style: decimal !important;
+    list-style-position: inside !important;
+    margin-left: 1rem !important;
+    padding-left: 0.5rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.trix-content ul,
+div[class*="trix"] ul,
+p ul {
+    list-style: disc !important;
+    list-style-position: inside !important;
+    margin-left: 1rem !important;
+    padding-left: 0.5rem !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+.trix-content li,
+div[class*="trix"] li,
+p li {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.6 !important;
+}
+
+/* General content styling untuk output HTML dari Trix */
+.content-html ol {
+    list-style: decimal !important;
+    list-style-position: inside !important;
+    margin-left: 1rem !important;
+    padding-left: 0.5rem !important;
+}
+
+.content-html ul {
+    list-style: disc !important;
+    list-style-position: inside !important;
+    margin-left: 1rem !important;
+    padding-left: 0.5rem !important;
+}
+
+.content-html li {
+    margin-bottom: 0.25rem !important;
+    line-height: 1.6 !important;
 }
 
 /* Sidebar Styles */
@@ -366,4 +581,330 @@ h1, h2, h3 {
 
 .offcanvas .nav-link {
   color: var(--hsu-neon-text) !important; 
+}
+
+/* ===== ADDITIONAL UTILITY CLASSES ===== */
+.table-clean thead th { 
+  position: sticky; 
+  top: 0; 
+  z-index: 1; 
+}
+
+.w-40 { width: 40px; }
+.w-80 { width: 80px; }
+.w-120 { width: 120px; }
+
+.truncate { 
+  max-width: 260px; 
+  white-space: nowrap; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+}
+
+@media (max-width: 991.98px) { 
+  .truncate { 
+    max-width: 180px; 
+  } 
+}
+
+/* ===== CHAT FUNCTIONALITY STYLES ===== */
+.chat-shell {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.chat-message {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Chat scrollbar styling */
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.chat-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Chat loading animation */
+.chat-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-typing::after {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  animation: chat-dot-blink 1.4s infinite both;
+}
+
+@keyframes chat-dot-blink {
+  0%, 80%, 100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* Modal enhancements */
+.modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .modal-backdrop.show {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  height: 300px;
+  max-height: 400px;
+}
+
+.chart-container canvas {
+  max-height: 100% !important;
+}
+
+/* ===== CHAT COMPONENT SPECIFIC STYLES ===== */
+.chat-shell{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  height:100%;
+  @apply bg-white dark:!bg-gray-900 text-gray-900 dark:text-white;
+}
+.chat-welcome{
+  padding:18px 6px;
+  @apply bg-white dark:!bg-gray-900;
+}
+.chat-body{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  min-height:260px;
+  max-height:52vh;
+  overflow:auto;
+  @apply bg-white dark:!bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3;
+}
+.chat-msg{
+  display:flex;
+  width:100%;
+}
+.chat-msg.user{
+  justify-content:flex-end;
+}
+.chat-msg.ai{
+  justify-content:flex-start;
+}
+.chat-bubble{
+  display:inline-block;
+  max-width:78%;
+  padding:12px 14px;
+  border-radius:16px;
+  box-shadow:0 1px 2px rgba(0,0,0,.05);
+}
+.chat-bubble.user{
+  @apply bg-blue-600 dark:bg-blue-500 text-white;
+  border-bottom-right-radius:6px;
+}
+.chat-bubble.ai{
+  @apply bg-gray-100 dark:!bg-gray-800 border border-gray-200 dark:border-gray-600;
+  @apply text-gray-800 dark:text-gray-100;
+  border-bottom-left-radius:6px;
+}
+.role-tag{
+  font-size:.72rem;
+  font-weight:700;
+  opacity:.7;
+  margin-bottom:4px;
+  @apply text-gray-600 dark:text-gray-300;
+}
+.content{
+  white-space:pre-wrap;
+  line-height:1.55;
+  @apply text-gray-800 dark:text-gray-100;
+}
+.sources{
+  margin-top:6px;
+  @apply text-gray-500 dark:text-gray-400;
+}
+.sources a{
+  @apply text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300;
+}
+.insights{
+  @apply text-gray-700 dark:text-gray-300;
+}
+.chart-wrap{
+  margin-top:10px;
+  @apply bg-white dark:!bg-gray-800 rounded-lg p-2;
+}
+.chat-input{
+  @apply w-full bg-white dark:!bg-gray-900;
+}
+
+/* Custom scrollbar untuk dark mode */
+.chat-body::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-body::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:!bg-gray-800 rounded-full;
+}
+.chat-body::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-500 rounded-full;
+}
+.chat-body::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-400;
+}
+
+/* animasi titik tiga */
+.role-tag.loading::after {
+  content: '...';
+  animation: dots 1.5s steps(3, end) infinite;
+}
+
+@keyframes dots {
+  0%   { content: ''; }
+  33%  { content: '.'; }
+  66%  { content: '..'; }
+  100% { content: '...'; }
+}
+
+/* Trix Editor Styling */
+trix-editor {
+  @apply border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500;
+  min-height: 200px !important;
+  padding: 0.75rem !important;
+  background: white;
+}
+
+/* Dark mode support untuk Trix */
+.dark trix-editor {
+  @apply border-gray-600 bg-gray-800 text-white;
+}
+
+.dark trix-editor:focus {
+  @apply ring-indigo-400 border-indigo-400;
+}
+
+/* Trix toolbar styling */
+.trix-button-row {
+  @apply border-b border-gray-300;
+}
+
+.dark .trix-button-row {
+  @apply border-gray-600;
+}
+
+.trix-button {
+  @apply text-gray-700 hover:text-gray-900 hover:bg-gray-100;
+  border: none !important;
+  background: none !important;
+}
+
+.dark .trix-button {
+  @apply text-gray-300 hover:text-white hover:bg-gray-700;
+}
+
+.trix-button.trix-active {
+  @apply bg-indigo-100 text-indigo-700;
+}
+
+.dark .trix-button.trix-active {
+  @apply bg-indigo-900 text-indigo-300;
+}
+
+/* Trix content styling */
+.trix-content {
+  line-height: 1.6;
+}
+
+.trix-content h1 {
+  @apply text-2xl font-bold mb-4;
+}
+
+.trix-content h2 {
+  @apply text-xl font-semibold mb-3;
+}
+
+.trix-content p {
+  @apply mb-3;
+}
+
+.trix-content ul, .trix-content ol {
+  @apply mb-3 pl-6;
+  list-style-position: inside !important;
+}
+
+.trix-content ul {
+  @apply list-disc;
+}
+
+.trix-content ol {
+  @apply list-decimal;
+}
+
+.trix-content li {
+  @apply mb-1;
+  display: list-item !important;
+}
+
+/* Pastikan list button di toolbar berfungsi */
+.trix-button[data-trix-action="bulletList"],
+.trix-button[data-trix-action="numberList"] {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* Style untuk list di dalam editor saat editing */
+trix-editor ul, trix-editor ol {
+  @apply mb-3 pl-6;
+  list-style-position: inside !important;
+}
+
+trix-editor ul {
+  @apply list-disc;
+}
+
+trix-editor ol {
+  @apply list-decimal;
+}
+
+trix-editor li {
+  @apply mb-1;
+  display: list-item !important;
+}
+
+.trix-content blockquote {
+  @apply border-l-4 border-gray-300 pl-4 italic;
+}
+
+.dark .trix-content blockquote {
+  @apply border-gray-600;
 }

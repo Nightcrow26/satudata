@@ -19,6 +19,7 @@ class DetailData extends Component
     public array $columns = [];
     public string $xAxis = '';
     public string $yAxis = '';
+    public string $selectedChartType = 'bar';
     public string $latitudeColumn = '';
     public string $longitudeColumn = '';
     public string $labelColumn = '';

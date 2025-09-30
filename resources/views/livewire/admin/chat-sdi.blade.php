@@ -1,11 +1,13 @@
 {{-- resources/views/livewire/chat-sdi.blade.php --}}
-<div x-data="chatBox({{ Js::from(!empty($history)) }})" x-init="init" class="chat-shell">
+<div x-data="chatBox({{ Js::from(!empty($history)) }})" x-init="init" class="chat-shell bg-white dark:!bg-gray-900 text-gray-900 dark:text-white rounded-lg">
+
+@auth
 
   {{-- WELCOME (muncul hanya jika belum ada chat & tidak streaming) --}}
-  <div class="chat-welcome" x-show="!hasAnyChat">
-    <h4 class="fw-bold mb-2 text-center">Selamat datang di AI Assistant!</h4>
-    <p class="text-muted text-center mb-3">Tanyakan data daerah dan dapatkan analisis yang akurat.</p>
-    <div class="row g-3 justify-content-center">
+  <div class="chat-welcome bg-white dark:!bg-gray-900" x-show="!hasAnyChat">
+    <h4 class="text-xl font-bold mb-4 text-center text-gray-800 dark:text-white">Selamat datang di AI Assistant!</h4>
+    <p class="text-gray-600 dark:text-gray-300 text-center mb-6">Tanyakan data daerah dan dapatkan analisis yang akurat.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 justify-center">
       @php $prompts = [
         'Bagaimana tren pertumbuhan penduduk 2019–2024?',
         'Buatkan analisis perkembangan ekonomi daerah 5 tahun terakhir.',
@@ -13,8 +15,8 @@
         'Bandingkan PDRB antar kecamatan.'
       ]; @endphp
       @foreach($prompts as $p)
-        <div class="col-12 col-md-6">
-          <button type="button" class="btn btn-light w-100 py-3 shadow-sm"
+        <div>
+          <button type="button" class="w-full py-3 px-4 bg-gray-50 hover:bg-gray-100 dark:!bg-gray-800 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-lg shadow-sm transition-colors duration-200 text-left"
                   @click="$wire.input={{ Js::from($p) }}; $wire.startStream(); hasAnyChat = true;">
             {{ $p }}
           </button>
@@ -24,7 +26,7 @@
   </div>
 
   {{-- CHAT BODY (muncul saat ada chat/streaming) --}}
-  <div class="chat-body" x-ref="scrollArea" x-show="hasAnyChat">
+  <div class="chat-body rounded-lg" x-ref="scrollArea" x-show="hasAnyChat">
 
     {{-- Riwayat permanen --}}
     @foreach($history as $i => $msg)
@@ -40,9 +42,9 @@
           {{-- sumber (bisa banyak) --}}
           @if(!$isUser && !empty($msg['sources']))
             <div class="sources mt-1">
-              <small class="text-muted">Sumber:
+              <small class="text-gray-500 dark:text-gray-400">Sumber:
                 @foreach($msg['sources'] as $k => $s)
-                  <a href="{{ $s['url'] ?? '#' }}" target="_blank">
+                  <a href="{{ $s['url'] ?? '#' }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline">
                     {{ $s['title'] ?? ($s['url'] ?? 'sumber') }}
                   </a>@if($k < count($msg['sources'])-1), @endif
                 @endforeach
@@ -52,9 +54,9 @@
 
           {{-- INSIGHTS (opsional) --}}
           @if(!$isUser && !empty($msg['insights']))
-            <ul class="insights mt-2 ps-4 text-sm">
+            <ul class="insights mt-2 ps-4 text-sm text-gray-700 dark:text-gray-300">
               @foreach($msg['insights'] as $bullet)
-                <li>{{ $bullet }}</li>
+                <li class="mb-1">{{ $bullet }}</li>
               @endforeach
             </ul>
           @endif
@@ -101,9 +103,9 @@
           <div class="content" x-text="pending.answer"></div>
 
           <div class="sources" x-show="pending.sources.length">
-            <small class="text-muted">Sumber:
+            <small class="text-gray-500 dark:text-gray-400">Sumber:
               <template x-for="(s,i) in pending.sources" :key="i">
-                <span><a :href="s.url" target="_blank" x-text="s.title || s.url"></a><span x-show="i<pending.sources.length-1">, </span></span>
+                <span><a :href="s.url" target="_blank" x-text="s.title || s.url" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"></a><span x-show="i<pending.sources.length-1">, </span></span>
               </template>
             </small>
           </div>
@@ -118,157 +120,25 @@
   </div>
 
   {{-- INPUT BAR --}}
-  <form wire:submit.prevent="startStream" class="chat-input">
-    <input type="text" class="form-control" placeholder="Ketik pertanyaan…"
-           wire:model.defer="input"
-           @keydown.enter.prevent="$wire.startStream(); hasAnyChat = true;">
-    <button class="btn btn-primary" type="submit" @click="hasAnyChat = true">
-      <i class="bi bi-send"></i>
-    </button>
-    <button class="btn btn-outline-secondary" type="button" @click="stop" x-show="streaming">Stop</button>
+  <form wire:submit.prevent="startStream" class="chat-input w-full bg-white dark:!bg-gray-900">
+    <div class="flex w-full gap-2 items-stretch rounded-lg">
+      <input type="text" class="flex-1 min-w-0 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:!bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ketik pertanyaan…"
+             wire:model.defer="input"
+             @keydown.enter.prevent="$wire.startStream(); hasAnyChat = true;">
+      <button class="px-4 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center justify-center" type="submit" @click="hasAnyChat = true">
+        <i class="bi bi-send"></i>
+      </button>
+      <button class="px-4 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 rounded-lg transition-colors duration-200 border border-gray-300 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 flex items-center justify-center" type="button" @click="stop" x-show="streaming">Stop</button>
+    </div>
   </form>
+
+@else
+  <div class="p-6 text-center">
+    <h3 class="text-xl font-semibold mb-4">Masuk untuk menggunakan AI Assistant</h3>
+    <p class="mb-4 text-gray-600 dark:text-gray-300">Silakan login terlebih dahulu untuk memulai chat dengan OpenAI.</p>
+    <a href="{{ route('login') }}" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">Login via Portal HSU</a>
+  </div>
+@endauth
+
 </div>
 
-@push('scripts')
-  <style>
-    .chat-shell{display:flex;flex-direction:column;gap:10px}
-    .chat-welcome{padding:18px 6px}
-    .chat-body{
-      display:flex;flex-direction:column;gap:12px;
-      min-height:260px;max-height:52vh;overflow:auto;
-      background:var(--bs-body-bg);border:1px solid var(--bs-border-color);
-      border-radius:.75rem;padding:12px
-    }
-    .chat-msg{display:flex;width:100%}
-    .chat-msg.user{justify-content:flex-end}
-    .chat-msg.ai{justify-content:flex-start}
-    .chat-bubble{
-      display:inline-block;max-width:78%;
-      padding:12px 14px;border-radius:16px;
-      box-shadow:0 1px 2px rgba(0,0,0,.05)
-    }
-    .chat-bubble.user{
-      background:#0d6efd;color:#fff;border-bottom-right-radius:6px
-    }
-    .chat-bubble.ai{
-      background:#f6f7fb;border-bottom-left-radius:6px
-    }
-    .role-tag{font-size:.72rem;font-weight:700;opacity:.7;margin-bottom:4px}
-    .content{white-space:pre-wrap;line-height:1.55}
-    .sources{margin-top:6px}
-    .chart-wrap{margin-top:10px}
-    .chat-input{display:flex;gap:8px;align-items:center}
-    .chat-input .form-control{border-radius:.75rem}
-    @media (prefers-color-scheme: dark){
-      .chat-bubble.ai{background:#1f2330;color:#e8ecf7}
-      .chat-body{background:#0f1320}
-    }
-
-    /* animasi titik tiga */
-    .role-tag.loading::after {
-      content: '...';
-      animation: dots 1.5s steps(3, end) infinite;
-    }
-
-    @keyframes dots {
-      0%   { content: ''; }
-      33%  { content: '.'; }
-      66%  { content: '..'; }
-      100% { content: '...'; }
-    }
-  </style>
-
-
-  <script>
-  function encodeHistoryBase64(history){ try{ return btoa(unescape(encodeURIComponent(JSON.stringify(history)))); }catch{ return ''; } }
-
-  // Render chart untuk bubble permanen
-  window.renderChart = (viz, data, canvasId) => ({
-    chart:null,
-    render(){
-      const el=document.getElementById(canvasId);
-      if(!el || !viz || !Array.isArray(data) || !data.length) return;
-      const labels=data.map(d=>d[viz.x]);
-      const datasets=(viz.y||[]).map(y=>({label:y,data:data.map(d=>d[y])}));
-      if(this.chart) this.chart.destroy();
-      this.chart=new Chart(el,{type:viz.type||'line',data:{labels,datasets},
-        options:{responsive:true,plugins:{title:{display:!!viz?.options?.title,text:viz?.options?.title||''}}}});
-    }
-  });
-
-  // Controller chat (Alpine)
-  window.chatBox = (hasHistoryInit=false)=>({
-    es:null, streaming:false, hasAnyChat:hasHistoryInit,
-    pending:{answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'},
-
-    init(){
-      // Mulai SSE dari Livewire
-      window.addEventListener('chat-start',(e)=>{
-        const msg=e.detail?.message||''; const h=e.detail?.history||[];
-        if(!msg) return; this.start(msg,h); this.hasAnyChat=true;
-      });
-      // Tutup stream jika modal ditutup
-      window.addEventListener('chat-modal-closed', this.stop.bind(this));
-    },
-
-    start(message,history){
-      this.stop(); this.streaming=true;
-      this.pending={answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'};
-      this.$nextTick(()=>this.scrollBottom());
-
-      const base=window.SDI_STREAM_URL || '/api/chatbot/stream';
-      const h=encodeHistoryBase64(history||[]);
-      const url=`${base}?message=${encodeURIComponent(message)}${h?('&h='+encodeURIComponent(h)):""}`;
-      this.es=new EventSource(url);
-
-      this.es.addEventListener('delta',ev=>{
-        const {text}=JSON.parse(ev.data||'{}');
-        if(typeof text==='string'){ this.pending.answer+=text; this.scrollBottom(); }
-      });
-
-      this.es.addEventListener('final', async (ev) => {
-        let data = {};
-        try { data = JSON.parse(ev.data || '{}'); } catch (e) { console.error('parse final', e); }
-
-        // 1) viz -> array
-        const viz = Array.isArray(data.viz) ? data.viz : (data.viz ? [data.viz] : []);
-
-        // 2) data_preview -> dukung 2 bentuk:
-        //    a) array of {source, rows: [...]}
-        //    b) array of rows (flat)
-        let preview = data.data_preview ?? [];
-        if (!Array.isArray(preview)) preview = [];
-        if (preview.length && !('rows' in (preview[0] || {}))) {
-          // flat → bungkus sebagai satu sumber
-          preview = [{ rows: preview }];
-        }
-
-        // 3) sematkan headline bila ada
-        const content = data.headline
-          ? `${data.headline}\n\n${data.answer || ''}`
-          : (data.answer || '');
-
-        await this.$wire.appendAssistant(
-          content,
-          data.sources || [],
-          viz,
-          preview,
-          data.insights || []
-        );
-
-        // bereskan state UI
-        this.streaming = false; // jika Anda pakai flag ini
-        this.es?.close(); this.es = null;
-        this.$nextTick(() => this.scrollBottom());
-      });
-
-
-      this.es.addEventListener('error',()=>{ this.streaming=false; this.es?.close(); this.es=null; });
-    },
-
-    stop(){ if(this.es){ this.es.close(); this.es=null; } this.streaming=false; },
-
-    scrollBottom(){ const box=this.$refs.scrollArea; if(!box) return; box.scrollTop=box.scrollHeight; }
-  });
-  </script>
-@endpush

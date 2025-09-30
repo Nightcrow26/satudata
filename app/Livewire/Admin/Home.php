@@ -32,27 +32,42 @@ class Home extends Component
     {
         \Carbon\Carbon::setLocale('id');
         $this->aspekCount      = Aspek::count();
-        $this->datasetCount    = Dataset::count();
-        $this->instansiCount   = Skpd::whereColumn('id','unor_induk_id')->count();
-        $this->publikasiCount  = Publikasi::count();
+        // Jika user biasa, batasi ke SKPD miliknya
+        if (auth()->check() && auth()->user()->hasRole('user')) {
+            $userSkpd = auth()->user()->skpd_uuid;
+
+            $this->datasetCount = Dataset::where('instansi_id', $userSkpd)->count();
+            $this->instansiCount = Skpd::whereColumn('id','unor_induk_id')->where('id', $userSkpd)->count();
+            $this->publikasiCount = Publikasi::where('instansi_id', $userSkpd)->count();
+        } else {
+            $this->datasetCount    = Dataset::count();
+            $this->instansiCount   = Skpd::whereColumn('id','unor_induk_id')->count();
+            $this->publikasiCount  = Publikasi::count();
+        }
 
         // Data Terbaru
-        $this->latestData = Dataset::with(['aspek', 'skpd'])
+        // Data Terbaru (batasi jika user role 'user')
+        $dsQuery = Dataset::with(['aspek', 'skpd'])
             ->latest('updated_at')
-            ->where('status', 'published')
-            ->take(4)
-            ->get();
+            ->where('status', 'published');
 
-        $this->latestPublikasi = Publikasi::with(['aspek', 'skpd'])
+        $pubQuery = Publikasi::with(['aspek', 'skpd'])
             ->latest('updated_at')
-            ->where('status', 'published')
-            ->take(4)
-            ->get();
+            ->where('status', 'published');
 
-        $this->latestIndikator = Walidata::with(['aspek', 'skpd'])
-            ->latest('verifikasi_data')
-            ->take(4)
-            ->get();
+        $wdQuery = Walidata::with(['aspek', 'skpd'])
+            ->latest('verifikasi_data');
+
+        if (auth()->check() && auth()->user()->hasRole('user')) {
+            $userSkpd = auth()->user()->skpd_uuid;
+            $dsQuery->where('instansi_id', $userSkpd);
+            $pubQuery->where('instansi_id', $userSkpd);
+            $wdQuery->where('skpd_id', $userSkpd);
+        }
+
+        $this->latestData = $dsQuery->take(10)->get();
+        $this->latestPublikasi = $pubQuery->take(10)->get();
+        $this->latestIndikator = $wdQuery->take(10)->get();
 
         // Inisialisasi Chart
         $this->initLineChart();
@@ -67,27 +82,49 @@ class Home extends Component
 
         foreach ($months as $month) {
             $this->lineLabels[] = Carbon::createFromFormat('Y-m', $month)->translatedFormat('M Y');
-            $this->lineData[]   = Dataset::whereYear('created_at', substr($month, 0, 4))
-                ->whereMonth('created_at', substr($month, 5, 2))
-                ->count();
+            $q = Dataset::whereYear('created_at', substr($month, 0, 4))
+                ->whereMonth('created_at', substr($month, 5, 2));
+            if (auth()->check() && auth()->user()->hasRole('user')) {
+                $q->where('instansi_id', auth()->user()->skpd_uuid);
+            }
+            $this->lineData[] = $q->count();
         }
     }
 
     protected function initDonutChart(): void
     {
-        $topAspek = Dataset::with('aspek')
+        $topAspekQuery = Dataset::with('aspek')
             ->selectRaw('aspek_id, COUNT(*) as total')
             ->groupBy('aspek_id')
             ->orderByDesc('total')
-            ->take(5)
-            ->get();
+            ->take(5);
+
+        if (auth()->check() && auth()->user()->hasRole('user')) {
+            $topAspekQuery->where('instansi_id', auth()->user()->skpd_uuid);
+        }
+
+        $topAspek = $topAspekQuery->get();
 
         $this->donutLabels = $topAspek->map(fn($d) => $d->aspek->nama ?? '-')->toArray();
         $this->donutData   = $topAspek->map(fn($d) => $d->total)->toArray();
     }
 
-    public function render()
+   public function render()
     {
+        if (auth()->guest() || (auth()->check() && auth()->user()->hasRole('guest'))) {
+            return view('public.home.index', [
+                'aspekCount'      => $this->aspekCount,
+                'datasetCount'    => $this->datasetCount,
+                'instansiCount'   => $this->instansiCount,
+                'publikasiCount'  => $this->publikasiCount,
+                'latestData'      => $this->latestData,
+                'latestPublikasi' => $this->latestPublikasi,
+                'latestIndikator' => $this->latestIndikator,
+            ])->layout('components.layouts.public', [
+                'title' => 'Beranda'
+            ]);
+        }
+
         return view('livewire.admin.home', [
             'aspekCount'      => $this->aspekCount,
             'datasetCount'    => $this->datasetCount,
@@ -100,6 +137,8 @@ class Home extends Component
             'lineData'        => $this->lineData,
             'donutLabels'     => $this->donutLabels,
             'donutData'       => $this->donutData,
+        ])->layout('components.layouts.app', [
+            'title' => 'Dashboard'
         ]);
     }
 }

@@ -27,7 +27,11 @@ class SkpdCrud extends Component
     public string     $alamat          = '';
     public string     $telepon         = '';
     public string     $deleteId        = '';
-    public $foto;                
+    public $foto;
+    
+    // Modal properties
+    public bool $showModal = false;
+    public bool $showDeleteModal = false;                
     
     public int $perPage = 10;
 
@@ -84,6 +88,9 @@ class SkpdCrud extends Component
                 ? 'SKPD berhasil diperbarui!' 
                 : 'SKPD berhasil dibuat!';
 
+        $this->showModal = false;
+        $this->resetInput();
+
         $this->dispatch('swal', 
             title   :$message,
             icon    :'success',
@@ -91,7 +98,7 @@ class SkpdCrud extends Component
             position:'bottom-end',
             timer   : 3000
         );
-        $this->dispatch('hide-modal', id:'skpd-modal');
+        
         $this->resetPage();
     }
 
@@ -240,8 +247,7 @@ class SkpdCrud extends Component
 
         $this->skpd_id = '';
         $this->editingSkpd = null;
-
-        $this->dispatch('show-modal', id:'skpd-modal');
+        $this->showModal = true;
     }
 
     public function showEditModal(string $id): void
@@ -256,20 +262,21 @@ class SkpdCrud extends Component
         $this->alamat    = $skpd->alamat ?? ' ';
         $this->telepon   = $skpd->telepon ?? ' ';    
 
-        $this->editingSkpd   = $skpd;
-        $this->dispatch('show-modal', id:'skpd-modal');
+        $this->editingSkpd = $skpd;
+        $this->showModal = true;
     }
 
     public function closeModal(): void
     {
-        $this->dispatch('hide-modal', id:'skpd-modal');
+        $this->showModal = false;
         $this->resetInput();
     }
 
     public function confirmDelete(string $id): void
     {
-        $this->deleteId        = $id;
-        $this->dispatch('show-modal', id:'delete-modal');
+        $this->deleteId = $id;
+        $this->nama = Skpd::find($id)?->nama ?? '';
+        $this->showDeleteModal = true;
     }
 
     public function deleteSkpdConfirmed(): void
@@ -277,6 +284,10 @@ class SkpdCrud extends Component
         $skpd = Skpd::findOrFail($this->deleteId);
         $skpd->foto && Storage::disk('s3')->delete($skpd->foto);
         $skpd->delete();
+        
+        $this->showDeleteModal = false;
+        $this->deleteId = '';
+        
         $this->dispatch('swal', 
             title   :'SKPD berhasil dihapus!',
             icon    :'success',
@@ -285,13 +296,13 @@ class SkpdCrud extends Component
             timer   : 3000
         );
         
-        $this->dispatch('hide-modal', id:'delete-modal');
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id:'delete-modal');
+        $this->showDeleteModal = false;
+        $this->deleteId = '';
     }
 
 }

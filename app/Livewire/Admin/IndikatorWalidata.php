@@ -13,6 +13,8 @@ use App\Models\Walidata;
 use App\Models\Skpd;
 use App\Models\Aspek;
 use App\Models\Indikator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Bidang;
 
 #[Title('Walidata')]
@@ -38,6 +40,8 @@ class IndikatorWalidata extends Component
     public ?string $aspek_id = null;
     public ?string $indikator_id = null;
     public ?string $bidang_id = null;
+    public string $nama = '';
+    public string $indikatorSearch = '';
 
     public int $perPage = 10;
 
@@ -70,9 +74,19 @@ class IndikatorWalidata extends Component
     public function mount(): void
     {
         // Dropdown master
-        $this->availableSkpds      = Skpd::orderBy('nama')->whereColumn('id', 'unor_induk_id')->get();
+        if (auth()->user()->hasRole('user')) {
+            $this->availableSkpds = Skpd::orderBy('nama')
+            ->whereColumn('id', 'unor_induk_id')
+            ->where('id', auth()->user()->skpd_uuid)
+            ->get();
+        }
+        else {
+            $this->availableSkpds = Skpd::orderBy('nama')
+            ->whereColumn('id', 'unor_induk_id')
+            ->get();
+        }
         $this->availableAspeks     = Aspek::orderBy('nama')->get();
-        $this->availableIndikators = Indikator::orderBy('kode_indikator')->get();
+        $this->loadIndikators();
         $this->availableBidangs    = Bidang::orderBy('kode_bidang')->get();
 
         // Lock SKPD untuk role 'user'
@@ -90,7 +104,14 @@ class IndikatorWalidata extends Component
                 $q->where(function ($x) use ($term) {
                     $x->where('satuan', 'ilike', $term)
                       ->orWhere('tahun', 'ilike', $term)
+                      ->orWhere('tahun', 'ilike', $term)
                       ->orWhere('data',  'ilike', $term);
+                })
+                ->orWhereHas('indikator', function ($s) use ($term) {
+                    $s->where('uraian_indikator', 'ilike', $term);
+                })
+                ->orWhereHas('bidang', function ($s) use ($term) {
+                    $s->where('uraian_bidang', 'ilike', $term);
                 })
                 ->orWhereHas('skpd', function ($s) use ($term) {
                     $s->where('singkatan', 'ilike', $term)
@@ -115,13 +136,16 @@ class IndikatorWalidata extends Component
     {
         $this->reset([
             'walidata_id', 'satuan', 'tahun', 'data',
-            'aspek_id', 'indikator_id', 'bidang_id',
+            'aspek_id', 'indikator_id', 'bidang_id', 'indikatorSearch',
         ]);
 
         // jaga skpd_id tetap terkunci untuk role 'user'
         if (!auth()->user()->hasRole('user')) {
             $this->skpd_id = null;
         }
+
+        // Reset indikator list to show all
+        $this->loadIndikators();
 
         $this->editingWalidata = null;
     }
@@ -133,6 +157,41 @@ class IndikatorWalidata extends Component
 
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'walidata-modal');
+        
+        // Update Tom Select options dengan format yang benar
+        $this->js("
+            setTimeout(() => {
+                // Update skpd options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'skpd_id',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . "
+                    }
+                }));
+                
+                // Update aspek options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'aspek_id',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) {
+                            return ['id' => $aspek->id, 'text' => $aspek->nama];
+                        })->values()) . "
+                    }
+                }));
+                
+                // Update bidang options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'bidang_id',
+                        options: " . json_encode($this->availableBidangs->map(function($bidang) {
+                            return ['id' => $bidang->id, 'text' => $bidang->nama];
+                        })->values()) . "
+                    }
+                }));
+            }, 100);
+        ");
     }
 
     public function showEditModal(string $id): void
@@ -151,27 +210,107 @@ class IndikatorWalidata extends Component
         $this->indikator_id = $wd->indikator_id;
         $this->bidang_id    = $wd->bidang_id;
 
+        // Set search field dengan nama indikator yang sedang diedit
+        if ($wd->indikator_id && $wd->indikator) {
+           $this->indikatorSearch = trim(($wd->indikator->kode_indikator ?? '').' - '.($wd->indikator->uraian_indikator ?? ''));
+        }
+
         $this->editingWalidata = $wd;
         $this->showModal = true;
 
         $this->dispatch('show-modal', id: 'walidata-modal');
+        
+        // Update Tom Select options dan set selected values
+        $this->js("
+            setTimeout(() => {
+                // Update SKPD options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        id: 'skpd-select',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . ",
+                        value: '" . $this->skpd_id . "'
+                    }
+                }));
+                
+                // Update aspek options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        id: 'aspek-select',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) {
+                            return ['id' => $aspek->id, 'text' => $aspek->nama];
+                        })->values()) . ",
+                        value: '" . $this->aspek_id . "'
+                    }
+                }));
+                
+                // Update indikator options dengan format [{id, text}] - sama dengan template blade
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        id: 'indikator-select',
+                        options: " . json_encode($this->availableIndikators->map(function($indikator) {
+                            return ['id' => $indikator->id, 'text' => trim(($indikator->kode_indikator ?? '').' - '.($indikator->uraian_indikator ?? ''))];
+                        })->values()) . ",
+                        value: '" . $this->indikator_id . "',
+                        text: '" . addslashes(trim(($wd->indikator->kode_indikator ?? '').' - '.($wd->indikator->uraian_indikator ?? ''))) . "'
+                    }
+                }));
+                
+                // Update bidang options dengan format [{id, text}] - sama dengan template blade
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        id: 'bidang-select',
+                        options: " . json_encode($this->availableBidangs->map(function($bidang) {
+                            return ['id' => $bidang->id, 'text' => trim(($bidang->kode_bidang ? $bidang->kode_bidang.' - ' : '').($bidang->uraian_bidang ?? ''))];
+                        })->values()) . ",
+                        value: '" . $this->bidang_id . "'
+                    }
+                }));
+            }, 500);
+        ");
+    }
+
+    private function normalizeIndikatorId(): void
+    {
+        if (blank($this->indikator_id)) {
+            return;
+        }
+
+        // Jika sudah UUID, biarkan
+        if (\Illuminate\Support\Str::isUuid($this->indikator_id)) {
+            return;
+        }
+
+        // Jika user/tomselect entah bagaimana mengirim label "KODE - Uraian",
+        // petakan ke id melalui kode_indikator.
+        $code = trim(strtok($this->indikator_id, '-')); // ambil bagian sebelum ' - '
+        if ($code !== '') {
+            $found = \App\Models\Indikator::where('kode_indikator', $code)->value('id');
+            $this->indikator_id = $found ?: null;
+        } else {
+            $this->indikator_id = null;
+        }
     }
 
     public function saveWalidata(): void
     {
-        // Lock SKPD untuk role 'user'
         if (auth()->user()->hasRole('user')) {
             $this->skpd_id = auth()->user()->skpd_uuid ?? null;
         }
 
-        // Auto-sync bidang dari indikator (jika ada)
-        if ($this->indikator_id) {
-            $this->bidang_id = \App\Models\Indikator::whereKey($this->indikator_id)->value('bidang_id');
+        // 1) Normalisasi indikator_id (label → UUID)
+        $this->normalizeIndikatorId();
+
+        // 2) Sinkron bidang dari indikator (hanya jika indikator_id valid UUID)
+        if ($this->indikator_id && \Illuminate\Support\Str::isUuid($this->indikator_id)) {
+            $this->bidang_id = optional(\App\Models\Indikator::find($this->indikator_id))->bidang_id;
         } else {
             $this->bidang_id = null;
         }
 
-        $validated = $this->validate(); // validasi setelah sinkron
+        // 3) Validasi SETELAH normalisasi & sinkron
+        $validated = $this->validate();
 
         if ($this->walidata_id) {
             \App\Models\Walidata::findOrFail($this->walidata_id)->update($validated);
@@ -189,7 +328,6 @@ class IndikatorWalidata extends Component
         $this->resetPage();
     }
 
-
     public function closeModal(): void
     {
         $this->showModal = false;
@@ -201,6 +339,7 @@ class IndikatorWalidata extends Component
     {
         $this->deleteId = $id;
         $this->showDeleteModal = true;
+        $this->nama = Walidata::find($id)?->indikator?->uraian_indikator ?? ''; // Set uraian untuk ditampilkan di modal
         $this->dispatch('show-modal', id: 'delete-modal');
     }
 
@@ -220,64 +359,64 @@ class IndikatorWalidata extends Component
         $this->showDeleteModal = false;
     }
 
+    public function loadIndikators(): void
+    {
+        $query = Indikator::orderBy('kode_indikator');
+        
+        if (!empty($this->indikatorSearch)) {
+            $search = "%{$this->indikatorSearch}%";
+            $query->where(function ($q) use ($search) {
+                $q->where('kode_indikator', 'ilike', $search)
+                  ->orWhere('uraian_indikator', 'ilike', $search);
+            });
+        }
+        
+        // Load more items for Tom Select search functionality
+        $this->availableIndikators = $query->limit(100)->get();
+    }
+
+    public function updatedIndikatorSearch(): void
+    {
+        $this->loadIndikators();
+        // Jangan reset selection jika user sedang mencari
+        // Biarkan user memilih dari hasil pencarian
+    }
+
+
+
     public function updatedIndikatorId($value): void
     {
-        // Debug log
-        \Log::info('updatedIndikatorId called with value:', ['value' => $value]);
-        
         if (blank($value)) {
             $this->bidang_id = null;
-            
-            // Dispatch event untuk clear bidang
-            $this->dispatch('tom-update', 
-                id: 'bidang', 
-                options: [], 
-                value: null,
-                text: ''
-            );
-            
-            \Log::info('Dispatched tom-update for clearing bidang');
             return;
         }
 
-        // Get bidang_id from selected indikator
-        $this->bidang_id = \App\Models\Indikator::whereKey($value)->value('bidang_id');
-        
-        \Log::info('Found bidang_id:', ['bidang_id' => $this->bidang_id]);
+        $code = trim(strtok($value, '-')); // ambil bagian depan sebelum ' - '
+        $found = \App\Models\Indikator::where('kode_indikator', trim($code))->value('id');
+        $this->indikator_id = $found ?: null;
 
-        $opt = [];
-        $text = '';
-        
-        if ($this->bidang_id) {
-            $bid = \App\Models\Bidang::select('id','kode_bidang','uraian_bidang')->find($this->bidang_id);
-            if ($bid) {
-                $text = trim(($bid->kode_bidang ? $bid->kode_bidang.' - ' : '').($bid->uraian_bidang ?? ''));
-                $opt  = [['id' => $bid->id, 'text' => $text]];
-            }
+        if ($this->indikator_id) {
+            $this->bidang_id = \App\Models\Indikator::find($this->indikator_id)->bidang_id;
+        } else {
+            $this->bidang_id = null;
         }
-
-        \Log::info('Prepared data for dispatch:', [
-            'options' => $opt,
-            'value' => $this->bidang_id,
-            'text' => $text
-        ]);
-
-        // Dispatch event untuk update bidang
-        $this->dispatch('tom-update', 
-            id: 'bidang', 
-            options: $opt, 
-            value: $this->bidang_id, 
-            text: $text
-        );
-        
-        \Log::info('Dispatched tom-update for updating bidang');
     }
 
     public function sinkronWalidata()
     {
         try {
+            // 1) Naikkan batas eksekusi proses PHP
+            //    300 detik = 5 menit (silakan sesuaikan kebutuhan)
+            @set_time_limit(300);
+
+            // (Opsional) jika butuh, bisa juga buka limit memori:
+            // @ini_set('memory_limit', '512M');
+
+            // 2) Ambil data dari API dengan timeout & retry yang lebih aman
             $response = Http::withToken('d71e88f811fdf46c2d3afc5ab7a3c41b')
-                ->timeout(60)
+                ->connectTimeout(20)   // batas koneksi awal
+                ->timeout(120)         // batas total request
+                ->retry(3, 500)        // coba ulang 3x jeda 500ms bila 5xx/timeout
                 ->get('https://sipd.go.id/ewalidata/serv/get_dssd_final', [
                     'kodepemda' => '6308',
                     'tahun'     => 2024,
@@ -292,63 +431,103 @@ class IndikatorWalidata extends Component
                 throw new \Exception("Format data tidak valid");
             }
 
+            // 3) Cache lokal untuk menghindari firstOrCreate berulang
+            $cacheBidang    = []; // ['kode_bidang' => BidangModel]
+            $cacheIndikator = []; // ['kode_indikator' => IndikatorModel]
+
+            // 4) Kumpulan rows untuk Walidata::upsert
+            $rowsWalidata = [];
+            $now = now();
             $sukses = 0;
+
+            DB::beginTransaction();
+
             foreach ($data as $item) {
-                // 1. Sinkron bidang
-                $bidang = Bidang::firstOrCreate(
-                    ['kode_bidang' => $item['kodebidang']],
-                    [
-                        'id'            => (string) Str::uuid(),
-                        'uraian_bidang' => $item['uraibidang'] ?? null,
-                    ]
-                );
+                // --- BIDANG ---
+                $kodeBidang = $item['kodebidang'] ?? null;
+                if (!$kodeBidang) {
+                    // skip jika kode bidang tidak ada
+                    continue;
+                }
 
-                // 2. Sinkron indikator
-                $indikator = Indikator::firstOrCreate(
-                    ['kode_indikator' => $item['kodeindikator']],
-                    [
-                        'id'                => (string) Str::uuid(),
-                        'uraian_indikator'  => $item['uraian_indikator'] ?? null,
-                        'bidang_id'         => $bidang->id,
-                    ]
-                );
+                if (!isset($cacheBidang[$kodeBidang])) {
+                    // cari existing dulu (lebih hemat dari firstOrCreate di loop besar)
+                    $existingBidang = Bidang::where('kode_bidang', $kodeBidang)->first();
+                    if (!$existingBidang) {
+                        $existingBidang = Bidang::create([
+                            'id'            => (string) Str::uuid(),
+                            'kode_bidang'   => $kodeBidang,
+                            'uraian_bidang' => $item['uraibidang'] ?? null,
+                        ]);
+                    }
+                    $cacheBidang[$kodeBidang] = $existingBidang;
+                }
+                $bidang = $cacheBidang[$kodeBidang];
 
-                // pilih timestamp yang tersedia dari API
+                // --- INDIKATOR ---
+                $kodeIndikator = $item['kodeindikator'] ?? null;
+                if (!$kodeIndikator) {
+                    // skip jika kode indikator tidak ada
+                    continue;
+                }
+
+                if (!isset($cacheIndikator[$kodeIndikator])) {
+                    $existingIndikator = Indikator::where('kode_indikator', $kodeIndikator)->first();
+                    if (!$existingIndikator) {
+                        $existingIndikator = Indikator::create([
+                            'id'               => (string) Str::uuid(),
+                            'kode_indikator'   => $kodeIndikator,
+                            'uraian_indikator' => $item['uraian_indikator'] ?? null,
+                            'bidang_id'        => $bidang->id,
+                        ]);
+                    } else {
+                        // pastikan relasi bidang terjaga (optional)
+                        if ($existingIndikator->bidang_id !== $bidang->id) {
+                            $existingIndikator->update(['bidang_id' => $bidang->id]);
+                        }
+                    }
+                    $cacheIndikator[$kodeIndikator] = $existingIndikator;
+                }
+                $indikator = $cacheIndikator[$kodeIndikator];
+
+                // --- Timestamp dari API ---
                 $apiTimestamp = $item['tanggal_verifikasi_pembinadata']
                     ?? $item['tanggal_verifikasi_walidata']
                     ?? null;
 
-                $parsedTimestamp = $apiTimestamp 
-                    ? Carbon::parse($apiTimestamp)
-                    : now();
+                $parsedTimestamp = $apiTimestamp ? Carbon::parse($apiTimestamp) : $now;
 
-                $walidata = Walidata::find($item['idtransaksi']);
-                if ($walidata) {
-                    $walidata->update([
-                        'satuan'       => $item['satuan'] ?? '',
-                        'tahun'        => $item['tahun'] ?? '2024',
-                        'data'         => $item['data'] ?? '0',
-                        'indikator_id' => $indikator->id,
-                        'bidang_id'    => $bidang->id,
-                        'verifikasi_data'   => $parsedTimestamp,
-                    ]);
-                } else {
-                    Walidata::create([
-                        'id'           => $item['idtransaksi'],
-                        'satuan'       => $item['satuan'] ?? '',
-                        'tahun'        => $item['tahun'] ?? '2024',
-                        'data'         => $item['data'] ?? '0',
-                        'indikator_id' => $indikator->id,
-                        'bidang_id'    => $bidang->id,
-                        'created_at'   => $parsedTimestamp,
-                        'verifikasi_data'   => $parsedTimestamp,
-                    ]);
-                }
-
+                // --- Siapkan row untuk upsert Walidata ---
+                $rowsWalidata[] = [
+                    'id'              => $item['idtransaksi'],                 // unique key
+                    'satuan'          => $item['satuan'] ?? '',
+                    'tahun'           => (string) ($item['tahun'] ?? '2024'),
+                    'data'            => (string) ($item['data'] ?? '0'),
+                    'indikator_id'    => $indikator->id,
+                    'bidang_id'       => $bidang->id,
+                    // timestamps
+                    'created_at'      => $parsedTimestamp, // dipakai ketika insert
+                    'updated_at'      => $now,             // dipakai ketika update
+                    'verifikasi_data' => $parsedTimestamp,
+                ];
 
                 $sukses++;
             }
 
+            // 5) Upsert Walidata sekaligus (sangat cepat)
+            if (!empty($rowsWalidata)) {
+                // kolom keunikan: 'id'
+                // kolom yang di-update jika sudah ada:
+                $updateCols = [
+                    'satuan','tahun','data','indikator_id','bidang_id',
+                    'verifikasi_data','updated_at'
+                ];
+                Walidata::upsert($rowsWalidata, ['id'], $updateCols);
+            }
+
+            DB::commit();
+
+            // 6) Notifikasi UI
             $this->dispatch('swal', 
                 title   : "Sinkronisasi selesai ($sukses data)",
                 icon    : 'success',
@@ -358,7 +537,8 @@ class IndikatorWalidata extends Component
             );
 
         } catch (\Throwable $e) {
-            \Log::error('Sinkron walidata error', ['msg' => $e->getMessage()]);
+            DB::rollBack();
+            Log::error('Sinkron walidata error', ['msg' => $e->getMessage(), 'line' => $e->getLine()]);
             $this->dispatch('swal',
                 title   : "Gagal sinkron: ".$e->getMessage(),
                 icon    : 'error',

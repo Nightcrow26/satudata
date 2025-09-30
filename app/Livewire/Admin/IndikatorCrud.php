@@ -26,8 +26,16 @@ class IndikatorCrud extends Component
     public string $kode_indikator = '';
     public string $uraian_indikator = '';
     public string $bidang_id = '';
+    public string $nama = '';
 
     public string $deleteId = '';
+    
+    public $bidangOptions = [];
+
+    public function mount(): void
+    {
+        $this->bidangOptions = Bidang::orderBy('kode_bidang')->get();
+    }
 
     public function updatedPerPage() { $this->resetPage(); }
 
@@ -69,6 +77,21 @@ class IndikatorCrud extends Component
         $this->showModal = true;
 
         $this->dispatch('show-modal', id: 'indikator-modal');
+        
+        // Update Tom Select options dengan format yang benar
+        $this->js("
+            setTimeout(() => {
+                // Update bidang options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'bidang_id',
+                        options: " . json_encode($this->bidangOptions->map(function($bidang) {
+                            return ['id' => $bidang->id, 'text' => trim(($bidang->kode_bidang ? $bidang->kode_bidang.' - ' : '').($bidang->uraian_bidang ?? ''))];
+                        })->values()) . "
+                    }
+                }));
+            }, 100);
+        ");
     }
 
     public function showEditModal(string $id): void
@@ -84,6 +107,22 @@ class IndikatorCrud extends Component
 
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'indikator-modal');
+        
+        // Update Tom Select options dan set selected values
+        $this->js("
+            setTimeout(() => {
+                // Update bidang options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'bidang_id',
+                        options: " . json_encode($this->bidangOptions->map(function($bidang) {
+                            return ['id' => $bidang->id, 'text' => trim(($bidang->kode_bidang ? $bidang->kode_bidang.' - ' : '').($bidang->uraian_bidang ?? ''))];
+                        })->values()) . ",
+                        value: '" . $this->bidang_id . "'
+                    }
+                }));
+            }, 500);
+        ");
     }
 
     public function saveIndikator(): void
@@ -120,8 +159,9 @@ class IndikatorCrud extends Component
     public function confirmDelete(string $id): void
     {
         $this->deleteId = $id;
+        $indikator = Indikator::findOrFail($id);
+        $this->nama = $indikator->uraian_indikator; // Set uraian untuk ditampilkan di modal
         $this->showDeleteModal = true;
-        $this->dispatch('show-modal', id: 'delete-modal');
     }
 
     public function deleteIndikatorConfirmed(): void
@@ -136,14 +176,17 @@ class IndikatorCrud extends Component
             timer: 3000
         );
 
-        $this->dispatch('hide-modal', id: 'delete-modal');
         $this->showDeleteModal = false;
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+    }
+
+    public function closeDeleteModal(): void
+    {
         $this->showDeleteModal = false;
     }
 }

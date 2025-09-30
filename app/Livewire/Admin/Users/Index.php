@@ -4,18 +4,20 @@ namespace App\Livewire\Admin\Users;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
 use App\Models\User;
 use App\Models\Skpd;
 use App\Library\SikonSplpLibrary;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 
 #[Title('Users')]
 class Index extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     #[Url(except: '')]
     public string $search = '';
@@ -32,6 +34,8 @@ class Index extends Component
     public string $nik              = '';
     public string $role             = '';
     public ?string $skpd_uuid       = null;
+    public $sk_penunjukan           = null; // File upload
+    public ?string $current_sk_penunjukan = null; // Current file path
 
     public array  $availableRoles   = [];
     public $availableSkpds = [];
@@ -63,7 +67,8 @@ class Index extends Component
             ],
             'role'       => 'required|exists:roles,name',
             'nik'        => 'nullable|string',
-            'skpd_uuid'  => 'nullable|exists:skpd,id'
+            'skpd_uuid'  => 'nullable|exists:skpd,id',
+            'sk_penunjukan' => 'nullable|file|mimes:pdf|max:5120', // Max 5MB
         ];
     }
 
@@ -99,7 +104,7 @@ class Index extends Component
     {
         $this->reset([
             'user_id','name','email','nik',
-            'role','skpd_uuid'
+            'role','skpd_uuid','sk_penunjukan','current_sk_penunjukan'
         ]);
         $this->editingUser = null;
     }
@@ -108,7 +113,32 @@ class Index extends Component
     {
         $this->resetValidation();
         $this->resetInput();
-        $this->dispatch('show-modal', id: 'user-modal');
+        $this->showModal = true;
+        
+        // Update Tom Select options dengan format yang benar
+        $this->js("
+            setTimeout(() => {
+                // Update SKPD options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'skpd_uuid',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . "
+                    }
+                }));
+                
+                // Update role options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'role',
+                        options: " . json_encode(collect($this->availableRoles)->map(function($role) {
+                            return ['id' => $role, 'text' => ucfirst($role)];
+                        })->values()) . "
+                    }
+                }));
+            }, 100);
+        ");
     }
 
     public function showEditModal(string $id): void
@@ -123,9 +153,37 @@ class Index extends Component
         $this->nik         = $user->nik ?? '';
         $this->role        = $user->getRoleNames()->first() ?? '';
         $this->skpd_uuid   = $user->skpd_uuid;
+        $this->current_sk_penunjukan = $user->sk_penunjukan;
         $this->editingUser = $user;
 
-        $this->dispatch('show-modal', id: 'user-modal');
+        $this->showModal = true;
+        
+        // Update Tom Select options dan set selected values
+        $this->js("
+            setTimeout(() => {
+                // Update SKPD options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'skpd_uuid',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . ",
+                        value: '" . $this->skpd_uuid . "'
+                    }
+                }));
+                
+                // Update role options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'role',
+                        options: " . json_encode(collect($this->availableRoles)->map(function($role) {
+                            return ['id' => $role, 'text' => ucfirst($role)];
+                        })->values()) . ",
+                        value: '" . $this->role . "'
+                    }
+                }));
+            }, 500);
+        ");
     }
 
     public function saveUser(): void
@@ -152,15 +210,39 @@ class Index extends Component
             }
         }
 
-        // 2. Lanjutkan simpan/update
+        // 2. Handle SK penunjukan upload
+        $skPenunjukanPath = null;
+        if ($this->sk_penunjukan) {
+            // Hapus file lama jika ada (untuk update)
+            if ($this->user_id && $this->current_sk_penunjukan) {
+                Storage::disk('s3')->delete($this->current_sk_penunjukan);
+            }
+            
+            // Generate filename like dataset pattern
+            $originalName = $this->sk_penunjukan->getClientOriginalName();
+            $extension = $this->sk_penunjukan->getClientOriginalExtension();
+            $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
+            
+            // Store file and save path only (not URL) - sama seperti dataset
+            $skPenunjukanPath = $this->sk_penunjukan->storeAs('sk-penunjukan', $filename, 's3');
+        }
+
+        // 3. Lanjutkan simpan/update
         if ($this->user_id) {
             $user = User::findOrFail($this->user_id);
-            $user->update([
+            $updateData = [
                 'name'      => $validated['name'],
                 'email'     => $validated['email'],
                 'skpd_uuid' => $validated['skpd_uuid'],
                 'nik'       => $validated['nik'],
-            ]);
+            ];
+            
+            // Tambahkan SK penunjukan jika ada file baru
+            if ($skPenunjukanPath) {
+                $updateData['sk_penunjukan'] = $skPenunjukanPath;
+            }
+            
+            $user->update($updateData);
             $user->syncRoles($validated['role']);
             $message = 'User berhasil diperbarui!';
         } else {
@@ -169,6 +251,7 @@ class Index extends Component
                 'email'     => $validated['email'],
                 'skpd_uuid' => $validated['skpd_uuid'],
                 'nik'       => $validated['nik'],
+                'sk_penunjukan' => $skPenunjukanPath,
             ]);
             $user->assignRole($validated['role']);
             $message = 'User berhasil dibuat!';
@@ -190,13 +273,13 @@ class Index extends Component
     {
         $this->showModal = false;
         $this->resetInput();
-        $this->dispatch('hide-modal', id: 'user-modal');
     }
 
     public function confirmDelete(string $id): void
     {
         $this->deleteId = $id;
-        $this->dispatch('show-modal', id: 'delete-modal');
+        $this->name = User::find($id)?->name ?? '';
+        $this->showDeleteModal = true;
     }
 
     public function deleteUserConfirmed(): void
@@ -210,13 +293,18 @@ class Index extends Component
             position: 'bottom-end',
             timer: 3000
         );
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+    }
+
+    public function closeDeleteModal(): void
+    {
+        $this->showDeleteModal = false;
     }
 
     public function cariDataAsn()

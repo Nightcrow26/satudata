@@ -44,7 +44,7 @@ class DatasetSearchService
                 'nama'  => (string)$r->nama,
                 'tahun' => (int)($r->tahun ?? 0),
                 'excel' => $r->excel,
-                'url'   => route('dataset.show', $r->id), // sesuaikan route show dataset Anda
+                'url'   => route('admin.dataset.show', $r->id), // sesuaikan route show dataset Anda
                 'score' => max($score, 0.1),
             ];
         })->sortByDesc('score')->values()->all();

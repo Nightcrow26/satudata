@@ -14,17 +14,16 @@
     {{-- Livewire & Vite --}}
     @livewireStyles
 
+    {{-- Anti-FOUC: set kelas .dark sedini mungkin sebelum CSS/JS dimuat --}}
     <script>
-    (function () {
-      try {
-        var t = localStorage.getItem('bsTheme');
-        if (!t) {
-          t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-          localStorage.setItem('bsTheme', t);
-        }
-        document.documentElement.setAttribute('data-bs-theme', t);
-      } catch (e) { /* ignore */ }
-    })();
+        (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var useDark = saved ? (saved === 'dark') : prefersDark;
+          document.documentElement.classList.toggle('dark', useDark);
+        } catch (e) {}
+      })();
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -35,16 +34,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
       crossorigin=""/>
-
-    <style>
-      .table-clean thead th { position: sticky; top: 0; z-index: 1; }
-      .w-40 { width: 40px; } .w-80 { width: 80px; } .w-120 { width: 120px; }
-      .truncate { max-width: 260px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      @media (max-width: 991.98px){ .truncate { max-width: 180px; } }
-    </style>
+    
+    {{-- Tom Select CSS --}}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.default.min.css" rel="stylesheet">
   </head>
 
-  <body class="min-h-screen flex flex-col bg-gray-100 text-gray-800 font-inter">
+  <body class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-inter">
 
     {{-- Nav Mobile --}}
     <x-admin.nav-mobile :title="$title" />
@@ -70,58 +65,22 @@
     <x-admin.chat-fab/>
 
     {{-- Footer --}}
-    <x-admin.footer/>
+    <x-ui.footer/>
 
     {{-- Scripts --}}
     @livewireScripts
-    <script>
-      (function () {
-        function applyTheme(theme) {
-          document.documentElement.setAttribute('data-bs-theme', theme);
-          try { localStorage.setItem('bsTheme', theme); } catch(e) {}
-
-          // sinkronkan semua switch
-          document.querySelectorAll('.js-theme-switch').forEach(sw => {
-            sw.checked = (theme === 'dark');
-          });
-        }
-
-        function bindSwitches() {
-          document.querySelectorAll('.js-theme-switch').forEach(sw => {
-            if (sw.dataset.bound) return;       // hindari double-binding
-            sw.addEventListener('change', e => {
-              applyTheme(e.target.checked ? 'dark' : 'light');
-            });
-            sw.dataset.bound = '1';
-          });
-        }
-
-        // Inisialisasi saat halaman siap
-        document.addEventListener('DOMContentLoaded', function () {
-          applyTheme(localStorage.getItem('bsTheme') || 'light');
-          bindSwitches();
-        });
-
-        // Re-apply setelah Livewire SPA navigation
-        document.addEventListener('livewire:navigated', function () {
-          applyTheme(localStorage.getItem('bsTheme') || 'light');
-          bindSwitches();
-        });
-
-        // Jika offcanvas dibuka, pastikan switch di dalamnya ikut ter-bind
-        document.addEventListener('shown.bs.offcanvas', function () {
-          applyTheme(localStorage.getItem('bsTheme') || 'light');
-          bindSwitches();
-        });
-      })();
-    </script>
-
+    
+    {{-- External dependencies for admin features --}}
     <script>window.SDI_STREAM_URL = @json(route('chatbot.stream'));</script> 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
         crossorigin=""></script>
+    
+    {{-- Tom Select JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    
     @stack('scripts')
   </body>
 </html>

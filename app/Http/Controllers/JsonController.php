@@ -17,7 +17,7 @@ class JsonController extends Controller
         $result = [];
 
         foreach ($datasets as $ds) {
-            $link = route('dataset.show', $ds->id); // Halaman detail publik
+            $link = route('admin.dataset.show', $ds->id); // Halaman detail publik
             $identifier = sha1($link);
             $issuedDate = $ds->created_at?->format('Y-m-d') ?? now()->format('Y-m-d');
             $modifiedDate = $ds->updated_at?->format('Y-m-d') ?? $issuedDate;

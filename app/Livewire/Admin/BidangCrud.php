@@ -25,6 +25,7 @@ class BidangCrud extends Component
 
     // Data field
     public string $bidang_id = '';
+    public string $nama = '';
     public string $kode_bidang = '';
     public string $uraian_bidang = '';
 
@@ -122,8 +123,9 @@ class BidangCrud extends Component
     public function confirmDelete(string $id): void
     {
         $this->deleteId = $id;
+        $bidang = Bidang::findOrFail($id);
+        $this->nama = $bidang->uraian_bidang; // Set uraian untuk ditampilkan di modal
         $this->showDeleteModal = true;
-        $this->dispatch('show-modal', id: 'delete-modal');
     }
 
     public function deleteBidangConfirmed(): void
@@ -138,14 +140,17 @@ class BidangCrud extends Component
             timer: 3000
         );
 
-        $this->dispatch('hide-modal', id: 'delete-modal');
         $this->showDeleteModal = false;
         $this->resetPage();
     }
 
     public function cancelDelete(): void
     {
-        $this->dispatch('hide-modal', id: 'delete-modal');
+        $this->showDeleteModal = false;
+    }
+
+    public function closeDeleteModal(): void
+    {
         $this->showDeleteModal = false;
     }
 }

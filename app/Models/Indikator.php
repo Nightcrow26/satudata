@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Indikator extends Model
@@ -31,5 +32,13 @@ class Indikator extends Model
     public function bidang(): BelongsTo
     {
         return $this->belongsTo(bidang::class, 'bidang_id', 'id');
+    }
+
+    /**
+     * Relasi ke walidata
+     */
+    public function walidata(): HasMany
+    {
+        return $this->hasMany(Walidata::class, 'indikator_id', 'id');
     }
 }

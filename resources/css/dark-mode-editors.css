@@ -1,0 +1,497 @@
+/* Dark Mode Support for Tom Select and Trix Editor */
+
+/* ===== TOM SELECT DARK MODE ===== */
+
+/* Tom Select Wrapper */
+.dark .ts-wrapper {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+}
+
+/* Tom Select Control (Main Input Area) */
+.dark .ts-control,
+.dark .ts-wrapper .ts-control {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+    color: #f9fafb !important;
+}
+
+.dark .ts-control:focus,
+.dark .ts-control.focus,
+.dark .ts-wrapper .ts-control:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 1px #3b82f6 !important;
+    background-color: #1f2937 !important;
+}
+
+.dark .ts-control.disabled,
+.dark .ts-wrapper .ts-control.disabled {
+    background-color: #374151 !important;
+    color: #9ca3af !important;
+    border-color: #4b5563 !important;
+}
+
+/* Tom Select Input Field */
+.dark .ts-control > div,
+.dark .ts-wrapper .ts-control > div {
+    color: #f9fafb !important;
+    background-color: transparent !important;
+}
+
+.dark .ts-control input,
+.dark .ts-wrapper .ts-control input {
+    color: #f9fafb !important;
+    background-color: transparent !important;
+}
+
+.dark .ts-control input::placeholder,
+.dark .ts-wrapper .ts-control input::placeholder {
+    color: #9ca3af !important;
+}
+
+/* Single Select Display Text */
+.dark .ts-control.single .item,
+.dark .ts-wrapper.single .ts-control .item {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* Tom Select Selected Items (only for multi-select tags) */
+.dark .ts-control.multi .item,
+.dark .ts-wrapper.multi .ts-control .item {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #1d4ed8 !important;
+}
+
+.dark .ts-control.multi .item.active,
+.dark .ts-wrapper.multi .ts-control .item.active {
+    background-color: #1d4ed8 !important;
+}
+
+/* Tom Select Dropdown Container */
+.dark .ts-dropdown,
+.dark .ts-wrapper .ts-dropdown {
+    background-color: #1f2937 !important;
+    border-color: #4b5563 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+}
+
+.dark .ts-dropdown .ts-dropdown-content,
+.dark .ts-wrapper .ts-dropdown .ts-dropdown-content {
+    background-color: #1f2937 !important;
+}
+
+/* Tom Select Options */
+.dark .ts-dropdown .option,
+.dark .ts-wrapper .ts-dropdown .option {
+    color: #f3f4f6 !important;
+    background-color: transparent !important;
+    padding: 8px 12px !important;
+}
+
+.dark .ts-dropdown .option:hover,
+.dark .ts-dropdown .option.active,
+.dark .ts-wrapper .ts-dropdown .option:hover,
+.dark .ts-wrapper .ts-dropdown .option.active {
+    background-color: #374151 !important;
+    color: #ffffff !important;
+}
+
+.dark .ts-dropdown .option.selected,
+.dark .ts-wrapper .ts-dropdown .option.selected {
+    background-color: #4b5563 !important;
+    color: #ffffff !important;
+}
+
+.dark .ts-dropdown .option.selected:hover,
+.dark .ts-wrapper .ts-dropdown .option.selected:hover {
+    background-color: #374151 !important;
+}
+
+/* Tom Select Create Option */
+.dark .ts-dropdown .create,
+.dark .ts-wrapper .ts-dropdown .create {
+    color: #d1d5db !important;
+    background-color: #374151 !important;
+    border-top: 1px solid #4b5563 !important;
+}
+
+.dark .ts-dropdown .create:hover {
+    @apply bg-gray-600 text-white;
+}
+
+/* Tom Select No Results */
+.dark .ts-dropdown .no-results {
+    @apply text-gray-400 bg-gray-800;
+}
+
+/* Tom Select Loading */
+.dark .ts-dropdown .spinner,
+.dark .ts-wrapper .ts-dropdown .spinner {
+    border-color: #4b5563 !important;
+}
+
+.dark .ts-dropdown .spinner:after,
+.dark .ts-wrapper .ts-dropdown .spinner:after {
+    border-top-color: #3b82f6 !important;
+}
+
+/* Multi-select items */
+.dark .ts-control.multi .item,
+.dark .ts-wrapper .ts-control.multi .item {
+    background-color: #374151 !important;
+    border-color: #4b5563 !important;
+    color: #e5e7eb !important;
+}
+
+.dark .ts-control.multi .item.active,
+.dark .ts-wrapper .ts-control.multi .item.active {
+    background-color: #4b5563 !important;
+    border-color: #6b7280 !important;
+    color: #ffffff !important;
+}
+
+/* Tom Select Arrow/Caret */
+.dark .ts-control .ts-control-arrow,
+.dark .ts-wrapper .ts-control .ts-control-arrow {
+    border-color: #9ca3af transparent transparent transparent !important;
+}
+
+.dark .ts-control.dropdown-active .ts-control-arrow,
+.dark .ts-wrapper .ts-control.dropdown-active .ts-control-arrow {
+    border-color: transparent transparent #9ca3af transparent !important;
+}
+
+/* Ensure dropdown is visible */
+.dark .ts-dropdown,
+.dark .ts-wrapper .ts-dropdown {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 10002 !important;
+    position: absolute !important;
+}
+
+/* Remove any conflicting background colors */
+.dark .ts-dropdown *,
+.dark .ts-wrapper .ts-dropdown * {
+    box-sizing: border-box;
+}
+
+/* Tom Select No Results */
+.dark .ts-dropdown .no-results,
+.dark .ts-wrapper .ts-dropdown .no-results {
+    color: #9ca3af !important;
+    background-color: transparent !important;
+}
+
+/* Enhanced Trix Editor Dark Mode */
+
+/* Trix Editor Container */
+.dark trix-editor.dark-mode,
+.dark .trix-editor.dark-mode {
+    @apply bg-gray-800 text-gray-100 border-gray-600;
+    color-scheme: dark;
+}
+
+/* Trix Toolbar Dark Mode */
+.dark trix-toolbar.dark-mode,
+.dark .trix-toolbar.dark-mode {
+    @apply bg-gray-800 border-gray-600;
+}
+
+/* Trix Toolbar Groups */
+.dark trix-toolbar .trix-button-group {
+    @apply border-gray-600;
+}
+
+/* Trix Buttons */
+.dark trix-toolbar .trix-button {
+    @apply text-gray-300 hover:bg-gray-700 border-gray-600;
+    background: transparent;
+}
+
+.dark trix-toolbar .trix-button:hover {
+    @apply bg-gray-700 text-white;
+}
+
+.dark trix-toolbar .trix-button.trix-active {
+    @apply bg-gray-600 text-white;
+}
+
+/* Trix Dialogs */
+.dark trix-toolbar .trix-dialog {
+    @apply bg-gray-800 border-gray-600;
+}
+
+.dark trix-toolbar .trix-dialog input[type="url"] {
+    @apply bg-gray-700 text-gray-100 border-gray-600;
+}
+
+.dark trix-toolbar .trix-dialog input[type="url"]:focus {
+    @apply border-blue-500 ring-blue-500;
+}
+
+/* Trix Content Area */
+.dark trix-editor div,
+.dark trix-editor p,
+.dark trix-editor ul,
+.dark trix-editor ol,
+.dark trix-editor li,
+.dark trix-editor blockquote {
+    @apply text-gray-100;
+}
+
+/* Trix Links */
+.dark trix-editor a {
+    @apply text-blue-400;
+}
+
+.dark trix-editor a:hover {
+    @apply text-blue-300;
+}
+
+/* Trix Blockquotes */
+.dark trix-editor blockquote {
+    @apply border-l-gray-600 bg-gray-700;
+}
+
+/* Trix Code */
+.dark trix-editor code {
+    @apply bg-gray-700 text-gray-200;
+}
+
+/* Trix Pre */
+.dark trix-editor pre {
+    @apply bg-gray-700 text-gray-200 border-gray-600;
+}
+
+/* Trix Placeholder */
+.dark trix-editor::before {
+    @apply text-gray-500;
+}
+
+/* Focus states for dark mode */
+.dark trix-editor:focus {
+    @apply ring-2 ring-blue-500 border-blue-500;
+    outline: none;
+}
+
+/* Trix attachment progress */
+.dark trix-editor .attachment__progress {
+    @apply bg-gray-600;
+}
+
+/* Trix file attachment */
+.dark trix-editor .attachment {
+    @apply bg-gray-700 border-gray-600;
+}
+
+.dark trix-editor .attachment__caption {
+    @apply text-gray-300;
+}
+
+.dark trix-editor .attachment__name {
+    @apply text-gray-100;
+}
+
+.dark trix-editor .attachment__size {
+    @apply text-gray-400;
+}
+
+.dark .ts-control.multi .item .remove {
+    @apply text-gray-400 hover:text-red-400;
+}
+
+/* ===== TRIX EDITOR DARK MODE ===== */
+.dark trix-editor {
+    @apply bg-gray-800 border-gray-600 text-white;
+    min-height: 120px;
+}
+
+.dark trix-editor:focus {
+    @apply border-blue-500 ring-2 ring-blue-500/20;
+    box-shadow: 0 0 0 1px rgb(59 130 246 / 0.5);
+}
+
+.dark trix-editor::placeholder {
+    @apply text-gray-400;
+}
+
+/* Trix Toolbar */
+.dark trix-toolbar {
+    @apply bg-gray-700 border-gray-600;
+}
+
+.dark trix-toolbar .trix-button-row {
+    @apply bg-gray-700;
+}
+
+.dark trix-toolbar .trix-button-group {
+    @apply border-gray-600;
+}
+
+.dark trix-toolbar .trix-button {
+    @apply text-gray-300 bg-transparent border-gray-600;
+}
+
+.dark trix-toolbar .trix-button:hover {
+    @apply text-white bg-gray-600;
+}
+
+.dark trix-toolbar .trix-button.trix-active {
+    @apply text-white bg-blue-600 border-blue-500;
+}
+
+.dark trix-toolbar .trix-button:not(:first-child) {
+    @apply border-l-gray-600;
+}
+
+/* Trix Dialog */
+.dark trix-toolbar .trix-dialog {
+    @apply bg-gray-800 border-gray-600 shadow-2xl;
+}
+
+.dark trix-toolbar .trix-dialog .trix-dialog__link-fields {
+    @apply bg-gray-800;
+}
+
+.dark trix-toolbar .trix-dialog input {
+    @apply bg-gray-700 border-gray-600 text-white;
+}
+
+.dark trix-toolbar .trix-dialog input:focus {
+    @apply border-blue-500 ring-1 ring-blue-500;
+}
+
+.dark trix-toolbar .trix-dialog .trix-button {
+    @apply text-gray-300;
+}
+
+.dark trix-toolbar .trix-dialog .trix-button:hover {
+    @apply text-white bg-gray-600;
+}
+
+/* Trix Content Styles in Dark Mode */
+.dark trix-editor h1 {
+    @apply text-white;
+}
+
+.dark trix-editor h2 {
+    @apply text-gray-100;
+}
+
+.dark trix-editor h3,
+.dark trix-editor h4,
+.dark trix-editor h5,
+.dark trix-editor h6 {
+    @apply text-gray-200;
+}
+
+.dark trix-editor blockquote {
+    @apply text-gray-300 border-l-gray-500 bg-gray-700/50;
+}
+
+.dark trix-editor code {
+    @apply bg-gray-700 text-gray-200 border-gray-600;
+}
+
+.dark trix-editor pre {
+    @apply bg-gray-900 text-gray-200 border-gray-600;
+}
+
+.dark trix-editor a {
+    @apply text-blue-400;
+}
+
+.dark trix-editor a:hover {
+    @apply text-blue-300;
+}
+
+/* Trix Lists */
+.dark trix-editor ul,
+.dark trix-editor ol {
+    @apply text-gray-200;
+}
+
+.dark trix-editor li {
+    @apply text-gray-200;
+}
+
+/* ===== IMPROVED FOCUS STYLES ===== */
+.dark .ts-control:focus-within {
+    @apply ring-2 ring-blue-500/30 border-blue-500;
+}
+
+.dark trix-editor:focus-within {
+    @apply ring-2 ring-blue-500/30 border-blue-500;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+@media (max-width: 640px) {
+    .dark .ts-dropdown {
+        @apply text-sm;
+    }
+    
+    .dark trix-toolbar .trix-button-group {
+        @apply flex-wrap;
+    }
+    
+    .dark trix-toolbar .trix-button {
+        @apply px-2 py-1 text-sm;
+    }
+}
+
+/* ===== ANIMATION SUPPORT - REMOVED TO PREVENT AUTO-OPEN ===== */
+/* CSS animation yang bisa menyebabkan dropdown auto-open dihapus */
+
+.dark trix-toolbar .trix-button {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* ===== SCROLLBAR STYLING ===== */
+.dark .ts-dropdown .ts-dropdown-content {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(75 85 99) rgb(55 65 81);
+}
+
+.dark .ts-dropdown .ts-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dark .ts-dropdown .ts-dropdown-content::-webkit-scrollbar-track {
+    @apply bg-gray-700;
+}
+
+.dark .ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+}
+
+.dark .ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+}
+
+.dark trix-editor {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(75 85 99) rgb(55 65 81);
+}
+
+.dark trix-editor::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dark trix-editor::-webkit-scrollbar-track {
+    @apply bg-gray-700;
+}
+
+.dark trix-editor::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded-full;
+}
+
+.dark trix-editor::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+}

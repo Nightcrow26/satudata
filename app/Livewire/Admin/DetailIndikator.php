@@ -24,6 +24,7 @@ class DetailIndikator extends Component
     public array $columns = ['tahun', 'data'];
     public string $xAxis = 'tahun';
     public string $yAxis = 'data';
+    public string $selectedChartType = 'bar';
     public int $perPage = 10;
     public int $chartPerPage = 10;
     public array $perPageOptions = [10, 25, 50, 100];

@@ -1,4 +1,4 @@
-<nav class="sidebar d-none d-md-block shadow p-3 m-2 rounded transition-all duration-300"
+<nav class="sidebar hidden md:block shadow-lg p-3 m-2 rounded-lg transition-all duration-300 bg-white dark:!bg-gray-800"
      x-data="{ 
        collapsed: localStorage.getItem('sidebar-collapsed') === 'true',
        toggle() {
@@ -9,9 +9,9 @@
      :class="{ 'sidebar-collapsed': collapsed }">
      
   <!-- Toggle Button -->
-  <div class="d-flex justify-content-end mb-3">
+  <div class="flex justify-end mb-3">
     <button @click="toggle()"
-            class="btn btn-sm btn-outline-secondary border-0">
+            class="inline-flex items-center px-2 py-1 text-sm font-medium rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
       <i class="bi bi-list" x-show="!collapsed"></i>
       <i class="bi bi-chevron-right" x-show="collapsed"></i>
     </button>
@@ -22,7 +22,7 @@
     <img src="{{ asset('logo-hsu.png') }}"
          alt="Logo"
          class="mx-auto max-h-20 w-auto">
-    <h6 class="mt-2">Satu Data<br>Hulu Sungai Utara</h6>
+    <h6 class="mt-2 text-gray-900 dark:text-white font-semibold">Satu Data<br>Hulu Sungai Utara</h6>
   </div>
 
   <!-- Logo kecil untuk collapsed state -->
@@ -33,79 +33,98 @@
          style="height: 30px; width: auto;">
   </div>
 
-  <ul class="nav flex-column">
+  <ul class="flex flex-col space-y-1">
 
     {{-- Home --}}
-    <li class="nav-item">
-      <x-admin.nav-link :active="request()->routeIs('dashboard')"
-                  href="{{ route('dashboard') }}"
-                  class="d-flex align-items-center mb-2"
-                  data-bs-toggle="tooltip" title="Dashboard">
-        <i class="bi bi-house-door me-2"></i>
-        <span x-show="!collapsed" x-transition>Dashboard</span>
-      </x-admin.nav-link>
+    <li>
+      <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+        <x-admin.nav-link :active="request()->routeIs('admin.dashboard')"
+                    href="{{ route('admin.dashboard') }}"
+                    class="flex items-center mb-2 w-full"
+                    x-bind:class="{ 'justify-center': collapsed }"
+                    title="Dashboard">
+          <i class="bi bi-house-door mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Dashboard</span>
+        </x-admin.nav-link>
+      </div>
     </li>
 
-    <li class="nav-item">
-      <x-admin.nav-link :active="request()->routeIs('dataset.index','dataset.*')"
-                  href="{{ route('dataset.index') }}"
-                  class="d-flex align-items-center mb-2"
-                  data-bs-toggle="tooltip" title="Dataset">
-        <i class="bi bi-folder me-2"></i>
-        <span x-show="!collapsed" x-transition>Dataset</span>
-      </x-admin.nav-link>
+    <li>
+      <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+        <x-admin.nav-link :active="request()->routeIs('admin.dataset.index','admin.dataset.*')"
+                    href="{{ route('admin.dataset.index') }}"
+                    class="flex items-center mb-2 w-full"
+                    x-bind:class="{ 'justify-center': collapsed }"
+                    title="Dataset">
+          <i class="bi bi-folder mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Dataset</span>
+        </x-admin.nav-link>
+      </div>
     </li>
 
     {{-- Publikasi --}}
-    <li class="nav-item">
-      <x-admin.nav-link :active="request()->routeIs('publikasi.index','publikasi.*')"
-                  href="{{ route('publikasi.index') }}"
-                  class="d-flex align-items-center mb-2"
-                  data-bs-toggle="tooltip" title="Publikasi">
-        <i class="bi bi-book me-2"></i>
-        <span x-show="!collapsed" x-transition>Publikasi</span>
-      </x-admin.nav-link>
+    <li>
+      <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+        <x-admin.nav-link :active="request()->routeIs('admin.publikasi.index','admin.publikasi.*')"
+                    href="{{ route('admin.publikasi.index') }}"
+                    class="flex items-center mb-2 w-full"
+                    x-bind:class="{ 'justify-center': collapsed }"
+                    title="Publikasi">
+          <i class="bi bi-book mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Publikasi</span>
+        </x-admin.nav-link>
+      </div>
     </li>
 
     {{-- Indikator Walidata --}}
-    <li class="nav-item">
-      <x-admin.nav-link :active="request()->routeIs('walidata.index','walidata.*')"
-                  href="{{ route('walidata.index') }}"
-                  class="d-flex align-items-center mb-2"
-                  data-bs-toggle="tooltip" title="Indikator Walidata">
-        <i class="bi bi-journal-check me-2"></i>
-        <span x-show="!collapsed" x-transition>Indikator Walidata</span>
-      </x-admin.nav-link>
+    <li>
+      <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+        <x-admin.nav-link :active="request()->routeIs('admin.walidata.index','admin.walidata.*')"
+                    href="{{ route('admin.walidata.index') }}"
+                    class="flex items-center mb-2 w-full"
+                    x-bind:class="{ 'justify-center': collapsed }"
+                    title="Indikator Walidata">
+          <i class="bi bi-journal-check mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Indikator Walidata</span>
+        </x-admin.nav-link>
+      </div>
     </li>
 
     {{-- SKPD --}}
-    <li class="nav-item">
-      <x-admin.nav-link :active="request()->routeIs('skpd.index','skpd.*')"
-                  href="{{ route('skpd.index') }}"
-                  class="d-flex align-items-center mb-2"
-                  data-bs-toggle="tooltip" title="SKPD">
-        <i class="bi bi-building me-2"></i>
-        <span x-show="!collapsed" x-transition>SKPD</span>
-      </x-admin.nav-link>
+    <li>
+      <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+        <x-admin.nav-link :active="request()->routeIs('admin.skpd.index','admin.skpd.*')"
+                    href="{{ route('admin.skpd.index') }}"
+                    class="flex items-center mb-2 w-full"
+                    x-bind:class="{ 'justify-center': collapsed }"
+                    title="SKPD">
+          <i class="bi bi-building mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>SKPD</span>
+        </x-admin.nav-link>
+      </div>
     </li>
     
-    @if (auth()->user()->hasRole('admin'))
+    @if (auth()->check() && auth()->user()->hasRole('admin'))
+
       {{-- Users --}}
-      <li class="nav-item">
-        <x-admin.nav-link :active="request()->routeIs('users.index','users.*')"
-                    href="{{ route('users.index') }}"
-                    class="d-flex align-items-center mb-2"
-                    data-bs-toggle="tooltip" title="Users">
-          <i class="bi bi-people me-2"></i>
-          <span x-show="!collapsed" x-transition>Users</span>
-       </x-admin.nav-link>
+      <li>
+        <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
+          <x-admin.nav-link :active="request()->routeIs('admin.users.index','admin.users.*')"
+                      href="{{ route('admin.users.index') }}"
+                      class="flex items-center mb-2 w-full"
+                      x-bind:class="{ 'justify-center': collapsed }"
+                      title="Users">
+            <i class="bi bi-people mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
+            <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Users</span>
+          </x-admin.nav-link>
+        </div>
       </li>
 
       {{-- Master Data Dropdown --}}
       @php
-        $isOpenOnLoad = request()->routeIs('bidang') || request()->routeIs('indikator') || request()->routeIs('aspek');
+        $isOpenOnLoad = request()->routeIs('admin.bidang') || request()->routeIs('admin.indikator') || request()->routeIs('admin.aspek');
       @endphp
-      <li class="nav-item mb-2"
+      <li class="mb-2"
           x-data="{ open: {{ $isOpenOnLoad ? 'true' : 'false' }} }">
         
         <a href="#"
@@ -118,41 +137,48 @@
                open = !open;
              }
            "
-           class="nav-link d-flex align-items-center mb-2"
-           :class="{ 'justify-content-center': collapsed, 'justify-content-between': !collapsed }"
-            data-bs-toggle="tooltip" title="Master Data">
-          <span class="d-flex align-items-center">
-            <i class="bi bi-building-gear me-2" :class="{ 'me-0': collapsed }"></i>
-            <span x-show="!collapsed" x-transition>Master Data</span>
+           class="flex items-center mb-2 px-3 py-2 rounded-md text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer"
+           :class="{ 'justify-center': collapsed, 'justify-between': !collapsed }"
+            title="Master Data">
+          <span class="flex items-center">
+            <i class="bi bi-building-gear mr-2" :class="{ 'mr-0': collapsed }"></i>
+            <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Master Data</span>
           </span>
-          <i class="bi bi-chevron-down arrow"
-             :class="{ 'rotated': open }"
+          <i class="bi bi-chevron-down transform transition-transform duration-200"
+             :class="{ 'rotate-180': open }"
              x-show="!collapsed"></i>
         </a>
 
-        <ul class="nav flex-column ms-3"
+        <ul class="flex flex-col ml-3 space-y-1"
             x-show="open && !collapsed"
             x-cloak
             style="display: none;">
-          <li class="nav-item">
-            <x-admin.nav-link :active="request()->routeIs('bidang')"
-                        href="{{ route('bidang') }}"
-                        class="mb-1">
-              <i class="bi bi-circle-square me-2"></i>Bidang
+          <li>
+            <x-admin.nav-link :active="request()->routeIs('admin.bidang')"
+                        href="{{ route('admin.bidang') }}"
+                        class="flex items-center mb-1">
+              <i class="bi bi-circle-square mr-2"></i>Bidang
             </x-admin.nav-link>
           </li>
-          <li class="nav-item">
-            <x-admin.nav-link :active="request()->routeIs('indikator')"
-                        href="{{ route('indikator') }}"
-                        class="mb-1">
-              <i class="bi bi-clipboard2-data me-2"></i>Indikator
+          <li>
+            <x-admin.nav-link :active="request()->routeIs('admin.indikator')"
+                        href="{{ route('admin.indikator') }}"
+                        class="flex items-center mb-1">
+              <i class="bi bi-clipboard2-data mr-2"></i>Indikator
             </x-admin.nav-link>
           </li>
-          <li class="nav-item">
-            <x-admin.nav-link :active="request()->routeIs('aspek')"
-                        href="{{ route('aspek') }}"
-                        class="mb-1">
-              <i class="bi bi-columns me-2"></i>Aspek
+          <li>
+            <x-admin.nav-link :active="request()->routeIs('admin.aspek')"
+                        href="{{ route('admin.aspek') }}"
+                        class="flex items-center mb-1">
+              <i class="bi bi-columns mr-2"></i>Aspek
+            </x-admin.nav-link>
+          </li>
+          <li>
+            <x-admin.nav-link :active="request()->routeIs('admin.survey')"
+                        href="{{ route('admin.survey') }}"
+                        class="flex items-center mb-1">
+              <i class="bi bi-columns mr-2"></i>Survey Pengguna
             </x-admin.nav-link>
           </li>
         </ul>

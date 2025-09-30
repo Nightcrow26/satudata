@@ -125,8 +125,42 @@ class DatasetCrud extends Component
         $this->showModal = true;
         $this->dispatch('show-modal', id: 'dataset-modal');
 
-        // Kosongkan summernote di frontend
-        $this->dispatch('clear-summernote-content');
+        // Kosongkan trix di frontend
+        $this->dispatch('clear-trix-content');
+        
+        // Clear Tom Select values for create mode
+        $this->js("
+            setTimeout(() => {
+                // Clear Trix content
+                window.dispatchEvent(new CustomEvent('set-trix-content', {
+                    detail: { content: '' }
+                }));
+                
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'instansi_id',
+                        value: '" . $this->instansi_id . "',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) { return ['id' => $skpd->id, 'text' => $skpd->nama]; })->values()->toArray()) . "
+                    }
+                }));
+                
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'aspek_id',
+                        value: '',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) { return ['id' => $aspek->id, 'text' => $aspek->nama]; })->values()->toArray()) . "
+                    }
+                }));
+                
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'status',
+                        value: 'draft',
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
+                    }
+                }));
+            }, 300);
+        ");
     }
 
     public function showEditModal(string $id): void
@@ -152,10 +186,56 @@ class DatasetCrud extends Component
         // Dispatch events dengan delay untuk memastikan modal terbuka dulu
         $this->dispatch('show-modal', id: 'dataset-modal');
         
-        // Delay untuk set content setelah modal terbuka dan summernote ter-initialize
+        // Update Tom Select options dan set Trix content
         $this->js("
             setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('set-summernote-content', {
+                // Update instansi options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'instansi_id',
+                        options: " . json_encode($this->availableSkpds->map(function($skpd) {
+                            return ['id' => $skpd->id, 'text' => $skpd->nama];
+                        })->values()) . ",
+                        value: '" . $this->instansi_id . "'
+                    }
+                }));
+                
+                // Update aspek options dengan format [{id, text}]
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'aspek_id',
+                        options: " . json_encode($this->availableAspeks->map(function($aspek) {
+                            return ['id' => $aspek->id, 'text' => $aspek->nama];
+                        })->values()) . ",
+                        value: '" . $this->aspek_id . "'
+                    }
+                }));
+                
+                // Update status Tom Select untuk edit mode
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'status',
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('admin') ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
+                        value: '" . $this->status . "'
+                    }
+                }));
+                
+                // Update Trix Editor content untuk deskripsi
+                window.dispatchEvent(new CustomEvent('trix-update', {
+                    detail: {
+                        target: 'deskripsi',
+                        content: " . json_encode($this->deskripsi) . "
+                    }
+                }));
+                
+                // Set Trix content for edit mode
+                const trixEditor = document.getElementById('dataset-deskripsi-editor');
+                if (trixEditor && trixEditor.editor) {
+                    trixEditor.editor.loadHTML('" . addslashes($this->deskripsi) . "');
+                }
+                
+                // Fallback event for Trix
+                window.dispatchEvent(new CustomEvent('set-trix-content', {
                     detail: { content: '" . addslashes($this->deskripsi) . "' }
                 }));
             }, 500);
@@ -296,6 +376,15 @@ class DatasetCrud extends Component
             'view','instansi_id','aspek_id'
         ]);
 
+        // Set default values for create mode
+        $this->status = 'draft';
+        $this->tahun = date('Y');
+        
+        // Auto-set instansi_id for user role
+        if (auth()->user()->hasRole('user')) {
+            $this->instansi_id = auth()->user()->skpd_uuid;
+        }
+        
         $this->deskripsi = '';
         $this->editingDataset = null;
     }
@@ -311,6 +400,7 @@ class DatasetCrud extends Component
     {
         $this->deleteId = $id;
         $this->showDeleteModal = true;
+        $this->nama = Dataset::find($id)?->nama ?? ''; 
         $this->dispatch('show-modal', id: 'delete-modal');
     }
 
