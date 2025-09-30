@@ -86,7 +86,14 @@
 
     <h6 class="mt-8 mb-3 text-lg font-semibold text-gray-900 dark:!text-white">Data Terbaru</h6>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        @foreach($latestData->take(4) as $item)
+        @if($latestData->isEmpty())
+            <div class="col-span-full">
+                <div class="bg-white dark:!bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:!border-gray-700 p-6 text-center">
+                    <p class="text-gray-700 dark:!text-gray-300">Belum ada data</p>
+                </div>
+            </div>
+        @else
+            @foreach($latestData->take(4) as $item)
             @php
                 // Dynamic color calculations for theme support
                 $aspekColor = $item->aspek->warna ?? '#6b7280';
@@ -186,17 +193,25 @@
                         </h3>
                         <p class="mt-1 text-xs text-gray-600 dark:text-gray-400 transition-colors duration-200"
                            style="-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;">
-                            {{ strip_tags(Str::of($item->deskripsi)->before('</p>')->before("\n")) ?? '' }}
+                            {{ strip_tags(Str::of($item->deskripsi)->before('&nbsp;')->before("\n")) ?? '' }}
                         </p>
                     </div>
                 </a>
             </article>
-        @endforeach
+            @endforeach
+        @endif
     </div>
 
     <h6 class="mt-8 mb-3 text-lg font-semibold text-gray-900 dark:text-white">Indikator Walidata Terbaru</h6>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        @foreach($latestIndikator->take(4) as $item)
+        @if($latestIndikator->isEmpty())
+            <div class="col-span-full">
+                <div class="bg-white dark:!bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:!border-gray-700 p-6 text-center">
+                    <p class="text-gray-700 dark:!text-gray-300">Belum ada indikator walidata</p>
+                </div>
+            </div>
+        @else
+            @foreach($latestIndikator->take(4) as $item)
             @php
                 // Relasi aspek bisa null
                 $aspek = $item->aspek ?? null;
@@ -304,12 +319,20 @@
                     </div>
                 </a>
             </article>
-        @endforeach
+            @endforeach
+        @endif
     </div>
 
     <h6 class="mt-8 mb-3 text-lg font-semibold text-gray-900 dark:text-white">Publikasi Terbaru</h6>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        @foreach($latestPublikasi->take(4) as $item)
+        @if($latestPublikasi->isEmpty())
+            <div class="col-span-full">
+                <div class="bg-white dark:!bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:!border-gray-700 p-6 text-center">
+                    <p class="text-gray-700 dark:!text-gray-300">Belum ada publikasi</p>
+                </div>
+            </div>
+        @else
+            @foreach($latestPublikasi->take(4) as $item)
             @php
                 // Dynamic color calculations for theme support
                 $aspekColor = $item->aspek->warna ?? '#6b7280';
@@ -407,12 +430,13 @@
                         </h3>
                         <p class="mt-1 text-xs text-gray-600 dark:text-gray-400 transition-colors duration-200"
                            style="-webkit-line-clamp:3;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;">
-                            {{ strip_tags(Str::of($item->deskripsi)->before('</p>')->before("\n")) ?? '' }}
+                            {{ strip_tags(Str::of($item->deskripsi)->before('&nbsp;')->before("\n")) ?? '' }}
                         </p>
                     </div>
                 </a>
             </article>
-        @endforeach
+            @endforeach
+        @endif
     </div>
 </div>
 

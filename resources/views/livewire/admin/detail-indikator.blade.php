@@ -42,7 +42,7 @@
   <div class="bg-white dark:!bg-gray-800 rounded-lg shadow-sm px-6 py-4 border border-gray-200 dark:border-gray-700 mb-4 relative min-h-[140px]">
     <div class="flex justify-between items-start gap-4">
       <div class="flex-grow min-w-0">
-        <h2 class="text-xl font-bold mb-3 text-gray-900 dark:text-white truncate">{{ $walidata->indikator->uraian_indikator ?? 'Indikator' }}</h2>
+        <h2 class="text-xl font-bold mb-3 text-gray-900 dark:text-white">{{ $walidata->indikator->uraian_indikator ?? 'Indikator' }}</h2>
         <div class="flex gap-2 mb-3 flex-wrap">
           <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full text-white" style="background-color: {{ $walidata->aspek->warna ?? '#10b981' }}">
             {{ $walidata->aspek->nama }}
