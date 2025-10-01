@@ -64,7 +64,7 @@
                                    transition-colors duration-200
                                    min-w-[calc(100vw-3rem)] max-w-[calc(100vw-3rem)]
                                    sm:min-w-[18rem] sm:max-w-[18rem] md:min-w-[20rem] md:max-w-[20rem]">
-                    <a href="{{ $p['url'] ?? '#' }}" class="group block p-4">
+                    <a href="{{ route('public.publications.download', $p->id) ?? '#' }}" class="group block p-4">
                         {{-- ROW atas: thumbnail kiri + kolom kanan --}}
                         <div class="flex items-start gap-4">
                             {{-- Thumbnail publikasi (cover/gambar) --}}

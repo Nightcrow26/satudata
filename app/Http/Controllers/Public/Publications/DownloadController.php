@@ -24,10 +24,12 @@ class DownloadController extends Controller
         
         // Jika user sudah login, tidak perlu mengisi survey
         if (!auth()->check() && !UserSurvey::hasUserCompletedSurvey($sessionId, $ipAddress)) {
-            // Guest belum mengisi survey -> redirect ke halaman publikasi dan trigger modal survey
-            return redirect()->route('public.publications.index', $publikasi)
+            // Guest belum mengisi survey -> redirect kembali ke halaman sebelumnya (agar modal muncul di halaman asal)
+            $downloadUrl = route('public.publications.download', $publikasi);
+            $previous = url()->previous() ?: route('public.publications.index');
+            return redirect($previous)
                            ->with('show_survey', true)
-                           ->with('download_url', route('public.publications.download', $publikasi));
+                           ->with('download_url', $downloadUrl);
         }
         
         // Track download (only once per session)
