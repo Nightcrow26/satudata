@@ -159,7 +159,16 @@ class PublikasiCrud extends Component
                         value: '" . $this->instansi_id . "'
                     }
                 }));
-                
+
+                // Update status options
+                window.dispatchEvent(new CustomEvent('tom-update', {
+                    detail: {
+                        target: 'status',
+                        value: 'draft',
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
+                    }
+                }));
+
                 // Update aspek options
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
@@ -222,7 +231,7 @@ class PublikasiCrud extends Component
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'status',
-                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('admin') ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin','verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
                         value: '" . $this->status . "'
                     }
                 }));

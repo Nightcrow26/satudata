@@ -180,22 +180,25 @@
                         class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white dark:focus:ring-indigo-400 dark:focus:border-indigo-400 {{ $errors->has('nama') ? 'border-red-300 dark:border-red-600' : '' }}">
                   @error('nama')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                 </div>
+                
                 <div>
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                   @php
-                      $statusOptions = ['draft' => 'Draft'];
-                      if (auth()->user()->hasRole('admin')) {
-                          $statusOptions['pending'] = 'Pending';
-                          $statusOptions['published'] = 'Published';
-                      }
+                    $statusOptions = ['draft' => 'Draft'];
+                    if (auth()->user()->hasRole(['admin', 'verifikator'])) {
+                      $statusOptions['pending'] = 'Pending';
+                      $statusOptions['published'] = 'Published';
+                    }
+                    $statusDisabled = auth()->user()->hasRole('user');
                   @endphp
                   <x-forms.select-tom 
-                      id="status"
-                      name="status"
-                      placeholder="-- Pilih Status --"
-                      wire:model.live="status"
-                      :options="$statusOptions"
-                      live="true"
+                    id="status"
+                    name="status"
+                    placeholder="-- Pilih Status --"
+                    wire:model.live="status"
+                    :options="$statusOptions"
+                    :disabled="$statusDisabled"
+                    live="true"
                   />
                   @error('status')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                 </div>

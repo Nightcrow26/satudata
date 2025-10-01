@@ -230,29 +230,27 @@
                                             @error('nama') <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                                         </div>
 
-                                        <div>
+                                       <div>
                                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
-
                                             @php
                                                 $statusOptions = ['draft' => 'Draft'];
                                                 if (auth()->user()->hasRole(['admin', 'verifikator'])) {
                                                     $statusOptions['pending'] = 'Pending';
                                                     $statusOptions['published'] = 'Published';
                                                 }
+                                                $statusDisabled = auth()->user()->hasRole('user');
                                             @endphp
-
                                             <x-forms.select-tom 
                                                 id="status"
                                                 name="status"
                                                 placeholder="-- Pilih Status --"
                                                 wire:model.live="status"
                                                 :options="$statusOptions"
+                                                :disabled="$statusDisabled"
+                                                live="true"
                                             />
-
-                                            @error('status')
-                                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                                            @enderror
-                                        </div>
+                                            @error('status')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                                            </div>
 
                                         <div>
                                             <x-forms.file-input 

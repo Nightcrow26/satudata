@@ -87,10 +87,18 @@
   // Applying update: opts/v/t prepared
   // Current options inspected
 
-      // Pastikan tidak disabled saat set
-      if (this.$refs.sel.disabled) { 
-        this.$refs.sel.disabled = false; 
-        this.ts.enable(); 
+      // Respect disabled flag if provided by the detail payload.
+      // If detail.disabled is true, keep the select disabled and don't enable TomSelect.
+      const detailDisabled = detail.disabled === true || detail.disabled === 'true';
+      if (detailDisabled) {
+        this.$refs.sel.disabled = true;
+        try { this.ts.disable(); } catch(e) { /* ignore if not ready */ }
+      } else {
+        // Ensure not disabled when detail doesn't request disabled
+        if (this.$refs.sel.disabled) { 
+          this.$refs.sel.disabled = false; 
+          try { this.ts.enable(); } catch(e) { /* ignore if not ready */ }
+        }
       }
 
   // STEP 1: Clear semua options
