@@ -55,7 +55,7 @@ class PublikasiCrud extends Component
         return [
             'nama'           => 'required|string|max:255',
             'status'         => 'required|in:draft,pending,published',
-            'pdf'            => 'nullable|file|mimes:pdf|max:5120',
+            'pdf'            => 'nullable|file|mimes:pdf|max:20480', // max 20MB
             'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'tahun'          => 'required|digits:4|integer',
             'catatan_verif'  => 'nullable|string',

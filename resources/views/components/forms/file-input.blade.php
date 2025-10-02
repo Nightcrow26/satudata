@@ -33,8 +33,15 @@
     fileName: '{{ $placeholder }}', 
     isDragOver: false,
     isSelected: false,
+    isUploading: false,
+    progress: 0,
     disabled: {{ $disabled ? 'true' : 'false' }}
-}">
+}"
+    x-on:livewire-upload-start="isUploading = true; progress = 0"
+    x-on:livewire-upload-finish="progress = 100; setTimeout(() => { isUploading = false }, 400)"
+    x-on:livewire-upload-error="isUploading = false"
+    x-on:livewire-upload-progress="progress = $event.detail.progress"
+>
     @if($label)
         <label for="{{ $inputId }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {{ $label }}
@@ -78,16 +85,17 @@
             :class="{
                 'border-blue-500 bg-blue-50 dark:bg-blue-900/20': isSelected || isDragOver,
                 'border-gray-300 dark:border-gray-600': !isSelected && !isDragOver,
-                'opacity-50': disabled,
-                'cursor-pointer': !disabled,
-                'cursor-not-allowed': disabled
+                'opacity-50': disabled || isUploading,
+                'cursor-pointer': !disabled && !isUploading,
+                'cursor-not-allowed': disabled || isUploading
             }"
             class="relative border-2 border-dashed rounded-lg p-4 transition-all duration-200 hover:border-blue-400 hover:bg-gray-50 dark:hover:bg-gray-700/50"
-            @if(!$disabled) 
-                @click="$refs.fileInput.click()" 
-                @dragover.prevent="isDragOver = true"
-                @dragleave.prevent="isDragOver = false"
+            @if(!$disabled)
+                @click="if(!isUploading){ $refs.fileInput.click() }"
+                @dragover.prevent="if(!isUploading){ isDragOver = true }"
+                @dragleave.prevent="if(!isUploading){ isDragOver = false }"
                 @drop.prevent="
+                    if(isUploading) return;
                     isDragOver = false;
                     const files = $event.dataTransfer.files;
                     if (files.length > 0) {
@@ -126,8 +134,15 @@
                 <div class="flex-1 text-center">
                     <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
                         @if(!$disabled)
-                            <span class="text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer">Choose file</span>
-                            <span class="text-gray-500"> or drag and drop</span>
+                            <template x-if="!isUploading">
+                                <span>
+                                    <span class="text-blue-600 dark:text-blue-400 hover:text-blue-500 cursor-pointer">Choose file</span>
+                                    <span class="text-gray-500"> or drag and drop</span>
+                                </span>
+                            </template>
+                            <template x-if="isUploading">
+                                <span class="text-gray-500">Uploading… please wait</span>
+                            </template>
                         @else
                             <span class="text-gray-500">File input disabled</span>
                         @endif
@@ -145,9 +160,10 @@
                 <div class="flex-shrink-0">
                     <button 
                         type="button" 
-                        @if(!$disabled) @click.stop="$refs.fileInput.click()" @endif
+                        @if(!$disabled) @click.stop="if(!isUploading){ $refs.fileInput.click() }" @endif
+                        x-bind:disabled="disabled || isUploading"
+                        :class="{ 'opacity-50 cursor-not-allowed': disabled || isUploading }"
                         class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors @if($disabled) opacity-50 cursor-not-allowed @endif"
-                        @if($disabled) disabled @endif
                     >
                         <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
@@ -156,6 +172,13 @@
                     </button>
                 </div>
             </div>
+        </div>
+        <!-- Progress Bar -->
+        <div x-show="isUploading" x-cloak class="mt-3" aria-live="polite" aria-atomic="true">
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-200" :style="`width: ${progress}%`"></div>
+            </div>
+            <div class="mt-1 text-xs text-gray-600 dark:text-gray-300" x-text="`Mengunggah… ${progress}%`"></div>
         </div>
     </div>
 

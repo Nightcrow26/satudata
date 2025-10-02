@@ -142,12 +142,7 @@
   x-init="init()"
 
   {{-- Event listener untuk tom-update --}}
-  @tom-update.window="
-    // tom-update received for component
-    if ($event.detail?.id === @js($compId)) {
-      applyUpdate($event.detail);
-    }
-  "
+  @tom-update.window="$event.detail && $event.detail.id === @js($compId) && applyUpdate($event.detail)"
   class="w-full"
 >
   @if($label)

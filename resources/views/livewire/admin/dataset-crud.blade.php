@@ -259,7 +259,7 @@
                                                 wire:model="excel"
                                                 accept=".xls,.xlsx,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                 icon="table-cells"
-                                                maxSize="10MB"
+                                                maxSize="5MB"
                                                 :existingFile="$editingDataset?->excel ? basename($editingDataset->excel) : null"
                                                 :existingFileUrl="$editingDataset?->excel ? Storage::disk('s3')->temporaryUrl($editingDataset->excel, now()->addMinutes(15)) : null"
                                             />
@@ -272,7 +272,7 @@
                                                 wire:model="metadata"
                                                 accept=".xls,.xlsx,.csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                                 icon="table-cells"
-                                                maxSize="10MB"
+                                                maxSize="5MB"
                                                 :existingFile="$editingDataset?->metadata ? basename($editingDataset->metadata) : null"
                                                 :existingFileUrl="$editingDataset?->metadata ? Storage::disk('s3')->temporaryUrl($editingDataset->metadata, now()->addMinutes(15)) : null"
                                             />
@@ -285,7 +285,7 @@
                                                 wire:model="bukti_dukung"
                                                 accept="application/pdf,.pdf"
                                                 icon="document-text"
-                                                maxSize="5MB"
+                                                maxSize="10MB"
                                                 :existingFile="$editingDataset?->bukti_dukung ? basename($editingDataset->bukti_dukung) : null"
                                                 :existingFileUrl="$editingDataset?->bukti_dukung ? Storage::disk('s3')->temporaryUrl($editingDataset->bukti_dukung, now()->addMinutes(15)) : null"
                                             />

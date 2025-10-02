@@ -236,7 +236,7 @@
                       wire:model="pdf"
                       accept="application/pdf,.pdf"
                       icon="document-text"
-                      maxSize="10MB"
+                      maxSize="20MB"
                       :existingFile="$editingPublikasi?->pdf ? basename($editingPublikasi->pdf) : null"
                       :existingFileUrl="$editingPublikasi?->pdf ? Storage::disk('s3')->temporaryUrl($editingPublikasi->pdf, now()->addMinutes(15)) : null"
                   />
