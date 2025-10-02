@@ -35,6 +35,8 @@
 
 // Berapa item awal sebelum "Selengkapnya"
 'previewCount' => 5,
+// Optional unique id for the panel instance to avoid radio name collisions
+'panelId' => null,
 ])
 
 <aside {{ $attributes->merge([
@@ -70,7 +72,7 @@
                 <span class="flex-none pt-0.5">
                     <input type="radio"
                         class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-teal-600 focus:ring-teal-600 dark:focus:ring-teal-400"
-                        name="sort" value="{{ $val }}" wire:model.live="{{ $sortModel }}"
+                        name="{{ $panelId ?? $sortModel }}" value="{{ $val }}" wire:model.live="{{ $sortModel }}"
                         @checked(data_get($selected, 'sort' )===$val)>
                 </span>
                 <span class="flex-1 leading-snug break-words">{{ $label }}</span>

@@ -12,11 +12,11 @@
 
             {{-- PANEL FILTER (desktop saja) --}}
             <x-public.walidata.filter-panel class="hidden md:block md:col-span-3" :show-search="false"
-                :aspek-options="$aspekOptions" :instansi-options="$instansiOptions" 
-                :bidang-options="$bidangOptions" :indikator-options="$indikatorOptions" 
-                sort-model="sort" aspek-model="selectedAspek" instansi-model="selectedInstansi" 
-                bidang-model="selectedBidang" indikator-model="selectedIndikator" 
-                q-model="q" 
+                :sort-options="$sortOptions" :aspek-options="$aspekOptions" :instansi-options="$instansiOptions"
+                :bidang-options="$bidangOptions" :indikator-options="$indikatorOptions"
+                sort-model="sort" aspek-model="selectedAspek" instansi-model="selectedInstansi"
+                bidang-model="selectedBidang" indikator-model="selectedIndikator"
+                q-model="q"
                 :selected="[
                     'q' => $q,
                     'sort' => $sort,
@@ -24,7 +24,7 @@
                     'selectedInstansi' => $selectedInstansi,
                     'selectedBidang' => $selectedBidang,
                     'selectedIndikator' => $selectedIndikator,
-                ]" on-reset="clearFilters" />
+                ]" on-reset="clearFilters" panel-id="walidata-panel-desktop" />
 
             {{-- KOLOM KANAN --}}
             <div class="md:col-span-9 space-y-4 sm:space-y-6">
@@ -45,7 +45,7 @@
                 {{-- Panel filter mobile (collapsed) --}}
                 <div x-show="filterOpen" x-cloak x-transition.duration.300ms 
                     class="md:hidden">
-                    <x-public.walidata.filter-panel :show-search="true"
+                    <x-public.walidata.filter-panel :show-search="true" :sort-options="$sortOptions"
                         :aspek-options="$aspekOptions" :instansi-options="$instansiOptions"
                         :bidang-options="$bidangOptions" :indikator-options="$indikatorOptions"
                         sort-model="sort" aspek-model="selectedAspek" instansi-model="selectedInstansi"
@@ -58,7 +58,7 @@
                             'selectedInstansi' => $selectedInstansi,
                             'selectedBidang' => $selectedBidang,
                             'selectedIndikator' => $selectedIndikator,
-                        ]" on-reset="clearFilters" />
+                        ]" on-reset="clearFilters" panel-id="walidata-panel-mobile" />
                 </div>
 
                 {{-- LIST WALIDATA --}}

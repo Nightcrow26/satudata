@@ -20,7 +20,7 @@
                 'aspek' => $aspek,
                 'instansi' => $instansi,
                 'bidang' => $bidang,
-            ]" on-reset="resetFilters" />
+            ]" on-reset="resetFilters" panel-id="data-panel-desktop" />
 
             {{-- KOLOM KANAN --}}
             <div class="md:col-span-9 space-y-4 sm:space-y-6">
@@ -173,7 +173,7 @@
                         'aspek' => $aspek,
                         'instansi' => $instansi,
                         'bidang' => $bidang,
-                    ]" on-reset="resetFilters" class="" />
+                    ]" on-reset="resetFilters" class="" panel-id="data-panel-mobile" />
                 </div>
 
                 {{-- Footer: Hapus & Terapkan (mobile only) --}}

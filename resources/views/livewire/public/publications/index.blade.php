@@ -20,7 +20,7 @@
                     'jenis' => $jenis,
                     'instansi' => $instansi,
                     'bidang' => $bidang,
-                ]" on-reset="resetFilters" />
+                ]" on-reset="resetFilters" panel-id="pub-panel-desktop" />
 
             {{-- KOLOM KANAN --}}
             <div class="md:col-span-9 space-y-4 sm:space-y-6">
@@ -163,7 +163,7 @@
                             'jenis' => $jenis,
                             'instansi' => $instansi,
                             'bidang' => $bidang,
-                        ]" on-reset="resetFilters" />
+                        ]" on-reset="resetFilters" panel-id="pub-panel-mobile" />
                 </div>
 
                 {{-- Footer: Hapus & Terapkan (mobile only) --}}

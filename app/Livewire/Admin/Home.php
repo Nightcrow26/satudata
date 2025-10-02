@@ -56,7 +56,7 @@ class Home extends Component
             ->where('status', 'published');
 
         $wdQuery = Walidata::with(['aspek', 'skpd'])
-            ->latest('verifikasi_data');
+            ->latest('verifikasi_data')->where('skpd_id', '!=', null);
 
         if (auth()->check() && auth()->user()->hasRole('user')) {
             $userSkpd = auth()->user()->skpd_uuid;

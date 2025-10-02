@@ -65,7 +65,7 @@ class FilterPublications
                     $query->orderBy('created_at', 'asc');
                     break;
                 case 'popular':
-                    $query->orderBy('view', 'desc');
+                    $query->orderBy('download', 'desc');
                     break;
                 case 'name':
                     $query->orderBy('nama', 'asc');

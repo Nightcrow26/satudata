@@ -37,7 +37,9 @@ class FilterWalidata
         }
 
         // Query walidata dengan relasi
-        $query = Walidata::with(['aspek', 'skpd', 'bidang', 'indikator', 'user'])->orderBy('verifikasi_data', 'desc');
+        // Hanya ambil data yang memiliki SKPD (skpd_id not null)
+        $query = Walidata::with(['aspek', 'skpd', 'bidang', 'indikator', 'user'])
+            ->whereNotNull('skpd_id');
         // Tidak perlu filter status karena semua data walidata sudah verified
 
         // Search berdasarkan data, satuan dan indikator
@@ -81,27 +83,42 @@ class FilterWalidata
             });
         }
 
-        // Sorting
-        switch ($sort) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'popular':
-                $query->orderBy('view', 'desc');
-                break;
-            case 'name':
-                $query->join('indikators', 'walidata.indikator_id', '=', 'indikators.id')
-                      ->orderBy('indikators.uraian_indikator', 'asc')
-                      ->select('walidata.*');
-                break;
-            case 'recent':
-            default:
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
+        try {
+            // Sorting
+            switch ($sort) {
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
+                    break;
+                case 'popular':
+                    $query->orderBy('view', 'desc');
+                    break;
+                case 'name':
+                    $query->join('indikators', 'walidata.indikator_id', '=', 'indikators.id')
+                          ->orderBy('indikators.uraian_indikator', 'asc')
+                          ->select('walidata.*');
+                    break;
+                case 'recent':
+                default:
+                    $query->orderBy('created_at', 'desc');
+                    break;
+            }
 
-        // Kembalikan model Eloquent langsung untuk kompatibilitas dengan template
-        return $query->paginate($perPage);
+            // Kembalikan model Eloquent langsung untuk kompatibilitas dengan template
+            return $query->paginate($perPage)->onEachSide(1);
+        } catch (\Exception $e) {
+            \Log::error('Error saat paginate walidata:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return new LengthAwarePaginator(
+                items: [],
+                total: 0,
+                perPage: $perPage,
+                currentPage: LengthAwarePaginator::resolveCurrentPage() ?: 1,
+                options: ['path' => request()->url(), 'query' => request()->query()]
+            );
+        }
     }
 
     /**
