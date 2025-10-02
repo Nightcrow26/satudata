@@ -143,68 +143,75 @@
         <i class="bi bi-journal-check mr-3"></i>Indikator Walidata
       </x-admin.nav-link>
 
-      @if (auth()->check() && auth()->user()->hasRole('admin'))
-        <!-- Admin Only Section -->
-        <x-admin.nav-link :active="request()->routeIs('admin.skpd.index','admin.skpd.*')"
-                          href="{{ route('admin.skpd.index') }}"
-                          class="flex items-center">
-          <i class="bi bi-building mr-3"></i>SKPD
-        </x-admin.nav-link>
+      @if (auth()->check())
+        @if (auth()->user()->hasAnyRole(['admin','verifikator']))
+          <x-admin.nav-link :active="request()->routeIs('admin.skpd.index','admin.skpd.*')"
+                            href="{{ route('admin.skpd.index') }}"
+                            class="flex items-center">
+            <i class="bi bi-building mr-3"></i>SKPD
+          </x-admin.nav-link>
+        @endif
 
-        <x-admin.nav-link :active="request()->routeIs('admin.users.index','admin.users.*')"
-                          href="{{ route('admin.users.index') }}"
-                          class="flex items-center">
-          <i class="bi bi-people mr-3"></i>Users
-        </x-admin.nav-link>
+        @if (auth()->user()->hasRole('admin'))
+          <x-admin.nav-link :active="request()->routeIs('admin.users.index','admin.users.*')"
+                            href="{{ route('admin.users.index') }}"
+                            class="flex items-center">
+            <i class="bi bi-people mr-3"></i>Users
+          </x-admin.nav-link>
+        @endif
 
-        {{-- Master Data Dropdown --}}
+        {{-- Master Data Dropdown: admin + verifikator (exclude Survey Pengguna for verifikator) --}}
         @php
           // pre‐open when on bidang or indikator
           $isOpenOnLoad = request()->routeIs('admin.bidang') || request()->routeIs('admin.indikator') || request()->routeIs('admin.aspek');
         @endphp
-        <div class="mt-2">
-          <button
-            @click.prevent="openMaster = !openMaster"
-            class="w-full flex items-center justify-between px-3 py-2 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md transition-colors"
-          >
-            <span class="flex items-center">
-              <i class="bi bi-building-gear mr-3"></i>Master Data
-            </span>
-            <i class="bi bi-chevron-down transition-transform duration-200"
-              :class="{ 'rotate-180': openMaster }"></i>
-          </button>
+        @if (auth()->user()->hasAnyRole(['admin','verifikator']))
+          <div class="mt-2">
+            <button
+              @click.prevent="openMaster = !openMaster"
+              class="w-full flex items-center justify-between px-3 py-2 text-gray-800 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-md transition-colors"
+            >
+              <span class="flex items-center">
+                <i class="bi bi-building-gear mr-3"></i>Master Data
+              </span>
+              <i class="bi bi-chevron-down transition-transform duration-200"
+                :class="{ 'rotate-180': openMaster }"></i>
+            </button>
 
-          <div class="ml-6 mt-1 space-y-1"
-              x-show="openMaster"
-              x-transition:enter="transition ease-out duration-200"
-              x-transition:enter-start="transform opacity-0 scale-95"
-              x-transition:enter-end="transform opacity-100 scale-100"
-              x-transition:leave="transition ease-in duration-150"
-              x-transition:leave-start="transform opacity-100 scale-100"
-              x-transition:leave-end="transform opacity-0 scale-95"
-              style="display: none;">
-            <x-admin.nav-link :active="request()->routeIs('admin.bidang')"
-                              href="{{ route('admin.bidang') }}"
-                              class="flex items-center py-2">
-              <i class="bi bi-circle-square mr-3"></i>Bidang
-            </x-admin.nav-link>
-            <x-admin.nav-link :active="request()->routeIs('admin.indikator')"
-                              href="{{ route('admin.indikator') }}"
-                              class="flex items-center py-2">
-              <i class="bi bi-clipboard2-data mr-3"></i>Indikator
-            </x-admin.nav-link>
-            <x-admin.nav-link :active="request()->routeIs('admin.aspek')"
-                              href="{{ route('admin.aspek') }}"
-                              class="flex items-center py-2">
-              <i class="bi bi-columns mr-3"></i>Aspek
-            </x-admin.nav-link>
-            <x-admin.nav-link :active="request()->routeIs('admin.survey')"
-                              href="{{ route('admin.survey') }}"
-                              class="flex items-center py-2">
-              <i class="bi bi-columns mr-3"></i>Survey Pengguna
-            </x-admin.nav-link>
+            <div class="ml-6 mt-1 space-y-1"
+                x-show="openMaster"
+                x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="transform opacity-0 scale-95"
+                x-transition:enter-end="transform opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="transform opacity-100 scale-100"
+                x-transition:leave-end="transform opacity-0 scale-95"
+                style="display: none;">
+              <x-admin.nav-link :active="request()->routeIs('admin.bidang')"
+                                href="{{ route('admin.bidang') }}"
+                                class="flex items-center py-2">
+                <i class="bi bi-circle-square mr-3"></i>Bidang
+              </x-admin.nav-link>
+              <x-admin.nav-link :active="request()->routeIs('admin.indikator')"
+                                href="{{ route('admin.indikator') }}"
+                                class="flex items-center py-2">
+                <i class="bi bi-clipboard2-data mr-3"></i>Indikator
+              </x-admin.nav-link>
+              <x-admin.nav-link :active="request()->routeIs('admin.aspek')"
+                                href="{{ route('admin.aspek') }}"
+                                class="flex items-center py-2">
+                <i class="bi bi-columns mr-3"></i>Aspek
+              </x-admin.nav-link>
+              @if (auth()->user()->hasRole('admin'))
+                <x-admin.nav-link :active="request()->routeIs('admin.survey')"
+                                  href="{{ route('admin.survey') }}"
+                                  class="flex items-center py-2">
+                  <i class="bi bi-columns mr-3"></i>Survey Pengguna
+                </x-admin.nav-link>
+              @endif
+            </div>
           </div>
-        </div>
+        @endif
       @endif
     </nav>
   </div>
