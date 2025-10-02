@@ -284,11 +284,16 @@
               </div>
 
               <div class="md:col-span-2">
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan Verifikator</label>
-                  <textarea wire:model.defer="catatan_verif"
-                            class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white dark:focus:ring-indigo-400 dark:focus:border-indigo-400 {{ $errors->has('catatan_verif') ? 'border-red-300 dark:border-red-600' : '' }}" 
-                            {{ auth()->user()->hasRole('user') ? 'disabled' : '' }}></textarea>
-                  @error('catatan_verif')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                  @php
+                    $showCatatanPub = !auth()->user()->hasRole('user') || (!empty($catatan_verif) && auth()->user()->hasRole('user'));
+                  @endphp
+                  @if($showCatatanPub)
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan Verifikator</label>
+                    <textarea wire:model.defer="catatan_verif"
+                              class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white dark:focus:ring-indigo-400 dark:focus:border-indigo-400 {{ $errors->has('catatan_verif') ? 'border-red-300 dark:border-red-600' : '' }}" 
+                              {{ auth()->user()->hasRole('user') ? 'disabled' : '' }}></textarea>
+                    @error('catatan_verif')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                  @endif
               </div>
 
               </div>
