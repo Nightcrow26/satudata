@@ -87,7 +87,7 @@ class FilterWalidata
             // Sorting
             switch ($sort) {
                 case 'oldest':
-                    $query->orderBy('created_at', 'asc');
+                    $query->orderBy('verifikasi_data', 'asc');
                     break;
                 case 'popular':
                     $query->orderBy('view', 'desc');
@@ -99,7 +99,7 @@ class FilterWalidata
                     break;
                 case 'recent':
                 default:
-                    $query->orderBy('created_at', 'desc');
+                    $query->orderBy('verifikasi_data', 'desc');
                     break;
             }
 

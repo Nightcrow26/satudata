@@ -81,6 +81,16 @@
                             
                             // URL untuk detail walidata (bisa disesuaikan jika ada halaman detail)
                             $detailUrl = route('public.walidata.show', $w->id ?? '#');
+                            // Safe date label: parse verifikasi_data if present
+                            $dateLabel = null;
+                            if (! empty($w->verifikasi_data)) {
+                                try {
+                                    $d = $w->verifikasi_data instanceof \Illuminate\Support\Carbon ? $w->verifikasi_data : \Carbon\Carbon::parse($w->verifikasi_data);
+                                    $dateLabel = $d ? $d->translatedFormat('d F Y') : null;
+                                } catch (\Exception $e) {
+                                    $dateLabel = null;
+                                }
+                            }
                         @endphp
                         
                         <x-public.walidata.walidata-card 
@@ -89,7 +99,7 @@
                             :thumb="$w->aspek?->foto_url ?? null" 
                             :badges="$badges" 
                             :instansi-label="$w->skpd?->singkatan ?? $w->skpd?->nama ?? 'instansi Belum Ditetapkan'"
-                            :date-label="$w->created_at ? $w->created_at->translatedFormat('d F Y') : null"
+                            :date-label="$dateLabel"
                             :data-value="$w->data ?? '-'"
                             :data-unit="$w->satuan ?? ''"
                             :year="$w->tahun ?? null"
