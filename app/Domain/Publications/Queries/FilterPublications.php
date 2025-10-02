@@ -32,9 +32,9 @@ class FilterPublications
             $q = is_string($q) ? trim($q) : '';
             if ($q !== '') {
                 $query->where(function ($builder) use ($q) {
-                    $builder->where('nama', 'like', "%{$q}%")
-                           ->orWhere('deskripsi', 'like', "%{$q}%")
-                           ->orWhere('keyword', 'like', "%{$q}%");
+                    $builder->where('nama', 'ilike', "%{$q}%")
+                           ->orWhere('deskripsi', 'ilike', "%{$q}%")
+                           ->orWhere('keyword', 'ilike', "%{$q}%");
                 });
             }
 

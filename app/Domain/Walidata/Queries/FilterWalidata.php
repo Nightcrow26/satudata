@@ -46,10 +46,10 @@ class FilterWalidata
         $q = trim($q);
         if ($q !== '') {
             $query->where(function ($builder) use ($q) {
-                $builder->where('data', 'like', "%{$q}%")
-                        ->orWhere('satuan', 'like', "%{$q}%")
+                $builder->where('data', 'ilike', "%{$q}%")
+                        ->orWhere('satuan', 'ilike', "%{$q}%")
                         ->orWhereHas('indikator', function ($indikatorQuery) use ($q) {
-                            $indikatorQuery->where('uraian_indikator', 'like', "%{$q}%");
+                            $indikatorQuery->where('uraian_indikator', 'ilike', "%{$q}%");
                         });
             });
         }
