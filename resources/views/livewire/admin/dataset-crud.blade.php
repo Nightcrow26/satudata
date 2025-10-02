@@ -358,11 +358,26 @@
                                 </div>
 
                                 <div class="bg-gray-50 dark:!bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
-                                    <button type="submit"
-                                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:ml-3 sm:w-auto sm:text-sm">
-                                        {{ $dataset_id ? 'Update' : 'Simpan' }}
+                                        <button type="button"
+                                            wire:click="saveDataset"
+                                            wire:loading.attr="disabled"
+                                            wire:target="saveDataset,excel,metadata,bukti_dukung"
+                                            aria-busy="true"
+                                            class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:ml-3 sm:w-auto sm:text-sm">
+                                        <span wire:loading wire:target="saveDataset,excel,metadata,bukti_dukung" class="inline-flex items-center">
+                                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                                            </svg>
+                                            <span>{{ $dataset_id ? 'Menyimpan Perubahan…' : 'Menyimpan…' }}</span>
+                                        </span>
+                                        <span wire:loading.remove wire:target="saveDataset,excel,metadata,bukti_dukung">
+                                            {{ $dataset_id ? 'Update' : 'Simpan' }}
+                                        </span>
                                     </button>
                                     <button type="button"
+                                            wire:loading.attr="disabled"
+                                            wire:target="saveDataset,excel,metadata,bukti_dukung"
                                             class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:!bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                             wire:click="closeModal"
                                             @click="show = false">
