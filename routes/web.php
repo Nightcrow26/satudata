@@ -61,7 +61,7 @@ Route::prefix('admin')->middleware('role:admin|verifikator|user')->name('admin.'
     Route::get('/walidata', \App\Livewire\Admin\IndikatorWalidata::class)->name('walidata.index');
     Route::get('/datasets/{dataset}', \App\Livewire\Admin\DetailData::class)->name('dataset.show');
     Route::get('/walidata/{walidata}', \App\Livewire\Admin\DetailIndikator::class)->name('walidata.show');
-    Route::post('/logout', \App\Http\Controllers\LogoutController::class)->name('logout');
+    Route::post('/logout', \App\Http\Controllers\LogOutController::class)->name('logout');
     Route::get('/skpd', \App\Livewire\Admin\SkpdCrud::class)->name('skpd.index');
 
     // Role admin khusus
