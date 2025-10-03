@@ -71,7 +71,7 @@ Route::prefix('admin')->middleware('role:admin|verifikator|user')->name('admin.'
     });
 });
 
-Route::post('/logout', \App\Http\Controllers\LogoutController::class)->name('logout');
+Route::post('/logout', \App\Http\Controllers\LogOutController::class)->name('logout');
 
 Route::get('/json', [\App\Http\Controllers\JsonController::class, 'index']);
 
