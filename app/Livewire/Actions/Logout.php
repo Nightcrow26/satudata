@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Actions;
+namespace App\Livewire\Actions;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
