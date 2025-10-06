@@ -98,118 +98,46 @@ class AspekCrud extends Component
     {
         $validated = $this->validate();
 
+        // === Upload Foto (opsional) ===
         if ($this->foto) {
-            try {
-                // Generate unique filename
-                $filename  = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->foto->getClientOriginalName(), PATHINFO_FILENAME));
-                $extension = $this->foto->getClientOriginalExtension();
-                $fullName  = $filename . '.' . $extension;
+            $filename  = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->foto->getClientOriginalName(), PATHINFO_FILENAME));
+            $extension = $this->foto->getClientOriginalExtension();
+            $fullName  = $filename . '.' . $extension;
 
-                // Upload to S3 with explicit path
-                $path = $this->foto->storeAs('aspek-fotos', $fullName, 's3');
-                
-                if (!$path) {
-                    throw new \Exception('Failed to upload file to S3');
-                }
+            $path = $this->foto->storeAs('aspek-fotos', $fullName, 's3');
+            $validated['foto'] = $path;
 
-                // Verify upload succeeded by checking if file exists
-                if (!Storage::disk('s3')->exists($path)) {
-                    throw new \Exception('File upload verification failed - file not found on S3');
-                }
-
-                \Log::info('Aspek foto uploaded successfully', [
-                    'path' => $path,
-                    'original_name' => $this->foto->getClientOriginalName(),
-                    'size' => $this->foto->getSize()
-                ]);
-
-                $validated['foto'] = $path;
-
-                // Only delete old file AFTER successful upload
-                if ($this->aspek_id) {
-                    $old = Aspek::find($this->aspek_id)?->foto;
-                    if ($old) {
-                        delete_storage_object_if_key($old);
-                        \Log::info('Old aspek foto deleted', ['old_path' => $old]);
-                    }
-                }
-            } catch (\Exception $e) {
-                \Log::error('Aspek foto upload failed', [
-                    'error' => $e->getMessage(),
-                    'aspek_id' => $this->aspek_id,
-                    'file_name' => $this->foto->getClientOriginalName() ?? 'unknown'
-                ]);
-
-                $this->dispatch('swal',
-                    title: 'Gagal mengunggah foto!',
-                    text: 'Silakan coba lagi atau hubungi administrator.',
-                    icon: 'error',
-                    toast: true,
-                    position: 'bottom-end',
-                    timer: 5000
-                );
-                return;
+            if ($this->aspek_id) {
+                $old = Aspek::find($this->aspek_id)?->foto;
+                delete_storage_object_if_key($old);
             }
         } else {
-            // Jangan override 'foto' saat tidak ada file baru
             unset($validated['foto']);
         }
 
-        try {
-            if ($this->aspek_id) {
-                $aspek = Aspek::findOrFail($this->aspek_id);
-                $aspek->update($validated);
-                
-                // Verify data saved
-                $aspek->refresh();
-                \Log::info('Aspek updated successfully', [
-                    'id' => $aspek->id,
-                    'nama' => $aspek->nama,
-                    'foto_path' => $aspek->foto
-                ]);
-            } else {
-                $aspek = Aspek::create(array_merge(
-                    ['id' => (string) Str::uuid()],
-                    $validated
-                ));
-                
-                \Log::info('Aspek created successfully', [
-                    'id' => $aspek->id,
-                    'nama' => $aspek->nama,
-                    'foto_path' => $aspek->foto
-                ]);
-            }
-
-            $message = $this->aspek_id
-                ? 'Aspek berhasil diperbarui!'
-                : 'Aspek berhasil dibuat!';
-
-            $this->dispatch('swal',
-                title: $message,
-                icon: 'success',
-                toast: true,
-                position: 'bottom-end',
-                timer: 3000
-            );
-
-            $this->closeModal();
-            $this->resetPage();
-        } catch (\Exception $e) {
-            \Log::error('Aspek save failed', [
-                'error' => $e->getMessage(),
-                'aspek_id' => $this->aspek_id,
-                'validated_data' => $validated
-            ]);
-
-            $this->dispatch('swal',
-                title: 'Gagal menyimpan aspek!',
-                text: 'Silakan coba lagi atau hubungi administrator.',
-                icon: 'error',
-                toast: true,
-                position: 'bottom-end',
-                timer: 5000
-            );
+        if ($this->aspek_id) {
+            Aspek::findOrFail($this->aspek_id)->update($validated);
+        } else {
+            Aspek::create(array_merge(
+                ['id' => (string) Str::uuid()],
+                $validated
+            ));
         }
+
+        $message = $this->aspek_id
+            ? 'Aspek berhasil diperbarui!'
+            : 'Aspek berhasil dibuat!';
+
+        $this->dispatch('swal',
+            title: $message,
+            icon: 'success',
+            toast: true,
+            position: 'bottom-end',
+            timer: 3000
+        );
+
+        $this->closeModal();
+        $this->resetPage();
     }
     
     public function closeModal(): void
