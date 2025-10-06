@@ -17,7 +17,10 @@ return new class extends Migration
 
             // skpd_id bertipe string -> definisikan manual
             $table->string('skpd_id')->nullable(); 
-            $table->foreign('skpd_id')
+        });
+
+        Schema::table('walidata', function (Blueprint $table) {
+              $table->foreign('skpd_id')
                   ->references('id')
                   ->on('skpd')
                   ->nullOnDelete()

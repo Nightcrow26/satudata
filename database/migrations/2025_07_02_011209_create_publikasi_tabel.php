@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('keyword')->nullable();
             $table->unsignedBigInteger('view')->default(0);
             // relasi ke instansi (skpd), user, dan aspek
+            $table->timestamps();  // created_at & updated_at
+        });
+        Schema::table('publikasi', function (Blueprint $table) {
             $table->foreignid('instansi_id')
                   ->nullable()
                   ->constrained('skpd', 'id')
@@ -30,7 +33,6 @@ return new class extends Migration
                   ->nullable()
                   ->constrained('aspeks', 'id')
                   ->onDelete('set null');
-            $table->timestamps();  // created_at & updated_at
         });
     }
 
