@@ -161,8 +161,8 @@
                     accept="image/*"
                     icon="photo"
                     maxSize="2MB"
-          :existingFile="$editingAspek?->foto ? basename($editingAspek->foto) : null"
-          :existingFileUrl="$editingAspek?->foto ? resolve_media_url($editingAspek->foto) : null"
+                    :existingFile="$editingAspek?->foto ? basename($editingAspek?->foto) : null"
+                    :existingFileUrl="$editingAspek?->foto ? resolve_media_url($editingAspek?->foto) : null"
                 />
                 
                 @if($foto)
