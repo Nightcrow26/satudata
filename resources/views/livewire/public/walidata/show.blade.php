@@ -9,7 +9,18 @@
             <section class="order-1 md:order-2 md:col-span-9">
                 <livewire:public.walidata.detail-content :walidata="$walidata" />
             </section>
-
+            
+             @php
+                use Carbon\Carbon;
+                $verifDate = null;
+                if (! empty($walidata->verifikasi_data)) {
+                    try {
+                        $verifDate = $walidata->verifikasi_data instanceof \Illuminate\Support\Carbon ? $walidata->verifikasi_data : Carbon::parse($walidata->verifikasi_data);
+                    } catch (\Exception $e) {
+                        $verifDate = null;
+                    }
+                }
+            @endphp
             {{-- Side Panel: tampil di mobile SETELAH konten, sticky di desktop --}}
             <aside class="order-2 md:order-1 md:col-span-3 md:sticky md:top-24">
                 <x-public.walidata.detail-sidepanel :walidata="[
@@ -23,7 +34,7 @@
                             ['label' => 'Data', 'value' => $walidata->data ?? '-'],
                             ['label' => 'Satuan', 'value' => $walidata->satuan ?? '-'],
                             ['label' => 'Status', 'value' => $walidata->verifikasi_data ? 'Terverifikasi' : 'Belum Terverifikasi'],
-                            ['label' => 'Dibuat', 'value' => $walidata->created_at ? $walidata->created_at->translatedFormat('d F Y') : '-'],
+                            ['label' => 'Dibuat', 'value' => $walidata->created_at ? $verifDate->translatedFormat('d F Y') : '-'],
                         ],
                     ]" />
             </aside>
