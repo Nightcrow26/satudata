@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('keyword')->nullable();
             $table->unsignedBigInteger('view')->default(0);
             // relasi ke instansi (skpd), user, dan aspek
-            $table->foreignid('instansi_id')
+            $table->foreignUuid('instansi_id')
                   ->nullable()
                   ->constrained('skpd', 'id')
                   ->onDelete('set null');
