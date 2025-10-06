@@ -69,9 +69,7 @@ class SkpdCrud extends Component
 
             if ($this->skpd_id) {
                 $old = Skpd::find($this->skpd_id)->foto;
-                if ($old && Storage::disk('s3')->exists($old)) {
-                    Storage::disk('s3')->delete($old);
-                }
+                delete_storage_object_if_key($old);
             }
         } else {
             // Jika tidak ada foto baru, jangan update kolom foto
@@ -282,7 +280,7 @@ class SkpdCrud extends Component
     public function deleteSkpdConfirmed(): void
     {
         $skpd = Skpd::findOrFail($this->deleteId);
-        $skpd->foto && Storage::disk('s3')->delete($skpd->foto);
+    delete_storage_object_if_key($skpd->foto);
         $skpd->delete();
         
         $this->showDeleteModal = false;

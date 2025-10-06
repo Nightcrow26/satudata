@@ -281,7 +281,7 @@ class DatasetCrud extends Component
 
             if ($this->dataset_id) {
                 $old = Dataset::find($this->dataset_id)?->excel;
-                $old && Storage::disk('s3')->delete($old);
+                    delete_storage_object_if_key($old);
             }
         } else {
             unset($validated['excel']);
@@ -298,7 +298,7 @@ class DatasetCrud extends Component
 
             if ($this->dataset_id) {
                 $oldM = Dataset::find($this->dataset_id)?->metadata;
-                $oldM && Storage::disk('s3')->delete($oldM);
+                    delete_storage_object_if_key($oldM);
             }
         } else {
             unset($validated['metadata']);
@@ -315,7 +315,7 @@ class DatasetCrud extends Component
 
             if ($this->dataset_id) {
                 $oldBukti = Dataset::find($this->dataset_id)?->bukti_dukung;
-                $oldBukti && Storage::disk('s3')->delete($oldBukti);
+                    delete_storage_object_if_key($oldBukti);
             }
         } else {
             unset($validated['bukti_dukung']);
@@ -408,10 +408,9 @@ class DatasetCrud extends Component
     {
         $dataset = Dataset::findOrFail($this->deleteId);
 
-        $dataset->excel && Storage::disk('s3')->delete($dataset->excel);
-        $dataset->metadata && Storage::disk('s3')->delete($dataset->metadata);
-        // Hapus juga bukti_dukung
-        $dataset->bukti_dukung && Storage::disk('s3')->delete($dataset->bukti_dukung);
+            delete_storage_object_if_key($dataset->excel);
+            delete_storage_object_if_key($dataset->metadata);
+            delete_storage_object_if_key($dataset->bukti_dukung);
 
         $dataset->delete();
 

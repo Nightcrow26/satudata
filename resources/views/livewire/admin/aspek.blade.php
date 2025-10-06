@@ -59,7 +59,7 @@
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                   @if($aspek->foto)
-                    <img src="{{ Storage::disk('s3')->temporaryUrl($aspek->foto, now()->addMinutes(15)) }}" class="h-12 w-12 rounded object-cover mx-auto">
+                    <img src="{{ resolve_media_url($aspek->foto) }}" class="h-12 w-12 rounded object-cover mx-auto" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
                   @else
                     <span class="text-gray-400 dark:text-gray-500">-</span>
                   @endif
@@ -102,7 +102,7 @@
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
         class="fixed inset-0 z-50 overflow-y-auto"
@@ -168,7 +168,7 @@
                 @if($foto)
                   <img src="{{ $foto->temporaryUrl() }}" class="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
                 @elseif($editingAspek?->foto)
-                  <img src="{{ Storage::disk('s3')->temporaryUrl($editingAspek->foto, now()->addMinutes(15)) }}" class="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm">
+                  <img src="{{ resolve_media_url($editingAspek->foto) }}" class="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
                 @endif
               </div>
             </div>

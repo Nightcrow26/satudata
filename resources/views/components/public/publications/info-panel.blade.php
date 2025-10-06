@@ -6,8 +6,9 @@
     {{-- Logo Instansi --}}
     <div class="flex justify-center">
         @if($publication->agency?->logo_url)
-        <img src="{{ $publication->agency->logo_url }}" alt="{{ $publication->agency->name }}"
-            class="h-20 sm:h-24 w-auto object-contain">
+              <img src="{{ resolve_media_url($publication->agency->logo_url, ['temporary'=>false, 'fallback'=>asset('logo-hsu.png')]) }}" alt="{{ $publication->agency->name }}"
+                  class="h-20 sm:h-24 w-auto object-contain"
+                  onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}'">
         @else
         <div class="h-20 sm:h-24 w-32 grid place-content-center text-teal-600/40 dark:text-teal-300/40">
             <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

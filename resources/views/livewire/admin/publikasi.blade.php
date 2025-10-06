@@ -85,7 +85,7 @@
                 <td class="px-6 py-4 whitespace-nowrap text-center">
                     @if($pub->pdf)
                         <a class="inline-flex items-center px-2 py-1 border border-red-300 dark:border-red-600 rounded text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                          href="{{ Storage::disk('s3')->temporaryUrl($pub->pdf, now()->addMinutes(15)) }}"
+                          href="{{ resolve_media_url($pub->pdf) }}"
                           target="_blank" data-bs-toggle="tooltip" title="Publikasi (PDF)">
                           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -237,8 +237,8 @@
                       accept="application/pdf,.pdf"
                       icon="document-text"
                       maxSize="20MB"
-                      :existingFile="$editingPublikasi?->pdf ? basename($editingPublikasi->pdf) : null"
-                      :existingFileUrl="$editingPublikasi?->pdf ? Storage::disk('s3')->temporaryUrl($editingPublikasi->pdf, now()->addMinutes(15)) : null"
+                      :existingFile="$editingPublikasi?->pdf ? basename($editingPublikasi?->pdf) : null"
+                      :existingFileUrl="$editingPublikasi?->pdf ? resolve_media_url($editingPublikasi?->pdf) : null"
                   />
                 </div>
                 <div>
@@ -249,15 +249,16 @@
                       accept="image/*"
                       icon="photo"
                       maxSize="2MB"
-                      :existingFile="$editingPublikasi?->foto ? basename($editingPublikasi->foto) : null"
-                      :existingFileUrl="$editingPublikasi?->foto ? Storage::disk('s3')->temporaryUrl($editingPublikasi->foto, now()->addMinutes(15)) : null"
+                      :existingFile="$editingPublikasi?->foto ? basename($editingPublikasi?->foto) : null"
+                      :existingFileUrl="$editingPublikasi?->foto ? resolve_media_url($editingPublikasi?->foto) : null"
                   />
                   @if($foto)
                     <img src="{{ $foto->temporaryUrl() }}"
                         class="mt-2 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm" style="width:80px">
                   @elseif($editingPublikasi?->foto)
-                    <img src="{{ Storage::disk('s3')->temporaryUrl($editingPublikasi->foto, now()->addMinutes(15)) }}"
-                        class="mt-2 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm" style="width:80px">
+                    <img src="{{ resolve_media_url($editingPublikasi?->foto) }}"
+                         onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}';"
+                         class="mt-2 rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm" style="width:80px">
                   @endif
                 </div>
 
@@ -282,8 +283,6 @@
                       placeholder="Masukkan deskripsi publikasi..."
                   />
               </div>
-
-              <div class="md:col-span-2">
                   @php
                     $showCatatanPub = !auth()->user()->hasRole('user') || (!empty($catatan_verif) && auth()->user()->hasRole('user'));
                   @endphp
@@ -295,13 +294,10 @@
                     @error('catatan_verif')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                   @endif
               </div>
-
-              </div>
             </div>
             <div class="bg-gray-50 dark:!bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse rounded-b-lg">
                 <button type="button"
                       wire:click="savePublikasi"
-                      wire:loading.attr="disabled"
                       wire:target="savePublikasi"
                       aria-busy="true"
                       class="w-full inline-flex items-center justify-center gap-2 rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 dark:focus:ring-indigo-400 sm:ml-3 sm:w-auto sm:text-sm transition-colors">

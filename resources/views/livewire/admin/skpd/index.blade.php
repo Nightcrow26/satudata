@@ -246,7 +246,7 @@
                                     icon="photo"
                                     maxSize="2MB"
                                     :existingFile="$editingSkpd?->foto ? basename($editingSkpd->foto) : null"
-                                    :existingFileUrl="$editingSkpd?->foto ? Storage::disk('s3')->temporaryUrl($editingSkpd->foto, now()->addMinutes(15)) : null"
+                                    :existingFileUrl="$editingSkpd?->foto ? resolve_media_url($editingSkpd->foto) : null"
                                 />
                             </div>
                             
@@ -269,7 +269,7 @@
                                 @if($fotoKey && !$isUrl && Storage::disk('s3')->exists($fotoKey))
                                     {{-- File ada di S3 --}}
                                     <img
-                                        src="{{ Storage::disk('s3')->temporaryUrl($fotoKey, now()->addMinutes(15)) }}"
+                                        src="{{ resolve_media_url($fotoKey) }}"
                                         alt="Logo SKPD"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
                                     >

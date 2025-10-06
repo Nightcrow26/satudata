@@ -215,7 +215,7 @@ class Index extends Component
         if ($this->sk_penunjukan) {
             // Hapus file lama jika ada (untuk update)
             if ($this->user_id && $this->current_sk_penunjukan) {
-                Storage::disk('s3')->delete($this->current_sk_penunjukan);
+                    delete_storage_object_if_key($this->current_sk_penunjukan);
             }
             
             // Generate filename like dataset pattern

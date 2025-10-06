@@ -38,7 +38,7 @@ $meta = collect($w->meta ?? [
     {{-- Logo --}}
     <div class="flex justify-center">
         @if($agencyLogo)
-        <img src="{{ $agencyLogo }}" alt="Logo {{ $agencyName }}" class="h-28 w-auto object-contain" loading="lazy">
+    <img src="{{ resolve_media_url($agencyLogo, ['temporary'=>false, 'fallback'=>asset('logo-hsu.png')]) }}" alt="Logo {{ $agencyName }}" class="h-28 w-auto object-contain" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}'">
         @else
         {{-- Placeholder logo (shield) --}}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"

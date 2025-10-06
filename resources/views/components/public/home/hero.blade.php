@@ -8,7 +8,7 @@
 <section class="relative isolate">
     @if($bgImage)
     {{-- Gambar latar + overlay gradasi yang sedikit lebih kuat di dark mode --}}
-    <img src="{{ $bgImage }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+    <img src="{{ resolve_media_url($bgImage) }}" alt="" class="absolute inset-0 -z-10 h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'" />
     <div class="absolute inset-0 -z-10 bg-gradient-to-r
                    from-black/80 via-transparent to-black/80
                    dark:from-black/70 dark:via-black/20 dark:to-black/70

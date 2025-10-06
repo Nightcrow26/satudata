@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
         {{-- LEFT: ringkasan aspek (sticky di desktop) --}}
         <div class="md:col-span-3">
             <x-public.aspects.summary-card 
-                :icon="$aspek->foto ? Storage::disk('s3')->temporaryUrl($aspek->foto, now()->addHour()) : null" 
+                :icon="$aspek->foto ? resolve_media_url($aspek->foto, ['minutes'=>60]) : null" 
                 :name="$aspek->nama"
                 :count="$dataCounts['data'] + $dataCounts['walidata'] + $dataCounts['publikasi']" />
         </div>

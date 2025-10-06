@@ -70,7 +70,7 @@
                                             bg-teal-50 dark:bg-teal-800/20
                                             ring-1 ring-teal-100 dark:ring-teal-800 transition-colors duration-200 shrink-0">
                                 @if(!empty($i->aspek->foto))
-                                <img src="{{  Storage::disk('s3')->temporaryUrl($i->aspek->foto, now()->addMinutes(15)) }}"  alt="" class="h-full w-full object-cover" />
+                                <img src="{{ resolve_media_url($i->aspek->foto) }}"  alt="" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'" />
                                 @else
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                     stroke-width="1.5" stroke="currentColor"

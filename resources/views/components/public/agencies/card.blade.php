@@ -12,44 +12,7 @@
 @php
     // Compute a safe logo URL. Accept full http/https/data URLs or try Storage URLs (default disk, then s3),
     // finally fall back to public storage asset.
-    $logoUrl = null;
-    if ($logo) {
-        if (\Illuminate\Support\Str::startsWith($logo, ['http://', 'https://', 'data:', '/'])) {
-            $logoUrl = $logo;
-        } else {
-            // 1) try default Storage::url()
-            try {
-                $candidate = \Illuminate\Support\Facades\Storage::url($logo);
-            } catch (\Throwable $e) {
-                $candidate = null;
-            }
-
-            // if candidate is an absolute URL, use it
-            if ($candidate && \Illuminate\Support\Str::startsWith($candidate, ['http://', 'https://'])) {
-                $logoUrl = $candidate;
-            } else {
-                // 2) try s3 disk explicitly if configured
-                try {
-                    if (array_key_exists('s3', config('filesystems.disks', []))) {
-                        $s3candidate = \Illuminate\Support\Facades\Storage::disk('s3')->url($logo);
-                    } else {
-                        $s3candidate = null;
-                    }
-                } catch (\Throwable $e) {
-                    $s3candidate = null;
-                }
-
-                if ($s3candidate && \Illuminate\Support\Str::startsWith($s3candidate, ['http://', 'https://'])) {
-                    $logoUrl = $s3candidate;
-                }
-
-                // 3) final fallback: public storage path
-                if (!$logoUrl) {
-                    $logoUrl = asset('storage/' . ltrim($logo, '/'));
-                }
-            }
-        }
-    }
+    $logoUrl = resolve_media_url($logo, ['temporary' => false, 'fallback' => asset('logo-hsu.png')]);
 @endphp
 
 <div class="p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-5 transition-colors duration-200">
@@ -59,7 +22,7 @@
                dark:ring-gray-700 dark:bg-gray-700/50">
        @if($logoUrl)
        <img src="{{ $logoUrl }}" alt="{{ $name }}" class="w-16 sm:w-20 h-full object-contain"
-           onerror="this.onerror=null;this.src='{{ url('logo-hsu.png') }}';">
+           onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}';">
         @else
         {{-- fallback placeholder svg --}}
         <svg class="w-12 sm:w-16 h-12 sm:h-16 text-gray-300 dark:text-gray-500" viewBox="0 0 24 24" fill="currentColor"

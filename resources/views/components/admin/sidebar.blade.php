@@ -19,18 +19,20 @@
 
   <!-- Logo dan Title -->
   <div class="text-center mb-5" x-show="!collapsed" x-transition>
-    <img src="{{ asset('logo-hsu.png') }}"
+    <img src="{{ resolve_media_url(asset('logo-hsu.png'), ['temporary'=>false]) }}"
          alt="Logo"
-         class="mx-auto max-h-20 w-auto">
+         class="mx-auto max-h-20 w-auto"
+         onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}'">
     <h6 class="mt-2 text-gray-900 dark:text-white font-semibold">Satu Data<br>Hulu Sungai Utara</h6>
   </div>
 
   <!-- Logo kecil untuk collapsed state -->
   <div class="text-center mb-4" x-show="collapsed" x-transition>
-    <img src="{{ asset('logo-hsu.png') }}"
+    <img src="{{ resolve_media_url(asset('logo-hsu.png'), ['temporary'=>false]) }}"
          alt="Logo"
          class="mx-auto"
-         style="height: 30px; width: auto;">
+         style="height: 30px; width: auto;"
+         onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}'">
   </div>
 
   <ul class="flex flex-col space-y-1">

@@ -10,40 +10,7 @@
 ])
 
 @php
-    $logoUrl = null;
-    if ($logo) {
-        if (\Illuminate\Support\Str::startsWith($logo, ['http://', 'https://', 'data:', '/'])) {
-            $logoUrl = $logo;
-        } else {
-            try {
-                $candidate = \Illuminate\Support\Facades\Storage::url($logo);
-            } catch (\Throwable $e) {
-                $candidate = null;
-            }
-
-            if ($candidate && \Illuminate\Support\Str::startsWith($candidate, ['http://', 'https://'])) {
-                $logoUrl = $candidate;
-            } else {
-                try {
-                    if (array_key_exists('s3', config('filesystems.disks', []))) {
-                        $s3candidate = \Illuminate\Support\Facades\Storage::disk('s3')->url($logo);
-                    } else {
-                        $s3candidate = null;
-                    }
-                } catch (\Throwable $e) {
-                    $s3candidate = null;
-                }
-
-                if ($s3candidate && \Illuminate\Support\Str::startsWith($s3candidate, ['http://', 'https://'])) {
-                    $logoUrl = $s3candidate;
-                }
-
-                if (!$logoUrl) {
-                    $logoUrl = asset('storage/' . ltrim($logo, '/'));
-                }
-            }
-        }
-    }
+    $logoUrl = resolve_media_url($logo, ['temporary' => false, 'fallback' => asset('logo-hsu.png')]);
 @endphp
 
 <div {{ $attributes->class([
@@ -58,7 +25,7 @@
                dark:!ring-gray-700 dark:!bg-gray-700/50">
        @if($logoUrl)
        <img src="{{ $logoUrl }}" alt="{{ $name }}" class="h-full w-auto object-contain"
-           onerror="this.onerror=null;this.src='{{ url('logo-hsu.png') }}';">
+           onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}';">
         @else
         {{-- Placeholder emblem --}}
         <svg class="w-16 h-16 text-gray-300 dark:text-gray-500" viewBox="0 0 24 24" fill="currentColor"

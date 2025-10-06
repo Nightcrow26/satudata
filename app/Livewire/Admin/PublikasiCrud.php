@@ -285,7 +285,7 @@ class PublikasiCrud extends Component
 
             if ($this->publikasi_id) {
                 $oldFoto = Publikasi::find($this->publikasi_id)->foto;
-                $oldFoto && Storage::disk('s3')->delete($oldFoto);
+                delete_storage_object_if_key($oldFoto);
             }
         } else {
             unset($validated['foto']);
@@ -301,7 +301,7 @@ class PublikasiCrud extends Component
 
             if ($this->publikasi_id) {
                 $oldPdf = Publikasi::find($this->publikasi_id)->pdf;
-                $oldPdf && Storage::disk('s3')->delete($oldPdf);
+                delete_storage_object_if_key($oldPdf);
             }
         } else {
             unset($validated['pdf']);
@@ -368,7 +368,8 @@ class PublikasiCrud extends Component
     {
         $pub = Publikasi::findOrFail($this->deleteId);
         // optionally hapus file:
-        Storage::disk('s3')->delete([$pub->pdf, $pub->foto]);
+    delete_storage_object_if_key($pub->pdf);
+    delete_storage_object_if_key($pub->foto);
         $pub->delete();
 
         $this->dispatch('swal',

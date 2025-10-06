@@ -27,7 +27,7 @@ $badgeVariants = [
         <div
             class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden ring-1 ring-gray-200 dark:!ring-gray-700 bg-gray-50 dark:!bg-gray-700 shrink-0">
             @if($thumb)
-            <img src="{{ $thumb }}" alt="" class="h-full w-full object-cover">
+            <img src="{{ resolve_media_url($thumb) }}" alt="" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
             @else
             {{-- placeholder --}}
             <div class="h-full w-full grid place-content-center text-gray-300 dark:!text-gray-400">

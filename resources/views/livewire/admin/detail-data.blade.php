@@ -13,7 +13,7 @@
       @if($fotoKey && Storage::disk('s3')->exists($fotoKey))
           {{-- Jika file ada di S3, gunakan temporaryUrl --}}
           <img
-            src="{{ Storage::disk('s3')->temporaryUrl($fotoKey, now()->addMinutes(15)) }}"
+            src="{{ resolve_media_url($fotoKey) }}"
             alt="Logo SKPD"
             class="w-12 h-12 object-contain"
           >

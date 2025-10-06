@@ -15,7 +15,7 @@
     <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden ring-1 ring-gray-200 bg-gray-50 shrink-0 grid place-items-center
                dark:ring-gray-700 dark:bg-gray-700/50">
         @if($thumb)
-        <img src="{{ $thumb }}" alt="" class="w-full h-full object-cover">
+    <img src="{{ resolve_media_url($thumb, ['temporary'=>false, 'fallback'=>asset('logo-hsu.png')]) }}" alt="" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}'">
         @else
         <svg class="h-10 w-10 text-gray-300 dark:text-gray-500" viewBox="0 0 24 24" fill="currentColor"
             aria-hidden="true">

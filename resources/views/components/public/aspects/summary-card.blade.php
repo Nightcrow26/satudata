@@ -6,7 +6,7 @@
     <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden ring-1 ring-gray-200 bg-gray-50 mx-auto
                 dark:!ring-gray-700 dark:!bg-gray-900">
         @if($icon)
-        <img src="{{ $icon }}" alt="Ikon {{ $name }}" class="w-full h-full object-cover">
+    <img src="{{ resolve_media_url($icon, ['temporary'=>false]) }}" alt="Ikon {{ $name }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
         @else
         <div class="h-full w-full grid place-content-center text-gray-300 dark:!text-gray-500">
             <svg class="h-10 w-10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

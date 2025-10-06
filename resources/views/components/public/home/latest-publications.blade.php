@@ -73,7 +73,7 @@
                                             ring-1 ring-teal-100 dark:ring-teal-800
                                             transition-colors duration-200 shrink-0">
                                 @if(!empty($p->aspek->foto))
-                                <img src="{{  Storage::disk('s3')->temporaryUrl($p->aspek->foto, now()->addMinutes(15)) }}" alt="" class="h-full w-full object-cover" />
+                                <img src="{{ resolve_media_url($p->aspek->foto) }}" alt="" class="h-full w-full object-cover" onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'" />
                                 @else
                                 {{-- ikon buku --}}
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"

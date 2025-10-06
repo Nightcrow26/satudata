@@ -18,7 +18,7 @@ request()->routeIs('public.publications.*')],
             <!-- Kiri: Logo + Judul -->
             <a href="{{ route('public.home') }}" class="flex items-center gap-3" wire:navigate>
                 <div class="h-9 w-9 rounded-full bg-white/10 grid place-items-center ring-1 ring-white/20">
-                    <img src="{{ asset('images/public/hsu_logo.png') }}" alt="Logo HSU" class="h-7 w-7 object-contain"
+                    <img src="{{ resolve_media_url(asset('images/public/hsu_logo.png'), ['temporary'=>false, 'fallback'=>asset('logo-hsu.png')]) }}" alt="Logo HSU" class="h-7 w-7 object-contain"
                         loading="lazy">
                 </div>
                 <div class="leading-tight">

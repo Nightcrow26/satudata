@@ -105,9 +105,7 @@ class AspekCrud extends Component
 
             if ($this->aspek_id) {
                 $old = Aspek::find($this->aspek_id)?->foto;
-                if ($old && Storage::disk('s3')->exists($old)) {
-                    Storage::disk('s3')->delete($old);
-                }
+                delete_storage_object_if_key($old);
             }
         } else {
             // Jangan override 'foto' saat tidak ada file baru
@@ -156,8 +154,8 @@ class AspekCrud extends Component
 
     public function deleteAspekConfirmed(): void
     {
-        $aspek = Aspek::findOrFail($this->deleteId);
-        $aspek->foto && Storage::disk('s3')->delete($aspek->foto);
+    $aspek = Aspek::findOrFail($this->deleteId);
+    delete_storage_object_if_key($aspek->foto);
         $aspek->delete();
 
          $this->dispatch('swal', 
