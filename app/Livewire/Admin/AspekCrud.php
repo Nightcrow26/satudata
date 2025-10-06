@@ -135,9 +135,18 @@ class AspekCrud extends Component
 
             $validated['foto'] = $path;
 
-            // Verifikasi object ada dan log URL contoh
+            // Verifikasi object ada dan log URL contoh (dengan retry singkat)
             $exists = false; $tmpUrl = null; $tmpErr = null;
-            try { $exists = \Storage::disk('s3')->exists($path); } catch (\Throwable $e) { $tmpErr = $e->getMessage(); }
+            for ($i = 0; $i < 3; $i++) {
+                try {
+                    $exists = \Storage::disk('s3')->exists($path);
+                } catch (\Throwable $e) {
+                    $tmpErr = ($tmpErr ? $tmpErr.' | ' : '') . $e->getMessage();
+                    $exists = false;
+                }
+                if ($exists) break;
+                usleep(200000); // 200ms
+            }
             try { $tmpUrl = \Storage::disk('s3')->temporaryUrl($path, now()->addMinutes(5)); } catch (\Throwable $eTmp) { $tmpUrl = null; $tmpErr = ($tmpErr ? $tmpErr.' | ' : '').$eTmp->getMessage(); }
 
             \Log::info('Aspek upload stored', [
