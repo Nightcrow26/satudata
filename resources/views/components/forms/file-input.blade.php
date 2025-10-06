@@ -38,7 +38,7 @@
     disabled: {{ $disabled ? 'true' : 'false' }}
 }"
     x-on:livewire-upload-start="isUploading = true; progress = 0"
-    x-on:livewire-upload-finish="progress = 100; setTimeout(() => { isUploading = false }, 400)"
+    x-on:livewire-upload-finish="progress = 100; isUploading = false"
     x-on:livewire-upload-error="isUploading = false"
     x-on:livewire-upload-progress="progress = $event.detail.progress"
 >
