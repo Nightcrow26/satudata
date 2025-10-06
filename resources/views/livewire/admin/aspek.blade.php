@@ -161,8 +161,8 @@
                     accept="image/*"
                     icon="photo"
                     maxSize="2MB"
-                    :existingFile="$editingAspek?->foto ? basename($editingAspek->foto) : null"
-                    :existingFileUrl="$editingAspek?->foto ? Storage::disk('s3')->temporaryUrl($editingAspek->foto, now()->addMinutes(15)) : null"
+          :existingFile="$editingAspek?->foto ? basename($editingAspek->foto) : null"
+          :existingFileUrl="$editingAspek?->foto ? resolve_media_url($editingAspek->foto) : null"
                 />
                 
                 @if($foto)

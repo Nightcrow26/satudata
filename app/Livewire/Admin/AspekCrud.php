@@ -103,6 +103,19 @@ class AspekCrud extends Component
             $path = $this->foto->store('aspek-fotos', 's3');
             $validated['foto'] = $path;
 
+            // Debug: verify object existence and sample URL
+            try {
+                $exists = \Storage::disk('s3')->exists($path);
+                $tmpUrl = null;
+                try {
+                    $tmpUrl = \Storage::disk('s3')->temporaryUrl($path, now()->addMinutes(5));
+                } catch (\Throwable $eTmp) {
+                    $tmpUrl = 'TEMP_URL_ERROR: ' . $eTmp->getMessage();
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Aspek foto upload debug failed', ['error' => $e->getMessage()]);
+            }
+
             if ($this->aspek_id) {
                 $old = Aspek::find($this->aspek_id)?->foto;
                 delete_storage_object_if_key($old);
