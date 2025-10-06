@@ -114,18 +114,32 @@
                         <div class="flex gap-3 mb-3">
                             {{-- Kolom kiri: thumbnail --}}
                             <div class="flex-shrink-0">
-                                @if(!empty($item->aspek->foto))
-                                <img src="{{ Storage::disk('s3')->temporaryUrl($item->aspek->foto, now()->addMinutes(15)) }}" 
+                                @php
+                                    $foto = $item->aspek->foto ?? null;
+                                    $thumbUrl = asset('kesehatan.png');
+                                    if (!empty($foto)) {
+                                        // Normalize malformed scheme like https:/ to https://
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'https:/') && !\Illuminate\Support\Str::startsWith($foto, 'https://')) {
+                                            $foto = str_replace('https:/', 'https://', $foto);
+                                        }
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) {
+                                            $foto = str_replace('http:/', 'http://', $foto);
+                                        }
+
+                                        if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
+                                            $thumbUrl = $foto;
+                                        } else {
+                                            try {
+                                                $thumbUrl = Storage::disk('s3')->temporaryUrl($foto, now()->addMinutes(15));
+                                            } catch (\Throwable $e) {
+                                                try { $thumbUrl = Storage::url($foto); } catch (\Throwable $e2) { $thumbUrl = asset('kesehatan.png'); }
+                                            }
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ $thumbUrl }}" 
                                      alt="{{ $item->nama }}" 
                                      class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700">
-                                @else
-                                <div class="w-25 h-25 bg-gray-100 dark:!bg-gray-700 rounded-lg flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" 
-                                         class="w-8 h-8 text-gray-400 dark:!text-gray-500">
-                                        <path fill-rule="evenodd" d="M1 5.25A2.25 2.25 0 0 1 3.25 3h13.5A2.25 2.25 0 0 1 19 5.25v9.5A2.25 2.25 0 0 1 16.75 17H3.25A2.25 2.25 0 0 1 1 14.75v-9.5Zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 0 0 .75-.75v-2.69l-2.22-2.219a.75.75 0 0 0-1.06 0l-1.91 1.909.47.47a.75.75 0 1 1-1.06 1.06L6.53 8.091a.75.75 0 0 0-1.06 0l-2.97 2.97ZM12 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                @endif
                             </div>
 
                             {{-- Kolom kanan: metadata --}}
@@ -211,7 +225,7 @@
                 </div>
             </div>
         @else
-            @foreach($latestIndikator->take(4) as $item)
+        @foreach($latestIndikator->take(4) as $item)
             @php
                 // Relasi aspek bisa null
                 $aspek = $item->aspek ?? null;
@@ -225,13 +239,17 @@
                 $darkBg = sprintf('rgba(%d, %d, %d, 0.2)', $rgb[0], $rgb[1], $rgb[2]);
                 $darkText = sprintf('rgba(%d, %d, %d, 0.9)', min(255, $rgb[0] + 60), min(255, $rgb[1] + 60), min(255, $rgb[2] + 60));
 
-                // Gambar: jika ada foto di S3 pakai temporaryUrl, jika tidak pakai public/kesehatan.png
+                // Gambar: gunakan URL absolut apa adanya; jika key/path, coba S3; fallback ke storage lokal atau aset default
                 $fotoUrl = asset('kesehatan.png');
-                if (!empty(optional($aspek)->foto)) {
-                    try {
-                        $fotoUrl = Storage::disk('s3')->temporaryUrl($aspek->foto, now()->addMinutes(15));
-                    } catch (\Throwable $e) {
-                        $fotoUrl = asset('kesehatan.png');
+                $foto = optional($aspek)->foto;
+                if (!empty($foto)) {
+                    if (\Illuminate\Support\Str::startsWith($foto, 'https:/') && !\Illuminate\Support\Str::startsWith($foto, 'https://')) { $foto = str_replace('https:/', 'https://', $foto); }
+                    if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) { $foto = str_replace('http:/', 'http://', $foto); }
+                    if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
+                        $fotoUrl = $foto;
+                    } else {
+                        try { $fotoUrl = Storage::disk('s3')->temporaryUrl($foto, now()->addMinutes(15)); }
+                        catch (\Throwable $e) { try { $fotoUrl = Storage::url($foto); } catch (\Throwable $e2) { $fotoUrl = asset('kesehatan.png'); } }
                     }
                 }
             @endphp
@@ -353,18 +371,23 @@
                         <div class="flex gap-3 mb-3">
                             {{-- Kolom kiri: thumbnail --}}
                             <div class="flex-shrink-0">
-                                @if(!empty($item->aspek->foto))
-                                <img src="{{ Storage::disk('s3')->temporaryUrl($item->aspek->foto, now()->addMinutes(15)) }}" 
+                                @php
+                                    $foto = $item->aspek->foto ?? null;
+                                    $thumbUrl = asset('kesehatan.png');
+                                    if (!empty($foto)) {
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'https:/') && !\Illuminate\Support\Str::startsWith($foto, 'https://')) { $foto = str_replace('https:/', 'https://', $foto); }
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) { $foto = str_replace('http:/', 'http://', $foto); }
+                                        if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
+                                            $thumbUrl = $foto;
+                                        } else {
+                                            try { $thumbUrl = Storage::disk('s3')->temporaryUrl($foto, now()->addMinutes(15)); }
+                                            catch (\Throwable $e) { try { $thumbUrl = Storage::url($foto); } catch (\Throwable $e2) { $thumbUrl = asset('kesehatan.png'); } }
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ $thumbUrl }}" 
                                      alt="{{ $item->nama }}" 
                                      class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700">
-                                @else
-                                <div class="w-25 h-25 bg-gray-100 dark:!bg-gray-700 rounded-lg flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" 
-                                         class="w-8 h-8 text-gray-400 dark:!text-gray-500">
-                                        <path fill-rule="evenodd" d="M1 5.25A2.25 2.25 0 0 1 3.25 3h13.5A2.25 2.25 0 0 1 19 5.25v9.5A2.25 2.25 0 0 1 16.75 17H3.25A2.25 2.25 0 0 1 1 14.75v-9.5Zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 0 0 .75-.75v-2.69l-2.22-2.219a.75.75 0 0 0-1.06 0l-1.91 1.909.47.47a.75.75 0 1 1-1.06 1.06L6.53 8.091a.75.75 0 0 0-1.06 0l-2.97 2.97ZM12 7a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                @endif
                             </div>
 
                             {{-- Kolom kanan: metadata --}}
