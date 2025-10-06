@@ -261,16 +261,21 @@
                                 @endphp
 
                                 <div class="mt-2">
-                                @if($fotoKey && Storage::disk('s3')->exists($fotoKey))
-                                    {{-- Jika file ada di S3 --}}
+                                @php
+                                    // Cek apakah URL penuh
+                                    $isUrl = filter_var($fotoKey, FILTER_VALIDATE_URL);
+                                @endphp
+
+                                @if($fotoKey && !$isUrl && Storage::disk('s3')->exists($fotoKey))
+                                    {{-- File ada di S3 --}}
                                     <img
                                         src="{{ Storage::disk('s3')->temporaryUrl($fotoKey, now()->addMinutes(15)) }}"
                                         alt="Logo SKPD"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
                                     >
 
-                                @elseif($fotoKey && filter_var($fotoKey, FILTER_VALIDATE_URL))
-                                    {{-- Jika $fotoKey sudah berupa URL (misalnya https://data.hsu.go.id/logo-hsu.png) --}}
+                                @elseif($fotoKey && $isUrl)
+                                    {{-- Jika sudah URL penuh --}}
                                     <img
                                         src="{{ $fotoKey }}"
                                         alt="Logo SKPD"
@@ -278,7 +283,7 @@
                                     >
 
                                 @elseif($fotoKey && file_exists(public_path($fotoKey)))
-                                    {{-- Jika file ada di public --}}
+                                    {{-- File lokal di public --}}
                                     <img
                                         src="{{ asset($fotoKey) }}"
                                         alt="Logo SKPD"
@@ -286,10 +291,10 @@
                                     >
 
                                 @else
-                                    {{-- Default gambar --}}
+                                    {{-- Default --}}
                                     <img
                                         src="{{ asset('images/default-logo.png') }}"
-                                        alt="Logo Default"
+                                        alt="Default Logo"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 opacity-50"
                                     >
                                 @endif
