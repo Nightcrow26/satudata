@@ -125,6 +125,14 @@
                                         if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) {
                                             $foto = str_replace('http:/', 'http://', $foto);
                                         }
+                                        // Handle protocol-relative URLs
+                                        if (\Illuminate\Support\Str::startsWith($foto, '//')) {
+                                            $foto = 'https:' . $foto;
+                                        }
+                                        // Upgrade known domain to https to avoid mixed content
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'http://data.hsu.go.id')) {
+                                            $foto = str_replace('http://', 'https://', $foto);
+                                        }
 
                                         if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
                                             $thumbUrl = $foto;
@@ -137,9 +145,10 @@
                                         }
                                     }
                                 @endphp
-                                <img src="{{ $thumbUrl }}" 
+                          <img src="{{ $thumbUrl }}" 
                                      alt="{{ $item->nama }}" 
-                                     class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700">
+                              class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700"
+                              onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
                             </div>
 
                             {{-- Kolom kanan: metadata --}}
@@ -245,6 +254,8 @@
                 if (!empty($foto)) {
                     if (\Illuminate\Support\Str::startsWith($foto, 'https:/') && !\Illuminate\Support\Str::startsWith($foto, 'https://')) { $foto = str_replace('https:/', 'https://', $foto); }
                     if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) { $foto = str_replace('http:/', 'http://', $foto); }
+                    if (\Illuminate\Support\Str::startsWith($foto, '//')) { $foto = 'https:' . $foto; }
+                    if (\Illuminate\Support\Str::startsWith($foto, 'http://data.hsu.go.id')) { $foto = str_replace('http://', 'https://', $foto); }
                     if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
                         $fotoUrl = $foto;
                     } else {
@@ -264,9 +275,10 @@
                         <div class="flex gap-3 mb-3">
                             {{-- Kolom kiri: thumbnail --}}
                             <div class="flex-shrink-0">
-                                <img src="{{ $fotoUrl }}" 
+                          <img src="{{ $fotoUrl }}" 
                                      alt="{{ optional($item->indikator)->uraian_indikator ?? '-' }}" 
-                                     class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:bg-gray-700">
+                              class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:bg-gray-700"
+                              onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
                             </div>
 
                             {{-- Kolom kanan: metadata --}}
@@ -377,6 +389,8 @@
                                     if (!empty($foto)) {
                                         if (\Illuminate\Support\Str::startsWith($foto, 'https:/') && !\Illuminate\Support\Str::startsWith($foto, 'https://')) { $foto = str_replace('https:/', 'https://', $foto); }
                                         if (\Illuminate\Support\Str::startsWith($foto, 'http:/') && !\Illuminate\Support\Str::startsWith($foto, 'http://')) { $foto = str_replace('http:/', 'http://', $foto); }
+                                        if (\Illuminate\Support\Str::startsWith($foto, '//')) { $foto = 'https:' . $foto; }
+                                        if (\Illuminate\Support\Str::startsWith($foto, 'http://data.hsu.go.id')) { $foto = str_replace('http://', 'https://', $foto); }
                                         if (\Illuminate\Support\Str::startsWith($foto, ['http://','https://'])) {
                                             $thumbUrl = $foto;
                                         } else {
@@ -387,7 +401,8 @@
                                 @endphp
                                 <img src="{{ $thumbUrl }}" 
                                      alt="{{ $item->nama }}" 
-                                     class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700">
+                                     class="w-25 h-25 object-cover rounded-lg bg-gray-100 dark:!bg-gray-700"
+                                     onerror="this.onerror=null;this.src='{{ asset('kesehatan.png') }}'">
                             </div>
 
                             {{-- Kolom kanan: metadata --}}
