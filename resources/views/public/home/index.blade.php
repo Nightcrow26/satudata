@@ -5,7 +5,7 @@
     <x-public.home.stats :items="[
         ['icon' => 'database',  'value' => $datasetCount, 'label' => 'Data'],
         ['icon' => 'book-open', 'value' => $publikasiCount, 'label' => 'Publikasi'],
-        ['icon' => 'landmark',  'value' => $instansiCount, 'label' => 'Instansi'],
+        ['icon' => 'landmark',  'value' => $instansiCount, 'label' => 'Perangkat Daerah'],
     ]" overlap />
 
     <livewire:public.home.search />

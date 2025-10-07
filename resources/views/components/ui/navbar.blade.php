@@ -5,7 +5,7 @@ $links = [
 ['label' => 'Indikator Walidata', 'href' => route('public.walidata.index'), 'active' => request()->routeIs('public.walidata.*')],
 ['label' => 'Publikasi', 'href' => route('public.publications.index'), 'active' =>
 request()->routeIs('public.publications.*')],
-['label' => 'Instansi', 'href' => route('public.agencies.index'), 'active' => request()->routeIs('public.agencies.*')],
+['label' => 'Perangkat Daerah', 'href' => route('public.agencies.index'), 'active' => request()->routeIs('public.agencies.*')],
 ['label' => 'Statistik Dasar', 'href' => 'https://hulusungaiutarakab.bps.go.id/', 'active' => false],
 ];
 @endphp
