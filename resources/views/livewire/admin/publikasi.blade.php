@@ -283,6 +283,7 @@
                       placeholder="Masukkan deskripsi publikasi..."
                   />
               </div>
+              <div class="md:col-span-2">
                   @php
                     $showCatatanPub = !auth()->user()->hasRole('user') || (!empty($catatan_verif) && auth()->user()->hasRole('user'));
                   @endphp
