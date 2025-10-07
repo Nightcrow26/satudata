@@ -21,10 +21,10 @@
     >
     {{-- Logo / Emblem --}}
     <div class="mx-auto w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl overflow-hidden
-               ring-1 ring-gray-200 bg-gray-50 grid place-items-center
+               ring-1 ring-gray-200 bg-gray-50 flex items-center justify-center p-3
                dark:!ring-gray-700 dark:!bg-gray-700/50">
        @if($logoUrl)
-       <img src="{{ $logoUrl }}" alt="{{ $name }}" class="h-full w-auto object-contain"
+       <img src="{{ $logoUrl }}" alt="{{ $name }}" class="max-w-full max-h-full w-auto h-auto object-contain"
            onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}';">
         @else
         {{-- Placeholder emblem --}}
