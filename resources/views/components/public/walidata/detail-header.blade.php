@@ -128,7 +128,7 @@ $views = $w->views ?? 112;
 
                 {{-- Download PDF --}}
                 <a 
-                    href="{{ route('public.walidata.pdf.download', $w) }}" 
+                    href="{{ route('public.walidata.download', [$w, 'pdf']) }}" 
                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:!bg-gray-800 border border-red-300 dark:border-red-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
                     title="Download PDF"
                 >
@@ -137,7 +137,7 @@ $views = $w->views ?? 112;
 
                 {{-- Download Excel --}}
                 <a 
-                    href="{{ route('public.walidata.download', $w) }}" 
+                    href="{{ route('public.walidata.download', [$w, 'excel']) }}" 
                     class="inline-flex items-center px-3 py-2 text-sm font-medium text-green-600 dark:text-green-400 bg-white dark:!bg-gray-800 border border-green-300 dark:border-green-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
                     title="Download Excel"
                 >

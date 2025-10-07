@@ -8,7 +8,6 @@ use App\Http\Controllers\Public\DownloadSurveyController;
 use App\Http\Controllers\Public\DataDownloadController;
 use App\Http\Controllers\Public\DataPdfDownloadController;
 use App\Http\Controllers\Public\WalidataDownloadController;
-use App\Http\Controllers\Public\WalidataPdfDownloadController;
 
 // =======================
 // PUBLIC (tanpa 'guest')
@@ -23,8 +22,7 @@ Route::name('public.')->group(function () {
 
     Route::get('/walidata', \App\Livewire\Public\Walidata\Index::class)->name('walidata.index');
     Route::get('/walidata/{walidata}', \App\Livewire\Public\Walidata\Show::class)->name('walidata.show');
-    Route::get('/walidata/{walidata}/unduh', [WalidataDownloadController::class, 'download'])->name('walidata.download');
-    Route::get('/walidata/{walidata}/pdf', [WalidataPdfDownloadController::class, 'download'])->name('walidata.pdf.download');
+    Route::get('/walidata/{walidata}/unduh/{format?}', [WalidataDownloadController::class, 'download'])->name('walidata.download')->where('format', 'excel|pdf');
 
     Route::view('/aspek', 'public.aspects.index')->name('aspects.index');
     Route::view('/aspek/{slug}', 'public.aspects.show')->name('aspects.show');
