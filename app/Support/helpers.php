@@ -58,7 +58,26 @@ if (! function_exists('resolve_media_url')) {
 
         try {
             if ($temporary && method_exists(Storage::disk($disk), 'temporaryUrl')) {
+                // First check if file exists to avoid NoSuchKey errors
+                try {
+                    if (!Storage::disk($disk)->exists($value)) {
+                        if (app()->environment('production')) {
+                            \Log::warning('File not found on S3, skipping temporaryUrl', ['path' => $value]);
+                        }
+                        throw new \Exception('File not found on S3');
+                    }
+                } catch (\Exception $existsCheck) {
+                    // If exists() fails, try temporaryUrl anyway (might be permission issue)
+                    if (app()->environment('production')) {
+                        \Log::debug('exists() check failed, trying temporaryUrl anyway', [
+                            'path' => $value,
+                            'exists_error' => $existsCheck->getMessage()
+                        ]);
+                    }
+                }
+
                 $url = Storage::disk($disk)->temporaryUrl($value, now()->addMinutes($minutes));
+                
                 // Log successful S3 URL generation in production
                 if (app()->environment('production')) {
                     \Log::debug('S3 temporaryUrl generated', [

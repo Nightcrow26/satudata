@@ -100,16 +100,61 @@ class AspekCrud extends Component
 
         // === Upload Foto (opsional) ===
         if ($this->foto) {
-            $filename  = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->foto->getClientOriginalName(), PATHINFO_FILENAME));
-            $extension = $this->foto->getClientOriginalExtension();
-            $fullName  = $filename . '.' . $extension;
+            try {
+                $filename  = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->foto->getClientOriginalName(), PATHINFO_FILENAME));
+                $extension = $this->foto->getClientOriginalExtension();
+                $fullName  = $filename . '.' . $extension;
 
-            $path = $this->foto->storeAs('aspek-fotos', $fullName, 's3');
-            $validated['foto'] = $path;
+                // Upload to S3
+                $path = $this->foto->storeAs('aspek-fotos', $fullName, 's3');
+                
+                if (!$path) {
+                    throw new \Exception('Upload gagal - path kosong');
+                }
 
-            if ($this->aspek_id) {
-                $old = Aspek::find($this->aspek_id)?->foto;
-                delete_storage_object_if_key($old);
+                // Verify upload by trying to get file size (more reliable than exists())
+                try {
+                    $fileSize = Storage::disk('s3')->size($path);
+                    \Log::info('Aspek foto uploaded successfully', [
+                        'path' => $path,
+                        'size' => $fileSize,
+                        'original_name' => $this->foto->getClientOriginalName()
+                    ]);
+                } catch (\Exception $verifyError) {
+                    // If size check fails, the upload might have failed
+                    \Log::error('Upload verification failed', [
+                        'path' => $path,
+                        'verify_error' => $verifyError->getMessage()
+                    ]);
+                    throw new \Exception('Upload gagal - file tidak dapat diverifikasi di S3');
+                }
+
+                $validated['foto'] = $path;
+
+                // Only delete old file AFTER successful verification
+                if ($this->aspek_id) {
+                    $old = Aspek::find($this->aspek_id)?->foto;
+                    if ($old) {
+                        delete_storage_object_if_key($old);
+                    }
+                }
+
+            } catch (\Exception $e) {
+                \Log::error('Aspek foto upload failed', [
+                    'error' => $e->getMessage(),
+                    'aspek_id' => $this->aspek_id,
+                    'file_name' => $this->foto->getClientOriginalName() ?? 'unknown'
+                ]);
+
+                $this->dispatch('swal',
+                    title: 'Gagal mengunggah foto!',
+                    text: $e->getMessage(),
+                    icon: 'error',
+                    toast: true,
+                    position: 'bottom-end',
+                    timer: 5000
+                );
+                return;
             }
         } else {
             unset($validated['foto']);
