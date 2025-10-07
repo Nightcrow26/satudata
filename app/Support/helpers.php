@@ -58,18 +58,66 @@ if (! function_exists('resolve_media_url')) {
 
         try {
             if ($temporary && method_exists(Storage::disk($disk), 'temporaryUrl')) {
-                return Storage::disk($disk)->temporaryUrl($value, now()->addMinutes($minutes));
+                $url = Storage::disk($disk)->temporaryUrl($value, now()->addMinutes($minutes));
+                // Log successful S3 URL generation in production
+                if (app()->environment('production')) {
+                    \Log::debug('S3 temporaryUrl generated', [
+                        'path' => $value,
+                        'url' => substr($url, 0, 100) . '...'
+                    ]);
+                }
+                return $url;
             }
         } catch (\Throwable $e) {
+            // Log S3 temporaryUrl failures in production
+            if (app()->environment('production')) {
+                \Log::warning('S3 temporaryUrl failed, trying alternatives', [
+                    'path' => $value,
+                    'error' => $e->getMessage()
+                ]);
+            }
             // fallthrough
         }
 
         try {
-            return Storage::disk($disk)->url($value);
+            $url = Storage::disk($disk)->url($value);
+            // Log fallback to regular S3 URL
+            if (app()->environment('production')) {
+                \Log::debug('S3 url generated as fallback', [
+                    'path' => $value,
+                    'url' => substr($url, 0, 100) . '...'
+                ]);
+            }
+            return $url;
         } catch (\Throwable $e) {
+            // Log S3 disk URL failures
+            if (app()->environment('production')) {
+                \Log::warning('S3 disk url failed, trying Storage::url', [
+                    'path' => $value,
+                    'error' => $e->getMessage()
+                ]);
+            }
+            
             try {
-                return Storage::url($value);
+                $url = Storage::url($value);
+                // Log fallback to Storage::url
+                if (app()->environment('production')) {
+                    \Log::debug('Storage::url generated as final fallback', [
+                        'path' => $value,
+                        'url' => substr($url, 0, 100) . '...'
+                    ]);
+                }
+                return $url;
             } catch (\Throwable $e2) {
+                // Log complete failure
+                if (app()->environment('production')) {
+                    \Log::error('All URL generation methods failed, using fallback image', [
+                        'path' => $value,
+                        'error1' => $e->getMessage(),
+                        'error2' => $e2->getMessage(),
+                        'fallback' => $fallback
+                    ]);
+                }
                 return $fallback;
             }
         }
