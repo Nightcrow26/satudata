@@ -18,9 +18,10 @@
   <!-- FAB -->
   <button type="button"
           @click="openModal()"
-          class="fixed bottom-4 right-4 w-30 h-14 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50"
+          class="fixed bottom-4 right-4 min-w-[120px] w-auto h-14 px-4 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center z-50 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 text-sm font-medium whitespace-nowrap"
           aria-label="Buka Asisten Data">
-    Chat Ai <i class="bi bi-chat-dots text-xl ms-2"></i>
+    <span>Chat Ai</span>
+    <i class="bi bi-chat-dots text-lg ml-2 flex-shrink-0"></i>
     <span class="absolute inset-0 rounded-full border-2 border-green-400 animate-ping opacity-35 pointer-events-none"></span>
   </button>
 
