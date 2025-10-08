@@ -471,27 +471,78 @@ function encodeHistoryBase64(history){ try{ return btoa(unescape(encodeURICompon
   // Controller chat (Alpine)
   window.chatBox = (hasHistoryInit=false)=>({
     es:null, streaming:false, hasAnyChat:hasHistoryInit,
+    currentRequestId: null, requestInProgress: false, lastProcessedRequestId: null,
+    processedFinalForRequest: null,
     pending:{answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'},
 
     init(){
-      // Mulai SSE dari Livewire
-      window.addEventListener('chat-start',(e)=>{
-        const msg=e.detail?.message||''; const h=e.detail?.history||[];
-        if(!msg) return; this.start(msg,h); this.hasAnyChat=true;
-      });
-      // Tutup stream jika modal ditutup
-      window.addEventListener('chat-modal-closed', this.stop.bind(this));
+      // Remove any existing listeners to prevent duplicates
+      if (this.chatStartHandler) {
+        window.removeEventListener('chat-start', this.chatStartHandler);
+      }
+      if (this.modalClosedHandler) {
+        window.removeEventListener('chat-modal-closed', this.modalClosedHandler);
+      }
+      
+      // Create bound handlers
+      this.chatStartHandler = (e) => {
+        const msg=e.detail?.message||''; 
+        const h=e.detail?.history||[];
+        const requestId=e.detail?.requestId||null;
+        
+        // Prevent duplicate processing of the same request
+        if (!msg || requestId === this.lastProcessedRequestId) {
+          console.log('ChatBox: Ignoring duplicate request:', requestId);
+          return;
+        }
+        
+        this.lastProcessedRequestId = requestId;
+        this.start(msg,h,requestId); 
+        this.hasAnyChat=true;
+      };
+      
+      this.modalClosedHandler = this.stop.bind(this);
+      
+      // Add listeners
+      window.addEventListener('chat-start', this.chatStartHandler);
+      window.addEventListener('chat-modal-closed', this.modalClosedHandler);
     },
 
-    start(message,history){
-      this.stop(); this.streaming=true;
+    start(message,history,requestId){
+      console.log('ChatBox: Starting stream for message:', message.substring(0, 50), 'RequestID:', requestId);
+      
+      // Prevent multiple simultaneous requests
+      if (this.requestInProgress) {
+        console.warn('ChatBox: Request already in progress, ignoring new request');
+        return;
+      }
+
+      this.stop(); // Ensure any previous connection is closed
+      this.streaming=true;
+      this.requestInProgress=true;
+      this.currentRequestId=requestId;
+      this.processedFinalForRequest=null; // Reset processed flag for new request
       this.pending={answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'};
       this.$nextTick(()=>this.scrollBottom());
 
       const base=window.SDI_STREAM_URL || '/api/chatbot/stream';
       const h=encodeHistoryBase64(history||[]);
       const url=`${base}?message=${encodeURIComponent(message)}${h?('&h='+encodeURIComponent(h)):""}`;
+      console.log('ChatBox: Opening EventSource to:', url);
       this.es=new EventSource(url);
+
+      // Add timeout to prevent stuck requests (30 seconds)
+      const timeout = setTimeout(() => {
+        console.warn('ChatBox: Request timeout after 30 seconds');
+        this.stop();
+        // Optionally show error message to user
+        this.pending.answer += '\n\n[Timeout: Permintaan terlalu lama, silakan coba lagi]';
+      }, 30000);
+
+      // Clear timeout when request completes
+      const clearTimeoutAndCleanup = () => {
+        clearTimeout(timeout);
+      };
 
       this.es.addEventListener('delta',ev=>{
         const {text}=JSON.parse(ev.data||'{}');
@@ -499,8 +550,35 @@ function encodeHistoryBase64(history){ try{ return btoa(unescape(encodeURICompon
       });
 
       this.es.addEventListener('final', async (ev) => {
+        console.log('ChatBox: Received final response for request:', this.currentRequestId);
         let data = {};
         try { data = JSON.parse(ev.data || '{}'); } catch (e) { console.error('parse final', e); }
+
+        // Prevent processing if already stopped streaming or no request in progress
+        if (!this.streaming || !this.requestInProgress) {
+          console.log('ChatBox: Ignoring final response - not streaming or no request in progress');
+          return;
+        }
+
+        // Prevent duplicate final processing for the same request
+        if (this.processedFinalForRequest === this.currentRequestId) {
+          console.log('ChatBox: Final response already processed for request:', this.currentRequestId);
+          return;
+        }
+
+        // Mark this request as processed
+        this.processedFinalForRequest = this.currentRequestId;
+
+        // Immediately set flags to prevent duplicate processing
+        this.streaming = false;
+        this.requestInProgress = false;
+        
+        // Close the EventSource and cleanup
+        clearTimeoutAndCleanup();
+        this.es?.close(); 
+        this.es = null;
+
+        console.log('ChatBox: Processing final response');
 
         // 1) viz -> array
         const viz = Array.isArray(data.viz) ? data.viz : (data.viz ? [data.viz] : []);
@@ -520,25 +598,60 @@ function encodeHistoryBase64(history){ try{ return btoa(unescape(encodeURICompon
           ? `${data.headline}\n\n${data.answer || ''}`
           : (data.answer || '');
 
-        await this.$wire.appendAssistant(
-          content,
-          data.sources || [],
-          viz,
-          preview,
-          data.insights || []
-        );
+        try {
+          await this.$wire.appendAssistant(
+            content,
+            data.sources || [],
+            viz,
+            preview,
+            data.insights || []
+          );
+          console.log('ChatBox: Successfully appended assistant response');
+        } catch (error) {
+          console.error('ChatBox: Error appending assistant response:', error);
+        }
 
-        // bereskan state UI
-        this.streaming = false; // jika Anda pakai flag ini
-        this.es?.close(); this.es = null;
+        // Reset pending content and request tracking
+        this.pending = {answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'};
+        this.currentRequestId = null;
+        this.processedFinalForRequest = null;
+        
         this.$nextTick(() => this.scrollBottom());
       });
 
 
-      this.es.addEventListener('error',()=>{ this.streaming=false; this.es?.close(); this.es=null; });
+      this.es.addEventListener('error',(e)=>{ 
+        console.error('ChatBox: EventSource error:', e);
+        clearTimeoutAndCleanup();
+        this.streaming=false; 
+        this.requestInProgress=false;
+        this.currentRequestId=null;
+        this.processedFinalForRequest=null;
+        this.es?.close(); 
+        this.es=null;
+        
+        // Show error message to user and reset pending after short delay
+        this.pending.answer = '[Error: Koneksi terputus, silakan coba lagi]';
+        setTimeout(() => {
+          this.pending = {answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'};
+        }, 3000); // Clear error message after 3 seconds
+      });
     },
 
-    stop(){ if(this.es){ this.es.close(); this.es=null; } this.streaming=false; },
+    stop(){ 
+      console.log('ChatBox: Stopping stream');
+      if(this.es){ 
+        this.es.close(); 
+        this.es=null; 
+      } 
+      this.streaming=false; 
+      this.requestInProgress=false;
+      this.currentRequestId=null;
+      this.processedFinalForRequest=null;
+      
+      // Clear pending content completely when stopping
+      this.pending = {answer:'',sources:[],viz:null,data:[],canvasId:'pendingChart'};
+    },
 
     scrollBottom(){ const box=this.$refs.scrollArea; if(!box) return; box.scrollTop=box.scrollHeight; }
 });

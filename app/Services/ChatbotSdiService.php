@@ -55,6 +55,16 @@ class ChatbotSdiService
 
     public function stream(string $message, array $context, \Closure $emit, \Closure $tick): void
     {
+        // Create response tracker for this specific request
+        $responseState = ['emitted' => false];
+        
+        // Log start of stream to help debug multiple calls
+        \Log::info('ChatbotSdiService::stream started', [
+            'message' => substr($message, 0, 50), 
+            'instance_id' => spl_object_id($this),
+            'request_id' => uniqid()
+        ]);
+        
         // 1) Intent
         $emit('delta', ['text' => "🔎 Memahami pertanyaan… "]);
         $intent = $this->safeExtractIntent($message);
@@ -77,7 +87,7 @@ class ChatbotSdiService
             $emit('delta', ['text' => "\n⚠️ Dataset belum tersedia di situs. Menyusun jawaban umum… "]);
             $final = $this->fallbackGeneralAnswer($message);
             $final['answer'] = "Catatan: dataset yang Anda minta belum tersedia di website ini.\n\n".$final['answer'];
-            $emit('final', $final);
+            $this->emitFinalOnce($emit, $final, $responseState);
             return;
         }
 
@@ -85,34 +95,16 @@ class ChatbotSdiService
         $best = $cands[0];
         $emit('delta', ['text' => "\n📥 Menyiapkan analisis untuk: ".implode(' • ', array_map(fn($d)=>$d['nama'], $picks))."…"]);
         try {
-            $final = app(\App\Services\ChatbotSdiService::class)->analyzeMultipleDatasetsViaJson($picks, $message, $emit);
-            $emit('final', $final);
+            $final = $this->analyzeMultipleDatasetsViaJson($picks, $message, $emit);
+            $this->emitFinalOnce($emit, $final, $responseState);
             return;
         } catch (\Throwable $e) {
             $emit('delta', ['text' => "\n⚠️ Gagal analisis: ".substr($e->getMessage(),0,200).'…']);
             $fallback = $this->fallbackGeneralAnswer($message);
             $fallback['answer'] = "Catatan: dataset terdeteksi, namun analisis otomatis gagal.\n\n".$fallback['answer'];
-            $emit('final', $fallback);
-            return; // <— penting: hentikan alur di sini
+            $this->emitFinalOnce($emit, $fallback, $responseState);
+            return;
         }
-
-        // 4) Analisis cepat → data_preview + viz
-        $emit('delta', ['text' => "\n🧮 Menganalisis data… "]);
-        $cols = $this->reader->detectColumns($rows);
-        $result = $this->analyzer->analyze($rows, $cols['tahun'], $cols['nilai'], $cols['wil'], $years);
-
-        // 5) Bangun final payload
-        $final = [
-            'answer' => $result['answer'],
-            'sources' => [[
-                'title' => $best['nama'],
-                'dataset_id' => $best['id'],
-                'url' => $best['url'],
-            ]],
-            'data_preview' => $result['data_preview'],
-            'viz' => $result['viz'],
-        ];
-        $emit('final', $final);
     }
 
     private function safeExtractIntent(string $q): array
@@ -224,33 +216,38 @@ class ChatbotSdiService
 
         // Prompt naratif + instruksi terstruktur
         $prompt = <<<PROMPT
-        Anda menerima beberapa potongan JSON berisi cuplikan dataset. Tugas Anda memberikan pengguna jawaban komprehensif berdasarkan data tersebut,  
-        berikan jawaban yang berkaitan dengan pertanyaan sesuai langkah berikut:
-        1) berikan temuan utama (insights) sepanjang 1-2 paragraf yang relevan dengan pertanyaan.
-        2) Rekomendasikan visualisasi yang tepat (struktur objek "viz" seperti contoh).
-        3) Sertakan "data_preview" dari cuplikan yang paling relevan (maks 40 baris total).
-        4) Tautkan "sources" ke asal dataset yang dilampirkan.
-        5) Jawab jelas, gunakan angka yang ada; jika perlu agregasi sederhana (sum/mean), jelaskan singkat.
-
-        Format keluaran JSON:
+        Anda adalah asisten analisis data yang membantu pengguna memahami dataset pemerintah Kabupaten Hulu Sungai Utara. 
+        
+        Berdasarkan data JSON yang diberikan, berikan jawaban yang MUDAH DIPAHAMI dalam bahasa Indonesia yang natural.
+        
+        TUGAS ANDA:
+        1) Berikan jawaban naratif yang menjelaskan temuan utama dari data (1-2 paragraf)
+        2) Sertakan insights penting dalam bentuk poin-poin
+        3) Rekomendasikan visualisasi yang tepat
+        4) Sertakan preview data yang relevan
+        
+        PENTING: Jawab dalam format JSON yang VALID dengan struktur berikut:
         {
-        "answer": string,
-        "insights": string[],
-        "viz": [
+          "answer": "Jawaban naratif dalam bahasa Indonesia yang mudah dipahami, tanpa format JSON di dalamnya",
+          "insights": ["Poin insight 1", "Poin insight 2"],
+          "viz": [
             {
-            "library": "chartjs",
-            "type": "line|bar|scatter",
-            "x": "<fieldX>",
-            "y": ["<fieldY>", "..."],
-            "series_meta": [ { "label":"<nama seri>", "source":"File #n" } ],
-            "options": { "title":"<judul>" }
+              "library": "chartjs",
+              "type": "line|bar|scatter",
+              "x": "nama_kolom_x",
+              "y": ["nama_kolom_y1", "nama_kolom_y2"],
+              "series_meta": [{"label": "Label grafik", "source": "File #1"}],
+              "options": {"title": "Judul Grafik"}
             }
-        ],
-        "data_preview": [
-            { "source": "File #n", "rows": [ {<kolom>:<nilai>}, ... ] }
-        ]
+          ],
+          "data_preview": [
+            {"source": "File #1", "rows": [{"kolom1": "nilai1", "kolom2": "nilai2"}]}
+          ]
         }
-        Pertanyaan: "{$question}"
+        
+        Pertanyaan pengguna: "{$question}"
+        
+        Jawab dalam JSON yang valid dan pastikan field "answer" berisi teks naratif biasa, BUKAN JSON nested.
         PROMPT;
 
         // Kirim prompt + JSON parts sebagai teks
@@ -281,9 +278,10 @@ class ChatbotSdiService
         // Parse JSON secara toleran
         $parsed = $this->parseJsonLoose($text);
         if (!is_array($parsed)) {
-            // fallback: bungkus sebagai jawaban plain
+            // fallback: bungkus sebagai jawaban plain, pastikan bukan JSON mentah
+            $cleanAnswer = $this->sanitizeAnswer($text);
             return [
-                'answer' => $text ?: 'Maaf, belum ada jawaban.',
+                'answer' => $cleanAnswer,
                 'insights'=>[],
                 'viz'=>[],
                 'data_preview'=>[],
@@ -293,28 +291,157 @@ class ChatbotSdiService
 
         // Gabungkan sumber & normalisasi bidang
         $parsed['sources']      = $sources;
-        $parsed['answer']       = $parsed['answer'] ?? ($text ?: 'Maaf, belum ada jawaban.');
+        $parsed['answer']       = $this->sanitizeAnswer($parsed['answer'] ?? $text);
         $parsed['data_preview'] = $parsed['data_preview'] ?? [];
         $parsed['viz']          = $parsed['viz'] ?? [];
+        $parsed['insights']     = $parsed['insights'] ?? [];
 
         return $parsed;
+    }
+
+    /**
+     * Helper method to ensure only one final response is emitted per request
+     */
+    private function emitFinalOnce(\Closure $emit, array $final, array &$responseState): void
+    {
+        if ($responseState['emitted']) {
+            \Log::warning('ChatbotSdiService: Attempted duplicate response emission blocked', [
+                'instance_id' => spl_object_id($this),
+                'response_state' => $responseState
+            ]);
+            return; // Already emitted a response, ignore subsequent calls
+        }
+        
+        \Log::info('ChatbotSdiService: Emitting final response', [
+            'instance_id' => spl_object_id($this), 
+            'answer_length' => strlen($final['answer'] ?? ''),
+            'response_state' => $responseState
+        ]);
+        
+        // Validate and sanitize the response structure
+        $validatedFinal = $this->validateFinalResponse($final);
+        
+        $responseState['emitted'] = true;
+        $emit('final', $validatedFinal);
+    }
+
+    /**
+     * Validate and sanitize final response structure
+     */
+    private function validateFinalResponse(array $response): array
+    {
+        \Log::info('ChatbotSdiService: Validating response', [
+            'has_answer' => isset($response['answer']),
+            'answer_type' => gettype($response['answer'] ?? null),
+            'answer_preview' => substr($response['answer'] ?? '', 0, 100)
+        ]);
+
+        // Ensure required fields exist with proper defaults
+        $validated = [
+            'answer' => $response['answer'] ?? 'Maaf, belum ada jawaban yang tersedia.',
+            'sources' => $response['sources'] ?? [],
+            'data_preview' => $response['data_preview'] ?? [],
+            'viz' => $response['viz'] ?? [],
+            'insights' => $response['insights'] ?? []
+        ];
+
+        // Ensure answer is always a string and never raw JSON
+        if (!is_string($validated['answer'])) {
+            \Log::warning('ChatbotSdiService: Answer is not string', ['type' => gettype($validated['answer'])]);
+            if (is_array($validated['answer']) || is_object($validated['answer'])) {
+                $validated['answer'] = 'Maaf, terjadi kesalahan dalam memproses jawaban.';
+            } else {
+                $validated['answer'] = (string)$validated['answer'];
+            }
+        }
+
+        // Sanitize the answer to ensure it's clean text
+        $validated['answer'] = $this->sanitizeAnswer($validated['answer']);
+
+        // Ensure insights is always an array
+        if (!is_array($validated['insights'])) {
+            $validated['insights'] = [];
+        }
+
+        // Ensure sources is always an array
+        if (!is_array($validated['sources'])) {
+            $validated['sources'] = [];
+        }
+
+        \Log::info('ChatbotSdiService: Response validated', [
+            'final_answer_length' => strlen($validated['answer']),
+            'insights_count' => count($validated['insights']),
+            'sources_count' => count($validated['sources'])
+        ]);
+
+        return $validated;
+    }
+
+    /**
+     * Check if a string looks like JSON
+     */
+    private function looksLikeJson(string $text): bool
+    {
+        $trimmed = trim($text);
+        return (str_starts_with($trimmed, '{') && str_ends_with($trimmed, '}')) ||
+               (str_starts_with($trimmed, '[') && str_ends_with($trimmed, ']'));
+    }
+
+    /**
+     * Sanitize answer to ensure it's never raw JSON
+     */
+    private function sanitizeAnswer(?string $answer): string
+    {
+        if (!$answer) {
+            return 'Maaf, belum ada jawaban yang tersedia.';
+        }
+
+        // If it looks like JSON, try to extract meaningful content
+        if ($this->looksLikeJson($answer)) {
+            $parsed = json_decode($answer, true);
+            if (is_array($parsed)) {
+                // Try to extract answer from JSON structure
+                if (isset($parsed['answer']) && is_string($parsed['answer'])) {
+                    return $parsed['answer'];
+                }
+                // If no answer field, return error message
+                return 'Maaf, terjadi kesalahan dalam memproses jawaban.';
+            }
+        }
+
+        return $answer;
     }
 
     private function parseJsonLoose(?string $text): ?array
     {
         if (!$text) return null;
 
+        // Clean the text first
+        $text = trim($text);
+        
+        // Try direct JSON decode first
         $j = json_decode($text, true);
-        if (is_array($j)) return $j;
+        if (is_array($j) && isset($j['answer'])) return $j;
 
+        // Try to extract JSON from markdown code blocks
         if (preg_match('/```json\s*([\s\S]*?)```/i', $text, $m)) {
             $j = json_decode(trim($m[1]), true);
-            if (is_array($j)) return $j;
+            if (is_array($j) && isset($j['answer'])) return $j;
         }
 
-        if (preg_match('/\{(?:[^{}]|(?R))*\}/s', $text, $m)) {
+        // Try to extract the first complete JSON object
+        if (preg_match('/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/s', $text, $m)) {
             $j = json_decode($m[0], true);
-            if (is_array($j)) return $j;
+            if (is_array($j) && isset($j['answer'])) return $j;
+        }
+        
+        // Try to find JSON that starts with { and ends with }
+        $start = strpos($text, '{');
+        $end = strrpos($text, '}');
+        if ($start !== false && $end !== false && $end > $start) {
+            $jsonStr = substr($text, $start, $end - $start + 1);
+            $j = json_decode($jsonStr, true);
+            if (is_array($j) && isset($j['answer'])) return $j;
         }
 
         return null;
