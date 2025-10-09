@@ -1,5 +1,5 @@
 {{-- resources/views/components/public/aspects/summary-card.blade.php --}}
-@props(['icon'=>null,'name'=>'','count'=>0])
+@props(['icon'=>null,'name'=>'','countData'=>0,'countWalidata'=>0,'countPublikasi'=>0])
 
 <aside class="rounded-2xl border border-gray-200 bg-white shadow-sm p-5 md:sticky md:top-24
               dark:!border-gray-700 dark:!bg-gray-800 transition-colors duration-200">
@@ -16,11 +16,29 @@
         @endif
     </div>
 
-    <div class="mt-4 text-center">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $name }}</h2>
-        <div class="mt-1 inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5
+    {{-- Info --}}
+    <div class="mt-3 sm:mt-4 text-center space-y-1">
+        <h3 class="text-sm sm:text-base font-semibold text-gray-900 group-hover:text-gray-950
+                   dark:!text-gray-100 dark:group-hover:!text-white">
+            {{ $name }}
+        </h3>
+        <div class="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5
+                    dark:!border-gray-700 dark:!bg-gray-600">
+            <span class="text-[11px] sm:text-xs text-gray-600 dark:!text-gray-300">
+                {{ $countData }} Dataset
+            </span>
+        </div>
+        <div class="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5
                     dark:border-gray-700 dark:bg-gray-600">
-            <span class="text-[11px] text-gray-600 dark:text-gray-300">{{ $count }} Dataset</span>
+            <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-300">
+                {{ $countWalidata }} Indikator
+            </span>
+        </div>
+        <div class="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5
+                    dark:border-gray-700 dark:bg-gray-600">
+            <span class="text-[11px] sm:text-xs text-gray-600 dark:text-gray-300">
+                {{ $countPublikasi }} Publikasi
+            </span>
         </div>
     </div>
 </aside>

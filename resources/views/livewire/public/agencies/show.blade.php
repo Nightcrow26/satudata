@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
                 :datasets-count="$dataCounts['data']"
                 :walidata-count="$dataCounts['walidata']" 
                 :publications-count="$dataCounts['publikasi']"
-                :views-count="$dataCounts['data'] + $dataCounts['walidata'] + $dataCounts['publikasi']"
+                :views-count="$viewtotal"
                 :address="$skpd->alamat" />
         </div>
 

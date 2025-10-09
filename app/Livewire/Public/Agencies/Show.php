@@ -169,10 +169,25 @@ class Show extends Component
             'walidata' => Walidata::where('skpd_id', $this->skpd->id)->count(),
             'publikasi' => Publikasi::where('instansi_id', $this->skpd->id)->whereIn('status', ['published', 'approved'])->count(),
         ];
+
+        // Calculate total views and downloads
+        $dataViews = Dataset::where('instansi_id', $this->skpd->id)
+            ->whereIn('status', ['published', 'approved'])
+            ->sum('view') ?? 0;
+        
+        $walidataViews = Walidata::where('skpd_id', $this->skpd->id)
+            ->sum('view') ?? 0;
+        
+        $publikasiDownloads = Publikasi::where('instansi_id', $this->skpd->id)
+            ->whereIn('status', ['published', 'approved'])
+            ->sum('download') ?? 0;
+        
+        $viewtotal = $dataViews + $walidataViews + $publikasiDownloads;
         
         return view('livewire.public.agencies.show', [
             'items' => $items,
             'dataCounts' => $dataCounts,
+            'viewtotal' => $viewtotal,
             'isDataTab' => $this->tab === 'data',
             'isWalidataTab' => $this->tab === 'walidata',
             'isPublikasiTab' => $this->tab === 'publikasi',

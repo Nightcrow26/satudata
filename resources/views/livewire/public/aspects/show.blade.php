@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Storage;
             <x-public.aspects.summary-card 
                 :icon="$aspek->foto ? resolve_media_url($aspek->foto, ['minutes'=>60]) : null" 
                 :name="$aspek->nama"
-                :count="$dataCounts['data'] + $dataCounts['walidata'] + $dataCounts['publikasi']" />
+                :countData="$dataCounts['data']"
+                :countWalidata="$dataCounts['walidata']"
+                :countPublikasi="$dataCounts['publikasi']" />
         </div>
 
         {{-- RIGHT: konten dengan tabs --}}
@@ -361,7 +363,7 @@ use Illuminate\Support\Facades\Storage;
                         }
                         
                         // URL untuk detail walidata
-                        $detailUrl = route('public.publications.download', $walidata->id ?? '#');
+                        $detailUrl = route('public.walidata.show', $walidata->id ?? '#');
                     @endphp
                     
                     <x-public.walidata.walidata-card 
@@ -374,7 +376,7 @@ use Illuminate\Support\Facades\Storage;
                         :data-value="$walidata->data"
                         :data-unit="$walidata->satuan"
                         :year="$walidata->tahun"
-                        :downloads="$p->download"
+                        :downloads="$walidata->view ?? 0"
                         :desc="$walidata->indikator?->uraian_indikator ?? 'Definisi tidak tersedia'" />
                 @endforeach
 
