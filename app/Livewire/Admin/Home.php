@@ -40,9 +40,9 @@ class Home extends Component
             $this->instansiCount = Skpd::whereColumn('id','unor_induk_id')->where('id', $userSkpd)->count();
             $this->publikasiCount = Publikasi::where('instansi_id', $userSkpd)->count();
         } else {
-            $this->datasetCount    = Dataset::count();
+            $this->datasetCount    = Dataset::where('status', 'published')->count();
             $this->instansiCount   = Skpd::whereColumn('id','unor_induk_id')->count();
-            $this->publikasiCount  = Publikasi::count();
+            $this->publikasiCount  = Publikasi::where('status', 'published')->count();
         }
 
         // Data Terbaru
