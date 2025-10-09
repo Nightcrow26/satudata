@@ -40,9 +40,9 @@ class Search extends Component
         // Search Datasets
         $datasets = Dataset::where('status', 'published')
             ->where(function($q) use ($query) {
-                $q->where('nama', 'LIKE', '%' . $query . '%')
-                  ->orWhere('deskripsi', 'LIKE', '%' . $query . '%')
-                  ->orWhere('keyword', 'LIKE', '%' . $query . '%');
+                $q->where('nama', 'ILIKE', '%' . $query . '%')
+                  ->orWhere('deskripsi', 'ILIKE', '%' . $query . '%')
+                  ->orWhere('keyword', 'ILIKE', '%' . $query . '%');
             })
             ->with(['aspek', 'skpd'])
             ->take($this->maxResults)
@@ -64,9 +64,9 @@ class Search extends Component
         // Search Publikasi
         $publikasi = Publikasi::where('status', 'published')
             ->where(function($q) use ($query) {
-                $q->where('nama', 'LIKE', '%' . $query . '%')
-                  ->orWhere('deskripsi', 'LIKE', '%' . $query . '%')
-                  ->orWhere('keyword', 'LIKE', '%' . $query . '%');
+                $q->where('nama', 'ILIKE', '%' . $query . '%')
+                  ->orWhere('deskripsi', 'ILIKE', '%' . $query . '%')
+                  ->orWhere('keyword', 'ILIKE', '%' . $query . '%');
             })
             ->with(['aspek', 'skpd'])
             ->take($this->maxResults)
@@ -88,10 +88,11 @@ class Search extends Component
         // Search Walidata
         $walidata = Walidata::where(function($q) use ($query) {
                 $q->whereHas('indikator', function($subQ) use ($query) {
-                    $subQ->where('uraian_indikator', 'LIKE', '%' . $query . '%');
+                    $subQ->where('uraian_indikator', 'ILIKE', '%' . $query . '%');
                 })
-                ->orWhere('data', 'LIKE', '%' . $query . '%')
-                ->orWhere('satuan', 'LIKE', '%' . $query . '%');
+                ->orWhere('data', 'ILIKE', '%' . $query . '%')
+                ->orWhere('satuan', 'ILIKE', '%' . $query . '%')
+                ->where('skpd_id', '!=', null); // Hanya walidata dengan SKPD
             })
             ->with(['aspek', 'skpd', 'indikator'])
             ->take($this->maxResults)

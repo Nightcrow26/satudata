@@ -106,14 +106,6 @@
                         </div>
                     </a>
                     @endforeach
-
-                    @if(count($searchResults) >= $maxResults)
-                    <div class="p-3 text-center border-t border-gray-200 dark:border-gray-600">
-                        <button wire:click="go" class="text-sm text-teal-600 dark:text-teal-400 hover:text-teal-700 dark:hover:text-teal-300 font-medium">
-                            Lihat semua hasil untuk "{{ $q }}"
-                        </button>
-                    </div>
-                    @endif
                 </div>
                 @endif
 
