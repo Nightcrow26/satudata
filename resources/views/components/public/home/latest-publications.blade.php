@@ -199,7 +199,8 @@
 
         <div class="text-center">
             <a href="{{ $moreUrl }}" class="mt-8 inline-flex items-center gap-2 rounded-full bg-teal-500 px-5 py-2.5 text-white text-sm font-semibold
-                      hover:bg-teal-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600">
+                      hover:bg-teal-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600"
+                      wire:navigate>
                 Lihat Lebih Banyak
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 5l7 7-7 7v-4H4v-6h9V5Z" />

@@ -14,7 +14,7 @@
 
     <x-public.home.latest-publications :items="$latestPublikasi" :more-url="route('public.publications.index')" />
 
-    <x-public.home.latest-indikators :items="$latestIndikator"/>
+    <x-public.home.latest-indikators :items="$latestIndikator" :more-url="route('public.walidata.index')"/>
 
 
     <x-public.home.release-schedule :year="2025" :data-items="$latestData" :pub-items="$latestPublikasi" more-data-url="#"
