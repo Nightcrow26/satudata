@@ -86,13 +86,13 @@ class Search extends Component
         }
 
         // Search Walidata
-        $walidata = Walidata::where(function($q) use ($query) {
+        $walidata = Walidata::where('skpd_id', '!=', null)
+                ->where(function($q) use ($query) {
                 $q->whereHas('indikator', function($subQ) use ($query) {
                     $subQ->where('uraian_indikator', 'ILIKE', '%' . $query . '%');
                 })
                 ->orWhere('data', 'ILIKE', '%' . $query . '%')
-                ->orWhere('satuan', 'ILIKE', '%' . $query . '%')
-                ->where('skpd_id', '!=', null); // Hanya walidata dengan SKPD
+                ->orWhere('satuan', 'ILIKE', '%' . $query . '%');
             })
             ->with(['aspek', 'skpd', 'indikator'])
             ->take($this->maxResults)
