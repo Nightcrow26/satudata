@@ -2,7 +2,7 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex justify-center">
             <div class="relative w-full max-w-2xl" x-data="{ focused: false }" @click.away="$wire.hideResults()">
-                <form wire:submit.prevent="go" class="relative">
+                <div class="relative">
                     <!-- Icon -->
                     <span class="pointer-events-none absolute inset-y-0 left-4 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -17,6 +17,7 @@
                     <input type="text" name="q" wire:model.live.debounce.300ms="q"
                         placeholder="Cari data, publikasi, atau walidata..." autocomplete="off" 
                         @focus="focused = true" @blur="focused = false"
+                        @keydown.enter.prevent=""
                         class="w-full rounded-full border border-gray-200 dark:border-gray-700
                                bg-white dark:!bg-gray-800
                                pl-11 pr-14 py-3 shadow-sm
@@ -47,13 +48,14 @@
                         wire:loading.delay.shortest>
                         Mencari…
                     </div>
-                </form>
+                </div>
 
                 <!-- Search Results Dropdown -->
                 @if($showResults && count($searchResults) > 0)
                 <div class="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                     @foreach($searchResults as $result)
                     <a href="{{ $result['url'] }}" 
+                       @if(in_array($result['type'], ['dataset', 'walidata'])) wire:navigate @endif
                        class="flex items-start gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0 transition-colors duration-150">
                         <!-- Icon -->
                         <div class="flex-shrink-0 mt-1">

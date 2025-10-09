@@ -128,14 +128,6 @@ class Search extends Component
         $this->showResults = false;
     }
 
-    public function go()
-    {
-        // Enter/submit: navigasi GET ke halaman yang sama dengan ?q=
-        return redirect()->route('public.home', [
-            'q' => $this->q !== '' ? $this->q : null,
-        ]);
-    }
-
     public function render()
     {
         return view('public.home.parts.search-livewire');
