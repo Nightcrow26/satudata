@@ -52,7 +52,7 @@
 
                 <!-- Search Results Dropdown -->
                 @if($showResults && count($searchResults) > 0)
-                <div class="absolute top-full left-0 right-0 bg-white dark:bg-gray-800 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div class="absolute top-full left-0 right-0 bg-white dark:!bg-gray-800 border border-t-0 border-gray-200 dark:!border-gray-700 rounded-b-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                     @foreach($searchResults as $result)
                     <a href="{{ $result['url'] }}" 
                        @if(in_array($result['type'], ['dataset', 'walidata'])) wire:navigate @endif
