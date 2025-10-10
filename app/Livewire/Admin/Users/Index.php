@@ -39,8 +39,6 @@ class Index extends Component
 
     public array  $availableRoles   = [];
     public $availableSkpds = [];
-
-    protected string $paginationTheme = 'bootstrap';
     
     public int $perPage = 10;
 

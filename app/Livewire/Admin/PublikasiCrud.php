@@ -42,8 +42,6 @@ class PublikasiCrud extends Component
     public $availableSkpds = [];
     public $availableAspeks = [];
 
-    protected string $paginationTheme = 'bootstrap';
-
     protected array $messages = [
         'foto.image' => 'File yang diunggah harus berupa gambar.',
         'foto.mimes' => 'Format gambar hanya boleh: jpg, jpeg, png, webp.',
