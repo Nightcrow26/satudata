@@ -277,18 +277,24 @@ class IndikatorWalidata extends Component
             return;
         }
 
+        // Tom Select seharusnya sudah mengirim UUID langsung
         // Jika sudah UUID, biarkan
         if (\Illuminate\Support\Str::isUuid($this->indikator_id)) {
             return;
         }
 
-        // Jika user/tomselect entah bagaimana mengirim label "KODE - Uraian",
-        // petakan ke id melalui kode_indikator.
-        $code = trim(strtok($this->indikator_id, '-')); // ambil bagian sebelum ' - '
-        if ($code !== '') {
-            $found = \App\Models\Indikator::where('kode_indikator', $code)->value('id');
-            $this->indikator_id = $found ?: null;
+        // Fallback: jika somehow masih berupa string dengan format "KODE - Uraian"
+        // (seharusnya tidak terjadi lagi dengan fix di updatedIndikatorId)
+        if (str_contains($this->indikator_id, '-')) {
+            $code = trim(strtok($this->indikator_id, '-')); // ambil bagian sebelum ' - '
+            if ($code !== '') {
+                $found = \App\Models\Indikator::where('kode_indikator', $code)->value('id');
+                $this->indikator_id = $found ?: null;
+            } else {
+                $this->indikator_id = null;
+            }
         } else {
+            // Jika bukan UUID dan bukan format "KODE - Uraian", reset
             $this->indikator_id = null;
         }
     }
@@ -386,19 +392,26 @@ class IndikatorWalidata extends Component
 
     public function updatedIndikatorId($value): void
     {
+        // Debug logging
+        \Log::info("updatedIndikatorId called with value: " . json_encode($value));
+        
         if (blank($value)) {
             $this->bidang_id = null;
+            \Log::info("Indikator ID cleared, bidang_id set to null");
             return;
         }
 
-        $code = trim(strtok($value, '-')); // ambil bagian depan sebelum ' - '
-        $found = \App\Models\Indikator::where('kode_indikator', trim($code))->value('id');
-        $this->indikator_id = $found ?: null;
+        // Tom Select mengirim UUID langsung, tidak perlu parsing dengan strtok
+        $this->indikator_id = $value;
 
-        if ($this->indikator_id) {
-            $this->bidang_id = \App\Models\Indikator::find($this->indikator_id)->bidang_id;
+        // Ambil bidang_id dari indikator yang dipilih
+        $indikator = \App\Models\Indikator::find($this->indikator_id);
+        if ($indikator) {
+            $this->bidang_id = $indikator->bidang_id;
+            \Log::info("Indikator found: {$indikator->uraian_indikator}, bidang_id set to: {$this->bidang_id}");
         } else {
             $this->bidang_id = null;
+            \Log::info("Indikator not found for ID: {$this->indikator_id}");
         }
     }
 

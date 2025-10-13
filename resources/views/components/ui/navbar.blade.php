@@ -114,7 +114,7 @@ request()->routeIs('public.publications.*')],
             <!-- Panel dropdown (mobile) -->
             <div class="absolute left-0 right-0 top-full md:hidden" @click.outside="open=false">
                 <div x-cloak x-show="open" x-transition.origin.top
-                    class="mt-2 bg-white dark:bg-gray-800 text-teal-900 dark:text-gray-200 rounded-xl shadow-xl ring-1 ring-black/10 dark:ring-white/10 overflow-hidden transition-colors duration-300">
+                    class="mt-2 bg-white dark:!bg-gray-800 text-teal-900 dark:!text-gray-200 rounded-xl shadow-xl ring-1 ring-black/10 dark:!ring-white/10 overflow-hidden transition-colors duration-300">
 
                     {{-- Bar kecil: hanya Login (tanpa toggle) --}}
                     <div class="px-3 py-2 sm:hidden flex items-center justify-end">
