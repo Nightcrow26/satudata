@@ -78,7 +78,13 @@
 
     {{-- Jenis Informasi (checkbox, dengan “Selengkapnya”) --}}
     <fieldset>
-        <legend class="text-sm font-semibold text-gray-800 dark:text-white">Jenis Informasi</legend>
+        <legend class="flex items-center justify-between text-sm font-semibold text-gray-800 dark:text-white">
+            <span>Aspek</span>
+            <a href="{{ route('public.aspects.index') }}"
+                class="ml-2 text-xs font-medium text-teal-600 hover:text-teal-700 dark:!text-teal-400 dark:!hover:text-teal-300 focus:outline-none focus:underline">
+                Lihat Halaman
+            </a>
+        </legend>
         @php
         $jenisAll = collect($jenisOptions);
         $jenisHead = $jenisAll->slice(0, $previewCount);
