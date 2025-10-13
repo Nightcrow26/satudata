@@ -15,11 +15,11 @@
     $logoUrl = resolve_media_url($logo, ['temporary' => false, 'fallback' => asset('logo-hsu.png')]);
 @endphp
 
-<div class="p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-5 transition-colors duration-200">
+<div class="p-4 sm:p-5 lg:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4 dark:!border-gray-700 dark:!bg-gray-800 lg:gap-5 transition-colors duration-200">
     {{-- Logo --}}
     <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto sm:mx-0 rounded-xl overflow-hidden grid place-items-center shrink-0
                ring-1 ring-gray-200 bg-gray-50
-               dark:ring-gray-700 dark:bg-gray-700/50">
+               dark:!ring-gray-700 dark:!bg-gray-700/50">
        @if($logoUrl)
        <img src="{{ $logoUrl }}" alt="{{ $name }}" class="w-16 sm:w-20 h-full object-contain"
            onerror="this.onerror=null;this.src='{{ asset('logo-hsu.png') }}';">

@@ -34,7 +34,7 @@
 ])
 
 <aside {{ $attributes->merge([
-    'class' => 'rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm
+    'class' => 'rounded-2xl border border-gray-200 dark:!border-gray-700 bg-white dark:!bg-gray-800 shadow-sm
     dark:shadow-gray-900/20 p-4 sm:p-5 space-y-5 md:sticky md:top-24 transition-colors duration-200'
     ]) }}>
     {{-- Search (opsional) --}}
@@ -82,7 +82,7 @@
         <legend class="flex items-center justify-between text-sm font-semibold text-gray-800 dark:text-white">
             <span>Aspek</span>
             <a href="{{ route('public.aspects.index') }}"
-                class="ml-2 text-xs font-medium text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 focus:outline-none focus:underline">
+                class="ml-2 text-xs font-medium text-teal-600 hover:text-teal-700 dark:!text-teal-400 dark:!hover:text-teal-300 focus:outline-none focus:underline">
                 Lihat Halaman
             </a>
         </legend>

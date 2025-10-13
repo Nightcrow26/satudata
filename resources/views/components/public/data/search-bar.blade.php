@@ -42,7 +42,7 @@ $container = $fullWidth
 
         {{-- Input --}}
         <input id="{{ $inputId }}" type="search" placeholder="{{ $placeholder }}"
-            class="w-full rounded-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 {{ $inputSize }} text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-sm dark:shadow-gray-950/20 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors duration-200"
+            class="w-full rounded-full border border-gray-300 dark:!border-gray-600 bg-white dark:!bg-gray-800 {{ $inputSize }} text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-sm dark:shadow-gray-950/20 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 transition-colors duration-200"
             wire:model.lazy="{{ $model }}" wire:key="search-{{ $inputId }}" {{ $attributes }} />
 
         {{-- Clear button (opsional) --}}

@@ -58,8 +58,8 @@
                 @endphp
 
                 <article class="relative snap-always shrink-0 transition-colors duration-200
-                               rounded-2xl border border-gray-200 dark:border-gray-800
-                               bg-white dark:bg-gray-800 shadow-sm hover:shadow-md
+                               rounded-2xl border border-gray-200 dark:!border-gray-800
+                               bg-white dark:!bg-gray-800 shadow-sm hover:shadow-md
                                min-w-[calc(100vw-3rem)] max-w-[calc(100vw-3rem)]
                                sm:min-w-[18rem] sm:max-w-[18rem] md:min-w-[20rem] md:max-w-[20rem]">
                     <a href="{{ route('public.walidata.show', $i->id) }}" class="group block p-4" wire:navigate>

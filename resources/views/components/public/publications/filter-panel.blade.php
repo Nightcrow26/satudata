@@ -33,7 +33,7 @@
 ])
 
 <aside {{ $attributes->merge([
-    'class' => 'rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm
+    'class' => 'rounded-2xl border border-gray-200 dark:!border-gray-700 bg-white dark:!bg-gray-800 shadow-sm
     dark:shadow-gray-900/20 p-4 sm:p-5 space-y-5 md:sticky md:top-24 transition-colors duration-200'
     ]) }}>
     {{-- Search (opsional) --}}
@@ -146,7 +146,7 @@
             <label class="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-200 cursor-pointer select-none">
                 <span class="flex-none pt-0.5">
                     <input type="checkbox"
-                        class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-teal-600 focus:ring-teal-600 dark:focus:ring-teal-400"
+                        class="h-4 w-4 rounded border-gray-300 dark:!border-gray-600 bg-white dark:!bg-gray-800 text-teal-600 focus:ring-teal-600 dark:focus:ring-teal-400"
                         value="{{ $val }}" wire:model.live="{{ $instansiModel }}" @checked(in_array($val, $instSelected,
                         true))>
                 </span>

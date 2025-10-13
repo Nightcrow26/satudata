@@ -76,7 +76,7 @@
                 <button @click="open = !open" type="button" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium
                            bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm
                            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2
-                           dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-900
+                           dark:!bg-gray-800 dark:!text-gray-200 dark:!border-gray-600 dark:!hover:bg-gray-700 dark:focus:ring-offset-gray-900
                            transition-colors duration-200" aria-haspopup="true" :aria-expanded="open">
                     {{-- Icon --}}
                     <svg x-show="getSortIcon() === 'clock'" class="h-4 w-4 text-gray-500 dark:text-gray-400"
