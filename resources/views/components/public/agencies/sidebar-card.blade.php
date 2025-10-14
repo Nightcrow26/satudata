@@ -53,7 +53,7 @@
             <div class="text-lg sm:text-2xl font-extrabold text-teal-700 dark:!text-teal-400 leading-none">
                 {{ number_format($walidataCount) }}
             </div>
-            <div class="text-xs sm:text-sm text-teal-700 dark:!text-teal-400">Walidata</div>
+            <div class="text-xs sm:text-sm text-teal-700 dark:!text-teal-400">Indikator Walidata</div>
         </div>
         <div>
             <div class="text-lg sm:text-2xl font-extrabold text-teal-700 dark:!text-teal-400 leading-none">
