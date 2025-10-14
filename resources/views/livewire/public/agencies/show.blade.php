@@ -334,8 +334,8 @@ use Illuminate\Support\Facades\Storage;
                             ];
                         }
                         
-                        // URL untuk detail dataset
-                        $detailUrl = route('public.data.show', $dataset->id ?? '#');
+                        // URL untuk detail dataset menggunakan slug
+                        $detailUrl = route('public.data.show', $dataset->slug ?? '#');
                     @endphp
                     
                     <x-public.data.dataset-card 
@@ -365,7 +365,7 @@ use Illuminate\Support\Facades\Storage;
                         }
                         
                         // URL untuk detail walidata
-                        $detailUrl = route('public.walidata.show', $walidata->id ?? '#');
+                        $detailUrl = route('public.walidata.show', $walidata->slug ?? '#');
                     @endphp
                     
                     <x-public.walidata.walidata-card 

@@ -61,7 +61,7 @@
                                bg-white dark:!bg-gray-800 shadow-sm hover:shadow-md
                                min-w-[calc(100vw-3rem)] max-w-[calc(100vw-3rem)]
                                sm:min-w-[18rem] sm:max-w-[18rem] md:min-w-[20rem] md:max-w-[20rem]">
-                    <a href="{{ route('public.data.show', $i->id) }}" class="group block p-4" wire:navigate>
+                    <a href="{{ route('public.data.show', $i->slug) }}" class="group block p-4" wire:navigate>
                         {{-- ROW atas --}}
                         <div class="flex items-start gap-4">
                             {{-- Thumbnail --}}

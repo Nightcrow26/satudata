@@ -57,8 +57,8 @@
                                 ];
                             }
                             
-                            // URL untuk detail dataset
-                            $detailUrl = route('public.data.show', $d->id ?? '#');
+                            // URL untuk detail dataset menggunakan slug
+                            $detailUrl = route('public.data.show', $d->slug ?? '#');
                         @endphp
                         
                         <x-public.data.dataset-card 

@@ -80,7 +80,7 @@
                             
                             
                             // URL untuk detail walidata (bisa disesuaikan jika ada halaman detail)
-                            $detailUrl = route('public.walidata.show', $w->id ?? '#');
+                            $detailUrl = route('public.walidata.show', $w->slug ?? '#');
                             // Safe date label: parse verifikasi_data if present
                             $dateLabel = null;
                             if (! empty($w->verifikasi_data)) {

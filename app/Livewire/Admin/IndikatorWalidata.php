@@ -392,12 +392,8 @@ class IndikatorWalidata extends Component
 
     public function updatedIndikatorId($value): void
     {
-        // Debug logging
-        \Log::info("updatedIndikatorId called with value: " . json_encode($value));
-        
         if (blank($value)) {
             $this->bidang_id = null;
-            \Log::info("Indikator ID cleared, bidang_id set to null");
             return;
         }
 
@@ -408,10 +404,8 @@ class IndikatorWalidata extends Component
         $indikator = \App\Models\Indikator::find($this->indikator_id);
         if ($indikator) {
             $this->bidang_id = $indikator->bidang_id;
-            \Log::info("Indikator found: {$indikator->uraian_indikator}, bidang_id set to: {$this->bidang_id}");
         } else {
             $this->bidang_id = null;
-            \Log::info("Indikator not found for ID: {$this->indikator_id}");
         }
     }
 

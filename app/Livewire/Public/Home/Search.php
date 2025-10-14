@@ -56,7 +56,7 @@ class Search extends Component
                 'description' => $dataset->deskripsi ? \Str::limit($dataset->deskripsi, 100) : null,
                 'category' => $dataset->aspek->nama ?? 'Dataset',
                 'institution' => $dataset->skpd->nama ?? 'Unknown',
-                'url' => route('public.data.show', $dataset->id),
+                'url' => route('public.data.show', $dataset->slug),
                 'icon' => 'database'
             ];
         }
@@ -106,7 +106,7 @@ class Search extends Component
                 'description' => $wal->indikator->uraian_indikator ? \Str::limit($wal->indikator->uraian_indikator, 100) : null,
                 'category' => $wal->aspek->nama ?? 'Walidata',
                 'institution' => $wal->skpd->nama ?? 'Unknown',
-                'url' => route('public.walidata.show', $wal->id),
+                'url' => route('public.walidata.show', $wal->slug),
                 'icon' => 'chart-bar',
                 'data_info' => "Tahun {$wal->tahun}: {$wal->data} {$wal->satuan}"
             ];

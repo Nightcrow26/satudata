@@ -24,6 +24,7 @@ class Dataset extends Model
     protected $table = 'datasets';  
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $appends = ['slug']; // supaya ikut saat toArray()
 
     protected static function boot()
     {
@@ -135,16 +136,44 @@ class Dataset extends Model
     }
 
     /**
-     * Resolve route model binding untuk public dataset
+     * Accessor untuk mendapatkan slug dari nama dataset
      */
-    public function resolveRouteBinding($value, $field = null)
+    public function getSlugAttribute(): string
     {
-        return $this->where('id', $value)
-            ->where(function ($query) {
+        return Str::slug(Str::lower($this->nama));
+    }
+
+    /**
+     * Resolve route model binding untuk public dataset
+     * Cari berdasarkan slug terlebih dahulu, kemudian fallback ke UUID
+     */
+    public function resolveRouteBinding($value, $field = null)       
+    {
+        // Jika value adalah UUID, langsung cari berdasarkan ID
+        if (\Illuminate\Support\Str::isUuid($value)) {
+            return $this->where('id', $value)
+                ->where(function ($query) {
+                    $query->where('status', 'published')
+                          ->orWhere('status', 'approved');
+                })
+                ->with(['aspek', 'skpd', 'user'])
+                ->first();
+        }
+
+        // Jika bukan UUID, anggap sebagai slug
+        // Cari dataset yang slug-nya cocok dengan nilai yang diberikan
+        $datasets = $this->where(function ($query) {
                 $query->where('status', 'published')
                       ->orWhere('status', 'approved');
             })
             ->with(['aspek', 'skpd', 'user'])
-            ->first();
+            ->get();
+
+        // Filter berdasarkan slug yang generated
+        $matchedDataset = $datasets->first(function ($dataset) use ($value) {
+            return $dataset->slug === $value;
+        });
+
+        return $matchedDataset;
     }
 }

@@ -45,11 +45,11 @@
                     <li class="py-2.5">
                         <div class="grid md:grid-cols-[1fr_auto] grid-cols-1 gap-1 items-center px-2">
                             {{-- Judul (link) --}}
-                            <a href="{{ route('public.data.show', $row['id']) }}" class="text-sm truncate
+                            <a href="{{ route('public.data.show', $row->slug ?? $row['id'] ?? '#') }}" class="text-sm truncate
                                           text-gray-800 dark:text-white
                                           hover:text-teal-700 dark:hover:text-teal-300
-                                          transition-colors duration-200" title="{{ $row['title'] ?? '' }}">
-                                {{ $row['nama'] ?? '—' }}
+                                          transition-colors duration-200" title="{{ $row->title ?? $row['title'] ?? '' }}">
+                                {{ $row->nama ?? $row['nama'] ?? '—' }}
                             </a>
 
                             {{-- Tanggal (md+) --}}
