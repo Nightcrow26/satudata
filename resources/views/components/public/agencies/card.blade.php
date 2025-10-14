@@ -51,7 +51,7 @@
             <div class="text-gray-600 dark:text-gray-500">:</div>
             <div class="text-gray-800 dark:text-gray-200 font-medium">{{ filled($pubs) ? $pubs : '—' }}</div>
 
-            <div class="text-gray-600 dark:text-gray-400">Walidata</div>
+            <div class="text-gray-600 dark:text-gray-400">Indikator Walidata</div>
             <div class="text-gray-600 dark:text-gray-500">:</div>
             <div class="text-gray-800 dark:text-gray-200 font-medium">{{ filled($walidata) ? $walidata : '—' }}</div>
 

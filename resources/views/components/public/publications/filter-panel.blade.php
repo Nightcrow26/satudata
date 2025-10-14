@@ -139,7 +139,7 @@
 
     {{-- Instansi (checkbox) --}}
     <fieldset>
-        <legend class="text-sm font-semibold text-gray-800 dark:text-white">Perangkat Daerah</legend>
+        <legend class="text-sm font-semibold text-gray-800 dark:text-white">Produsen Data</legend>
         @php
         $instAll = collect($instansiOptions);
         $instHead = $instAll->slice(0, $previewCount);

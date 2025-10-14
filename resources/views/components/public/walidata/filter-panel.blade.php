@@ -144,9 +144,9 @@
 
     <div class="border-t border-gray-200 my-3 dark:border-gray-700"></div>
 
-    {{-- Perangkat Daerah (checkbox) --}}
+    {{-- Produsen Data (checkbox) --}}
     <fieldset>
-        <legend class="text-sm font-semibold text-gray-800 dark:text-white">Perangkat Daerah</legend>
+        <legend class="text-sm font-semibold text-gray-800 dark:text-white">Produsen Data</legend>
         @php
         $instAll = collect($instansiOptions);
         $instHead = $instAll->slice(0, $previewCount);
