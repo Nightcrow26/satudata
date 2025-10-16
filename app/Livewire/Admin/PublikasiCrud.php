@@ -52,7 +52,7 @@ class PublikasiCrud extends Component
     {
         return [
             'nama'           => 'required|string|max:255',
-            'status'         => 'required|in:draft,pending,published',
+            'status'         => 'required|in:draft,revisi,pending,published',
             'pdf'            => 'nullable|file|mimes:pdf|max:20480', // max 20MB
             'foto'           => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'tahun'          => 'required|digits:4|integer',
@@ -163,7 +163,7 @@ class PublikasiCrud extends Component
                     detail: {
                         target: 'status',
                         value: 'draft',
-                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('produsen data') ? ['revisi' => 'Revisi'] : []) + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
                     }
                 }));
 
@@ -229,7 +229,7 @@ class PublikasiCrud extends Component
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'status',
-                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin','verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('produsen data') ? ['revisi' => 'Revisi'] : []) + (auth()->user()->hasRole(['admin','verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
                         value: '" . $this->status . "'
                     }
                 }));

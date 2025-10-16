@@ -86,6 +86,7 @@
                                     {{ match($ds->status) {
                                     'published' => 'bg-green-500',
                                     'pending'   => 'bg-yellow-500',
+                                    'revisi'    => 'bg-blue-500',
                                     'draft'     => 'bg-gray-500',
                                     } }}">
                                     {{ ucfirst($ds->status) }}
@@ -234,11 +235,14 @@
                                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                                             @php
                                                 $statusOptions = ['draft' => 'Draft'];
+                                                if (auth()->user()->hasRole('produsen data')) {
+                                                    $statusOptions['revisi'] = 'Revisi';
+                                                }
                                                 if (auth()->user()->hasRole(['admin', 'verifikator'])) {
                                                     $statusOptions['pending'] = 'Pending';
                                                     $statusOptions['published'] = 'Published';
                                                 }
-                                                $statusDisabled = auth()->user()->hasRole('produsen data');
+                                                $statusDisabled = false; // Enable status field for all users
                                             @endphp
                                             <x-forms.select-tom 
                                                 id="status"

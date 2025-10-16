@@ -156,7 +156,7 @@ class DatasetCrud extends Component
                     detail: {
                         target: 'status',
                         value: 'draft',
-                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('produsen data') ? ['revisi' => 'Revisi'] : []) + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . "
                     }
                 }));
             }, 300);
@@ -215,7 +215,7 @@ class DatasetCrud extends Component
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'status',
-                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
+                        options: " . json_encode(collect(['draft' => 'Draft'] + (auth()->user()->hasRole('produsen data') ? ['revisi' => 'Revisi'] : []) + (auth()->user()->hasRole(['admin', 'verifikator']) ? ['pending' => 'Pending', 'published' => 'Published'] : []))->map(function($text, $value) { return ['id' => $value, 'text' => $text]; })->values()->toArray()) . ",
                         value: '" . $this->status . "'
                     }
                 }));

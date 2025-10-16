@@ -46,7 +46,11 @@ class SurveyCrud extends Component
             ->paginate($this->perPage)
             ->onEachSide(1);
 
-        return view('livewire.admin.survey-crud', compact('surveys'));
+        // Calculate statistics
+        $totalSurveys = UserSurvey::count();
+        $averageRating = UserSurvey::avg('rating');
+
+        return view('livewire.admin.survey-crud', compact('surveys', 'totalSurveys', 'averageRating'));
     }
 
     public function confirmDelete(string $id): void
