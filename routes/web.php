@@ -49,7 +49,7 @@ Route::middleware('guest')->group(function () {
 Route::get('/chatbot/stream', [\App\Http\Controllers\ChatbotStreamController::class, 'stream'])
     ->name('chatbot.stream');
 
-Route::prefix('admin')->middleware('role:admin|verifikator|user')->name('admin.')->group(function () {
+Route::prefix('admin')->middleware('role:admin|verifikator|produsen data')->name('admin.')->group(function () {
     Route::get('/dashboard', \App\Livewire\Admin\Home::class)->name('dashboard');
     Route::get('/aspek', \App\Livewire\Admin\AspekCrud::class)->name('aspek');
     Route::get('/bidang', \App\Livewire\Admin\BidangCrud::class)->name('bidang');

@@ -14,14 +14,14 @@
           {{-- Jika file ada di S3, gunakan temporaryUrl --}}
           <img
             src="{{ resolve_media_url($fotoKey) }}"
-            alt="Logo SKPD"
+            alt="Logo Produsen Data"
             class="w-12 h-12 object-contain"
           >
       @elseif($fotoKey && file_exists(public_path($fotoKey)))
           {{-- Jika file tidak di S3 tapi ada di public, gunakan asset --}}
           <img
             src="{{ asset($fotoKey) }}"
-            alt="Logo SKPD"
+            alt="Logo Produsen Data"
             class="w-12 h-12 object-contain"
           >
       @else
@@ -33,7 +33,7 @@
           >
       @endif
       <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ $walidata->skpd->nama ?? 'SKPD' }}
+        {{ $walidata->skpd->nama ?? 'Produsen Data' }}
       </h1>
     </div>
   </div>
@@ -151,7 +151,7 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">Data</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">Satuan</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">Status Verifikasi</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">SKPD</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700">Produsen Data</th>
             </tr>
           </thead>
           <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">

@@ -25,7 +25,7 @@
             <aside class="order-2 md:order-1 md:col-span-3 md:sticky md:top-24">
                 <x-public.walidata.detail-sidepanel :walidata="[
                         'agency' => [
-                            'name' => $walidata->skpd->nama ?? 'SKPD Tidak Diketahui',
+                            'name' => $walidata->skpd->nama ?? 'Produsen Data Tidak Diketahui',
                             'logo' => $walidata->skpd->logo_url ?? null,
                         ],
                         'meta' => [

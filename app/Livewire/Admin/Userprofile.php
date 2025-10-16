@@ -80,7 +80,7 @@ class Userprofile extends Component
         $this->js("
             setTimeout(() => {
                 
-                // Update SKPD options dengan format [{id, text}]
+                // Update Produsen Data options dengan format [{id, text}]
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'skpd_uuid',
@@ -106,7 +106,7 @@ class Userprofile extends Component
             // Fallback dengan delay lebih lama
             setTimeout(() => {
                 
-                // Second attempt for SKPD
+                // Second attempt for Produsen Data
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'skpd_uuid',
@@ -163,7 +163,7 @@ class Userprofile extends Component
             $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
             
             // Store file and save path only (not URL) - sama seperti dataset
-            $path = $this->sk_penunjukan->storeAs('sk-penunjukan', $filename, 's3');
+            $path = $this->sk_penunjukan->storeAs('sk-penunjukan', $filename, ['disk' => 's3', 'visibility' => 'public']);
             $updateData['sk_penunjukan'] = $path;
         }
 

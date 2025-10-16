@@ -28,7 +28,7 @@ class JsonController extends Controller
             if ($ds->excel) {
                 $distribution[] = [
                     "@type" => "dcat:Distribution",
-                    "downloadURL" => Storage::disk('s3')->temporaryUrl($ds->excel, now()->addMinutes(15)),
+                    "downloadURL" => resolve_media_url($ds->excel),
                     "mediaType" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     "format" => "xlsx",
                     "description" => "Data utama: {$ds->nama}",
@@ -39,7 +39,7 @@ class JsonController extends Controller
             if ($ds->metadata) {
                 $distribution[] = [
                     "@type" => "dcat:Distribution",
-                    "downloadURL" => Storage::disk('s3')->temporaryUrl($ds->metadata, now()->addMinutes(15)),
+                    "downloadURL" => resolve_media_url($ds->metadata),
                     "mediaType" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     "format" => "xlsx",
                     "description" => "Metadata dari: {$ds->nama}",

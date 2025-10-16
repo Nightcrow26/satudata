@@ -181,7 +181,7 @@
                 <td>{{ $dataset->aspek->nama ?? 'Tidak Diketahui' }}</td>
             </tr>
             <tr>
-                <td>SKPD</td>
+                <td>Produsen Data</td>
                 <td>{{ $dataset->skpd->nama ?? 'Tidak Diketahui' }}</td>
             </tr>
             <tr>

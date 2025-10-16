@@ -109,7 +109,7 @@ class WalidataDownloadController extends Controller
                     'Data',
                     'Satuan',
                     'Status Verifikasi',
-                    'SKPD',
+                    'Produsen Data',
                     'Aspek',
                     'Bidang'
                 ];

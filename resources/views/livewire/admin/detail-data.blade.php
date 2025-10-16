@@ -14,14 +14,14 @@
           {{-- Jika file ada di S3, gunakan temporaryUrl --}}
           <img
             src="{{ resolve_media_url($fotoKey) }}"
-            alt="Logo SKPD"
+            alt="Logo Produsen Data"
             class="w-12 h-12 object-contain"
           >
       @elseif($fotoKey && file_exists(public_path($fotoKey)))
           {{-- Jika file tidak di S3 tapi ada di public, gunakan asset --}}
           <img
             src="{{ asset($fotoKey) }}"
-            alt="Logo SKPD"
+            alt="Logo Produsen Data"
             class="w-12 h-12 object-contain"
           >
       @else

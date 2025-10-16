@@ -106,7 +106,7 @@ class AspekCrud extends Component
                 $fullName  = $filename . '.' . $extension;
 
                 // Upload to S3
-                $path = $this->foto->storeAs('aspek-fotos', $fullName, 's3');
+                $path = $this->foto->storeAs('aspek-fotos', $fullName, ['disk' => 's3', 'visibility' => 'public']);
                 
                 if (!$path) {
                     throw new \Exception('Upload gagal - path kosong');

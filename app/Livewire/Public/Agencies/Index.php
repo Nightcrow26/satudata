@@ -20,7 +20,7 @@ class Index extends Component
 
     protected function getSkpdQuery()
     {
-        // Query SKPD hanya yang merupakan induk (unor_induk_id = id)
+        // Query Produsen Data hanya yang merupakan induk (unor_induk_id = id)
         $query = Skpd::whereColumn('id', 'unor_induk_id')
             ->withCount([
                 'datasets' => function ($q) {
@@ -77,7 +77,7 @@ class Index extends Component
 
     public function render()
     {
-        // Ambil data SKPD dengan pagination langsung dari database
+        // Ambil data Produsen Data dengan pagination langsung dari database
         $agencies = $this->getSkpdQuery()->paginate($this->perPage);
 
         // Transform data untuk compatibility dengan template
@@ -91,7 +91,7 @@ class Index extends Component
                 'pubs' => $skpd->publikasis_count,
                 'walidata' => $skpd->walidata_count,
                 'updated' => $skpd->updated_at,
-                'views' => null, // SKPD tidak memiliki views
+                'views' => null, // Produsen Data tidak memiliki views
                 'href' => route('public.agencies.show', ['slug' => Str::slug($skpd->nama)]),
             ];
         });

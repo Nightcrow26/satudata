@@ -32,8 +32,8 @@ class Home extends Component
     {
         \Carbon\Carbon::setLocale('id');
         $this->aspekCount      = Aspek::count();
-        // Jika user biasa, batasi ke SKPD miliknya
-        if (auth()->check() && auth()->user()->hasRole('user')) {
+        // Jika produsen data, batasi ke SKPD miliknya
+        if (auth()->check() && auth()->user()->hasRole('produsen data')) {
             $userSkpd = auth()->user()->skpd_uuid;
 
             $this->datasetCount = Dataset::where('instansi_id', $userSkpd)->count();
@@ -46,7 +46,7 @@ class Home extends Component
         }
 
         // Data Terbaru
-        // Data Terbaru (batasi jika user role 'user')
+        // Data Terbaru (batasi jika role 'produsen data')
         $dsQuery = Dataset::with(['aspek', 'skpd'])
             ->latest('updated_at')
             ->where('status', 'published');
@@ -58,7 +58,7 @@ class Home extends Component
         $wdQuery = Walidata::with(['aspek', 'skpd'])
             ->latest('verifikasi_data')->where('skpd_id', '!=', null);
 
-        if (auth()->check() && auth()->user()->hasRole('user')) {
+        if (auth()->check() && auth()->user()->hasRole('produsen data')) {
             $userSkpd = auth()->user()->skpd_uuid;
             $dsQuery->where('instansi_id', $userSkpd);
             $pubQuery->where('instansi_id', $userSkpd);
@@ -84,7 +84,7 @@ class Home extends Component
             $this->lineLabels[] = Carbon::createFromFormat('Y-m', $month)->translatedFormat('M Y');
             $q = Dataset::whereYear('created_at', substr($month, 0, 4))
                 ->whereMonth('created_at', substr($month, 5, 2));
-            if (auth()->check() && auth()->user()->hasRole('user')) {
+            if (auth()->check() && auth()->user()->hasRole('produsen data')) {
                 $q->where('instansi_id', auth()->user()->skpd_uuid);
             }
             $this->lineData[] = $q->count();
@@ -99,7 +99,7 @@ class Home extends Component
             ->orderByDesc('total')
             ->take(5);
 
-        if (auth()->check() && auth()->user()->hasRole('user')) {
+        if (auth()->check() && auth()->user()->hasRole('produsen data')) {
             $topAspekQuery->where('instansi_id', auth()->user()->skpd_uuid);
         }
 

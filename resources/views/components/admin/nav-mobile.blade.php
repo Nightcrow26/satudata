@@ -148,7 +148,7 @@
           <x-admin.nav-link :active="request()->routeIs('admin.skpd.index','admin.skpd.*')"
                             href="{{ route('admin.skpd.index') }}"
                             class="flex items-center">
-            <i class="bi bi-building mr-3"></i>SKPD
+            <i class="bi bi-building mr-3"></i>Produsen Data
           </x-admin.nav-link>
         @endif
 

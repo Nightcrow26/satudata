@@ -92,16 +92,16 @@
       </div>
     </li>
 
-    {{-- SKPD --}}
+    {{-- Produsen Data --}}
     <li>
       <div x-bind:class="{ 'flex justify-center': collapsed, 'flex': !collapsed }">
         <x-admin.nav-link :active="request()->routeIs('admin.skpd.index','admin.skpd.*')"
                     href="{{ route('admin.skpd.index') }}"
                     class="flex items-center mb-2 w-full"
                     x-bind:class="{ 'justify-center': collapsed }"
-                    title="SKPD">
+                    title="Produsen Data">
           <i class="bi bi-building mr-2" x-bind:class="{ 'mr-0': collapsed }"></i>
-          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>SKPD</span>
+          <span class="text-gray-900 dark:text-white" x-show="!collapsed" x-transition>Produsen Data</span>
         </x-admin.nav-link>
       </div>
     </li>

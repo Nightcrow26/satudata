@@ -102,7 +102,7 @@
     <div class="header">
         <h1>Data Indikator Walidata</h1>
         <h2>{{ $walidata->indikator->uraian_indikator ?? 'Indikator' }}</h2>
-        <p><strong>SKPD:</strong> {{ $walidata->skpd->nama ?? 'N/A' }}</p>
+        <p><strong>Produsen Data:</strong> {{ $walidata->skpd->nama ?? 'N/A' }}</p>
         <p><strong>Aspek:</strong> {{ $walidata->aspek->nama ?? 'N/A' }}</p>
     </div>
 

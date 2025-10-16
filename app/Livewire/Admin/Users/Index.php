@@ -116,7 +116,7 @@ class Index extends Component
         // Update Tom Select options dengan format yang benar
         $this->js("
             setTimeout(() => {
-                // Update SKPD options
+                // Update Produsen Data options
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'skpd_uuid',
@@ -159,7 +159,7 @@ class Index extends Component
         // Update Tom Select options dan set selected values
         $this->js("
             setTimeout(() => {
-                // Update SKPD options dengan format [{id, text}]
+                // Update Produsen Data options dengan format [{id, text}]
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         target: 'skpd_uuid',
@@ -222,7 +222,7 @@ class Index extends Component
             $filename = time() . '_' . pathinfo($originalName, PATHINFO_FILENAME) . '.' . $extension;
             
             // Store file and save path only (not URL) - sama seperti dataset
-            $skPenunjukanPath = $this->sk_penunjukan->storeAs('sk-penunjukan', $filename, 's3');
+            $skPenunjukanPath = $this->sk_penunjukan->storeAs('sk-penunjukan', $filename, ['disk' => 's3', 'visibility' => 'public']);
         }
 
         // 3. Lanjutkan simpan/update

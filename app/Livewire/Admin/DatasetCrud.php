@@ -79,7 +79,7 @@ class DatasetCrud extends Component
 
     public function mount(): void
     {
-        if (auth()->user()->hasRole('user')) {
+        if (auth()->user()->hasRole('produsen data')) {
             $this->availableSkpds = Skpd::orderBy('nama')
             ->whereColumn('id', 'unor_induk_id')
             ->where('id', auth()->user()->skpd_uuid)
@@ -102,8 +102,8 @@ class DatasetCrud extends Component
                 $q->where('nama', 'ilike', "%{$this->search}%")
             );
 
-        // 2) Batasi untuk role 'user' berdasarkan skpd milik user
-        if (auth()->user()->hasRole('user')) {
+        // 2) Batasi untuk role 'produsen data' berdasarkan skpd milik user
+        if (auth()->user()->hasRole('produsen data')) {
             $query->where('instansi_id', auth()->user()->skpd_uuid);
         }
 
@@ -276,7 +276,7 @@ class DatasetCrud extends Component
             $extension = $this->excel->getClientOriginalExtension();
             $fullName  = $filename . '.' . $extension;
 
-            $pathExcel = $this->excel->storeAs('datasets/excel', $fullName, 's3');
+            $pathExcel = $this->excel->storeAs('datasets/excel', $fullName, ['disk' => 's3', 'visibility' => 'public']);
             $validated['excel'] = $pathExcel;
 
             if ($this->dataset_id) {
@@ -293,7 +293,7 @@ class DatasetCrud extends Component
             $metaExt  = $this->metadata->getClientOriginalExtension();
             $metaFull = $metaName . '.' . $metaExt;
 
-            $pathMeta = $this->metadata->storeAs('datasets/meta', $metaFull, 's3');
+            $pathMeta = $this->metadata->storeAs('datasets/meta', $metaFull, ['disk' => 's3', 'visibility' => 'public']);
             $validated['metadata'] = $pathMeta;
 
             if ($this->dataset_id) {
@@ -310,7 +310,7 @@ class DatasetCrud extends Component
             $bdExt  = $this->bukti_dukung->getClientOriginalExtension();
             $bdFull = $bdName . '.' . $bdExt;
 
-            $pathBukti = $this->bukti_dukung->storeAs('datasets/bukti_dukung', $bdFull, 's3');
+            $pathBukti = $this->bukti_dukung->storeAs('datasets/bukti_dukung', $bdFull, ['disk' => 's3', 'visibility' => 'public']);
             $validated['bukti_dukung'] = $pathBukti;
 
             if ($this->dataset_id) {
@@ -380,8 +380,8 @@ class DatasetCrud extends Component
         $this->status = 'draft';
         $this->tahun = date('Y');
         
-        // Auto-set instansi_id for user role
-        if (auth()->user()->hasRole('user')) {
+        // Auto-set instansi_id for produsen data role
+        if (auth()->user()->hasRole('produsen data')) {
             $this->instansi_id = auth()->user()->skpd_uuid;
         }
         

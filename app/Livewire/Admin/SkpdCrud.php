@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Library\SikonSplpLibrary;
 
-#[Title('SKPD')]
+#[Title('Produsen Data')]
 class SkpdCrud extends Component
 {
     use WithPagination, WithFileUploads;
@@ -64,7 +64,7 @@ class SkpdCrud extends Component
 
         // Jika ada upload baru, simpan dan gantikan foto lama
         if ($this->foto) {
-            $path = $this->foto->store('skpd-fotos', 's3');
+            $path = $this->foto->store('skpd-fotos', ['disk' => 's3', 'visibility' => 'public']);
             $validated['foto'] = $path;
 
             if ($this->skpd_id) {
@@ -83,8 +83,8 @@ class SkpdCrud extends Component
         }
 
         $message = $this->skpd_id 
-                ? 'SKPD berhasil diperbarui!' 
-                : 'SKPD berhasil dibuat!';
+                ? 'Produsen Data berhasil diperbarui!' 
+                : 'Produsen Data berhasil dibuat!';
 
         $this->showModal = false;
         $this->resetInput();
@@ -109,8 +109,8 @@ class SkpdCrud extends Component
                   ->orWhere('singkatan','ilike',"%{$this->search}%")
             );
 
-         // 2) Batasi untuk role 'user' berdasarkan skpd milik user
-        if (auth()->user()->hasRole('user')) {
+         // 2) Batasi untuk role 'produsen data' berdasarkan skpd milik user
+        if (auth()->user()->hasRole('produsen data')) {
             $query->where('id', auth()->user()->skpd_uuid);
         }
         $skpds = $query
@@ -176,7 +176,7 @@ class SkpdCrud extends Component
                         continue;
                     }
 
-                    // Cek apakah SKPD sudah ada
+                    // Cek apakah Produsen Data sudah ada
                     $skpd = Skpd::find($item['id']);
 
                     if ($skpd) {
@@ -202,7 +202,7 @@ class SkpdCrud extends Component
 
                     $sukses++;
                 } catch (\Exception $e) {
-                    \Log::error('Error updating SKPD:', [
+                    \Log::error('Error updating Produsen Data:', [
                         'item' => $item,
                         'error' => $e->getMessage()
                     ]);
@@ -211,7 +211,7 @@ class SkpdCrud extends Component
 
             // Kirim notifikasi sukses menggunakan Livewire dispatch
             $this->dispatch('swal', 
-                title   : "Sinkronisasi berhasil! ($sukses/$total SKPD berhasil disinkronkan)",
+                title   : "Sinkronisasi berhasil! ($sukses/$total Produsen Data berhasil disinkronkan)",
                 icon    : 'success',
                 toast   : true,
                 position: 'bottom-end',
@@ -287,7 +287,7 @@ class SkpdCrud extends Component
         $this->deleteId = '';
         
         $this->dispatch('swal', 
-            title   :'SKPD berhasil dihapus!',
+            title   :'Produsen Data berhasil dihapus!',
             icon    :'success',
             toast   :true,
             position:'bottom-end',

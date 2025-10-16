@@ -51,7 +51,7 @@
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-12">#</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tahun</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">SKPD</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Produsen Data</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Aspek</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Download</th>
@@ -189,7 +189,7 @@
                       $statusOptions['pending'] = 'Pending';
                       $statusOptions['published'] = 'Published';
                     }
-                    $statusDisabled = auth()->user()->hasRole('user');
+                    $statusDisabled = auth()->user()->hasRole('produsen data');
                   @endphp
                   <x-forms.select-tom 
                     id="status"
@@ -208,7 +208,7 @@
                   <x-forms.select-tom 
                       id="instansi_id"
                       name="instansi_id"
-                      placeholder="-- Pilih SKPD --"
+                      placeholder="-- Pilih Produsen Data --"
                       wire:model.defer="instansi_id"
                       :options="$availableSkpds->pluck('nama', 'id')->toArray()"
                       live="true"
@@ -285,13 +285,13 @@
               </div>
               <div class="md:col-span-2">
                   @php
-                    $showCatatanPub = !auth()->user()->hasRole('user') || (!empty($catatan_verif) && auth()->user()->hasRole('user'));
+                    $showCatatanPub = !auth()->user()->hasRole('produsen data') || (!empty($catatan_verif) && auth()->user()->hasRole('produsen data'));
                   @endphp
                   @if($showCatatanPub)
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catatan Verifikator</label>
                     <textarea wire:model.defer="catatan_verif"
                               class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white dark:focus:ring-indigo-400 dark:focus:border-indigo-400 {{ $errors->has('catatan_verif') ? 'border-red-300 dark:border-red-600' : '' }}" 
-                              {{ auth()->user()->hasRole('user') ? 'disabled' : '' }}></textarea>
+                              {{ auth()->user()->hasRole('produsen data') ? 'disabled' : '' }}></textarea>
                     @error('catatan_verif')<p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                   @endif
               </div>

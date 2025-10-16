@@ -66,8 +66,8 @@ class PublikasiCrud extends Component
 
     public function mount(): void
     {
-        // Role-based SKPD loading
-        if (auth()->user()->hasRole('user')) {
+        // Role-based Produsen Data loading
+        if (auth()->user()->hasRole('produsen data')) {
             $this->availableSkpds = Skpd::orderBy('nama')
                 ->whereColumn('id', 'unor_induk_id')
                 ->where('id', auth()->user()->skpd_uuid)
@@ -99,7 +99,7 @@ class PublikasiCrud extends Component
             );
 
         // Role-based filtering
-        if (auth()->user()->hasRole('user')) {
+        if (auth()->user()->hasRole('produsen data')) {
             $query->where('instansi_id', auth()->user()->skpd_uuid);
         }
 
@@ -123,8 +123,8 @@ class PublikasiCrud extends Component
         $this->status = 'draft';
         $this->tahun = date('Y');
         
-        // Auto-set instansi_id for user role
-        if (auth()->user()->hasRole('user')) {
+        // Auto-set instansi_id for produsen data role
+        if (auth()->user()->hasRole('produsen data')) {
             $this->instansi_id = auth()->user()->skpd_uuid;
         }
         
@@ -278,7 +278,7 @@ class PublikasiCrud extends Component
             $fotoName = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->foto->getClientOriginalName(), PATHINFO_FILENAME));
             $fotoExt = $this->foto->getClientOriginalExtension();
             $fotoFull = $fotoName . '.' . $fotoExt;
-            $pathFoto = $this->foto->storeAs('publikasi-fotos', $fotoFull, 's3');
+            $pathFoto = $this->foto->storeAs('publikasi-fotos', $fotoFull, ['disk' => 's3', 'visibility' => 'public']);
             $validated['foto'] = $pathFoto;
 
             if ($this->publikasi_id) {
@@ -294,7 +294,7 @@ class PublikasiCrud extends Component
             $pdfName = now()->format('YmdHis') . '-' . Str::slug(pathinfo($this->pdf->getClientOriginalName(), PATHINFO_FILENAME));
             $pdfExt = $this->pdf->getClientOriginalExtension();
             $pdfFull = $pdfName . '.' . $pdfExt;
-            $pathPdf = $this->pdf->storeAs('publikasi-pdfs', $pdfFull, 's3');
+            $pathPdf = $this->pdf->storeAs('publikasi-pdfs', $pdfFull, ['disk' => 's3', 'visibility' => 'public']);
             $validated['pdf'] = $pathPdf;
 
             if ($this->publikasi_id) {

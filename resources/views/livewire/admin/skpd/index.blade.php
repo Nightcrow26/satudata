@@ -4,7 +4,7 @@
             <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
                 {{-- Title + Per-Page --}}
                 <div class="flex items-center flex-wrap gap-4">
-                    <h3 class="mt-3 text-lg font-medium text-gray-900 dark:text-white">SKPD</h3>
+                    <h3 class="mt-3 text-lg font-medium text-gray-900 dark:text-white">Produsen Data</h3>
                     <select wire:model.live="perPage"
                             class="block border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white text-sm">
                         <option value="10">10</option>
@@ -56,7 +56,7 @@
                         <input type="text"
                                wire:model.live.debounce.300ms="search"
                                class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:!bg-gray-800 dark:text-white sm:text-sm"
-                               placeholder="Cari SKPD…">
+                               placeholder="Cari Produsen Data…">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -93,7 +93,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:!bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {{-- Looping SKPD --}}
+                        {{-- Looping Produsen Data --}}
                         @forelse($skpds as $idx => $skpd)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -142,8 +142,8 @@
                                     <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                     </svg>
-                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Tidak ada data SKPD</h3>
-                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Mulai dengan menambahkan SKPD baru.</p>
+                                    <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Tidak ada data Produsen Data</h3>
+                                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Mulai dengan menambahkan Produsen Data baru.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -157,7 +157,7 @@
         </div>
     </div>
 
-    {{-- Modal Tambah/Edit SKPD --}}
+    {{-- Modal Tambah/Edit Produsen Data --}}
     <template x-teleport="body">
         <div wire:ignore.self wire:key="skpd-modal"
             x-data="{ show: $wire.entangle('showModal').live }"
@@ -188,7 +188,7 @@
                     <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                         <div class="flex items-center justify-between mb-6">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                                {{ $skpd_id ? 'Edit SKPD' : 'Tambah SKPD' }}
+                                {{ $skpd_id ? 'Edit Produsen Data' : 'Tambah Produsen Data' }}
                             </h3>
                             <button type="button"
                                     class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
@@ -239,7 +239,7 @@
                             </div>
                             <div>
                                 <x-forms.file-input 
-                                    label="Foto SKPD"
+                                    label="Foto Produsen Data"
                                     name="foto"
                                     wire:model="foto"
                                     accept="image/*"
@@ -270,7 +270,7 @@
                                     {{-- File ada di S3 --}}
                                     <img
                                         src="{{ resolve_media_url($fotoKey) }}"
-                                        alt="Logo SKPD"
+                                        alt="Logo Produsen Data"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
                                     >
 
@@ -278,7 +278,7 @@
                                     {{-- Jika sudah URL penuh --}}
                                     <img
                                         src="{{ $fotoKey }}"
-                                        alt="Logo SKPD"
+                                        alt="Logo Produsen Data"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
                                     >
 
@@ -286,7 +286,7 @@
                                     {{-- File lokal di public --}}
                                     <img
                                         src="{{ asset($fotoKey) }}"
-                                        alt="Logo SKPD"
+                                        alt="Logo Produsen Data"
                                         class="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600"
                                     >
 
@@ -368,7 +368,7 @@
                                 </h3>
                                 <div class="mt-2">
                                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                                        Apakah Anda yakin ingin menghapus SKPD ini
+                                        Apakah Anda yakin ingin menghapus Produsen Data ini
                                         <strong> {{ $nama }}</strong>?
                                     </p>
                                 </div>

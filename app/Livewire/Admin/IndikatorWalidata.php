@@ -52,7 +52,7 @@ class IndikatorWalidata extends Component
 
     protected array $messages = [
         'tahun.regex' => 'Tahun harus 4 digit.',
-        'skpd_id.exists' => 'SKPD tidak valid.',
+        'skpd_id.exists' => 'Produsen Data tidak valid.',
         'aspek_id.exists' => 'Aspek tidak valid.',
         'indikator_id.exists' => 'Indikator tidak valid.',
         'bidang_id.exists' => 'Bidang tidak valid.',
@@ -74,7 +74,7 @@ class IndikatorWalidata extends Component
     public function mount(): void
     {
         // Dropdown master
-        if (auth()->user()->hasRole('user')) {
+        if (auth()->user()->hasRole('produsen data')) {
             $this->availableSkpds = Skpd::orderBy('nama')
             ->whereColumn('id', 'unor_induk_id')
             ->where('id', auth()->user()->skpd_uuid)
@@ -89,8 +89,8 @@ class IndikatorWalidata extends Component
         $this->loadIndikators();
         $this->availableBidangs    = Bidang::orderBy('kode_bidang')->get();
 
-        // Lock SKPD untuk role 'user'
-        if (auth()->user()->hasRole('user')) {
+        // Lock Produsen Data untuk role 'produsen data'
+        if (auth()->user()->hasRole('produsen data')) {
             $this->skpd_id = auth()->user()->skpd_uuid ?? null;
         }
     }
@@ -119,8 +119,8 @@ class IndikatorWalidata extends Component
                 });
             });
 
-        // Batasi user biasa ke SKPD miliknya
-        if (auth()->user()->hasRole('user')) {
+        // Batasi user biasa ke Produsen Data miliknya
+        if (auth()->user()->hasRole('produsen data')) {
             $query->where('skpd_id', auth()->user()->skpd_uuid);
         }
 
@@ -139,8 +139,8 @@ class IndikatorWalidata extends Component
             'aspek_id', 'indikator_id', 'bidang_id', 'indikatorSearch',
         ]);
 
-        // jaga skpd_id tetap terkunci untuk role 'user'
-        if (!auth()->user()->hasRole('user')) {
+        // jaga skpd_id tetap terkunci untuk role 'produsen data'
+        if (!auth()->user()->hasRole('produsen data')) {
             $this->skpd_id = null;
         }
 
@@ -223,7 +223,7 @@ class IndikatorWalidata extends Component
         // Update Tom Select options dan set selected values
         $this->js("
             setTimeout(() => {
-                // Update SKPD options dengan format [{id, text}]
+                // Update Produsen Data options dengan format [{id, text}]
                 window.dispatchEvent(new CustomEvent('tom-update', {
                     detail: {
                         id: 'skpd-select',
@@ -301,7 +301,7 @@ class IndikatorWalidata extends Component
 
     public function saveWalidata(): void
     {
-        if (auth()->user()->hasRole('user')) {
+        if (auth()->user()->hasRole('produsen data')) {
             $this->skpd_id = auth()->user()->skpd_uuid ?? null;
         }
 

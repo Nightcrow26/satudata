@@ -217,8 +217,8 @@
                             <div class="md:col-span-2">
                                 <x-forms.select-tom 
                                     id="skpd-select"
-                                    label="Instansi (SKPD)"
-                                    placeholder="Ketik untuk mencari SKPD..."
+                                    label="Instansi (Produsen Data)"
+                                    placeholder="Ketik untuk mencari Produsen Data..."
                                     model="skpd_id"
                                     :options="$availableSkpds->map(function($skpd) {
                                         return [

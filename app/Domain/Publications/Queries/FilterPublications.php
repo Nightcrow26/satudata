@@ -20,7 +20,7 @@ class FilterPublications
         string $q = '',
         string $sort = 'recent',      // 'recent' | 'oldest' | 'popular' | 'name'
         array $jenis = [],            // Jenis Informasi (aspek)
-        array $instansi = [],         // Instansi (SKPD)
+        array $instansi = [],         // Instansi (Produsen Data)
         array $bidang = [],           // Bidang Urusan (sama dengan aspek)
         int $perPage = 10,
     ): LengthAwarePaginator {

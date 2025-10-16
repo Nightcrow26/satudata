@@ -52,7 +52,7 @@
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
               <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">NIK</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">SKPD</th>   
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Produsen Data</th>   
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
               <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider w-32">Aksi</th>
             </tr>
@@ -221,7 +221,7 @@
                                 <x-forms.select-tom 
                                     id="skpd_uuid"
                                     name="skpd_uuid"
-                                    placeholder="-- Pilih SKPD --"
+                                    placeholder="-- Pilih Produsen Data --"
                                     wire:model.live="skpd_uuid"
                                     :options="$availableSkpds->pluck('nama', 'id')->toArray()"
                                 />

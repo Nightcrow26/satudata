@@ -57,7 +57,7 @@ class FilterDatasets
             });
         }
 
-        // Filter berdasarkan instansi/SKPD
+        // Filter berdasarkan instansi/Produsen Data
         if (!empty($instansi)) {
             $query->whereHas('skpd', function ($builder) use ($instansi) {
                 $builder->whereIn('singkatan', $instansi)

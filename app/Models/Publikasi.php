@@ -72,7 +72,7 @@ class Publikasi extends Model
      */
 
     /**
-     * Dataset belongs to an instansi (SKPD).
+     * Dataset belongs to an instansi (Produsen Data).
      */
     public function skpd(): BelongsTo
     {

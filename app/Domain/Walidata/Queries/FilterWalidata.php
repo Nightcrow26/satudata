@@ -37,7 +37,7 @@ class FilterWalidata
         }
 
         // Query walidata dengan relasi
-        // Hanya ambil data yang memiliki SKPD (skpd_id not null)
+        // Hanya ambil data yang memiliki Produsen Data (skpd_id not null)
         $query = Walidata::with(['aspek', 'skpd', 'bidang', 'indikator', 'user'])
             ->whereNotNull('skpd_id');
         // Tidak perlu filter status karena semua data walidata sudah verified
@@ -61,7 +61,7 @@ class FilterWalidata
             });
         }
 
-        // Filter berdasarkan instansi/SKPD
+        // Filter berdasarkan instansi/Produsen Data
         if (!empty($instansi)) {
             $query->whereHas('skpd', function ($builder) use ($instansi) {
                 $builder->whereIn('singkatan', $instansi)

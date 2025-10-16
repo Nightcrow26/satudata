@@ -110,7 +110,7 @@
                         <x-forms.select-tom 
                             id="skpd_uuid"
                             name="skpd_uuid"
-                            placeholder="-- Pilih SKPD --"
+                            placeholder="-- Pilih Produsen Data --"
                             wire:model.live="skpd_uuid"
                             :options="$availableSkpds->pluck('nama', 'id')->toArray()"
                             :disabled="auth()->user()->id === optional($editingUser)->id"
